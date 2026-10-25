@@ -30,8 +30,8 @@ Merging to `main` deploys automatically (`.github/workflows/deploy.yml`). Manual
 
 1. **Deploy secrets** — in GitHub: Settings → Secrets and variables → Actions, add `DEPLOY_HOST`
    (`root@<server ip>`) and `DEPLOY_SSH_KEY` (a private key authorized on the server).
-2. **PR previews** — in Cloudflare: Workers & Pages → Create → Pages → Connect to Git → this repo.
-   Build command `npm run build`, output directory `dist`, environment variable `NODE_VERSION=22`.
-   Every PR then gets a preview link. (Previews are for the team's review; the real site is in China.)
+2. **PR previews** — on vercel.com: Add New → Project → import this repo → Deploy (settings come from
+   `vercel.json`). Every PR then gets a preview link in a comment. (Previews are for the team's review;
+   the real site is the one in China.)
 3. **Protect `main`** — Settings → Branches → add a rule for `main`: require a pull request and the
    `CI / build` check to pass before merging.
