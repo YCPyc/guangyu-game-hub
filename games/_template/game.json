@@ -1,0 +1,10 @@
+{
+  "title": "游戏名称",
+  "course": "brain-behind-the-bot",
+  "session": 1,
+  "summary": "一两句话：学生在游戏里做什么、能理解什么概念。",
+  "minutes": "15 分钟",
+  "format": "老师投屏，全班一起操作",
+  "concepts": ["概念一", "概念二"],
+  "authors": ["你的名字"]
+}

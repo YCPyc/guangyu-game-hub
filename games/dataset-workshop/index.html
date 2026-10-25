@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据集工坊 · 光语 AI 课堂游戏</title>
+<style>
+:root {
+  /* 光语课堂游戏共享配色（见 games/_template） */
+  --bg: #faf8f3; --card: #ffffff; --ink: #1f2937; --muted: #5f6b7a; --line: #e6e1d6;
+  --brand: #1f7a68; --brand-ink: #165a4d; --brand-soft: #e3f1ec; --accent: #e8a33a; --accent-soft: #fdf1dc;
+  --ok: #2f9e44; --bad: #d64545; --radius: 14px;
+}
+* { box-sizing: border-box; }
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+header.top { background: var(--card); border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--brand); }
+.brand { display: flex; align-items: baseline; gap: 12px; flex: 1 1 280px; min-width: 0; flex-wrap: wrap; }
+.brand h1 { margin: 0; font-size: 1.6rem; }
+.brand .tag { font-size: .8rem; color: var(--muted); }
+.top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { border: 2px solid transparent; border-radius: 14px; padding: 10px 20px; font-weight: 700; background: var(--brand); color: #fff; min-height: 52px; transition: transform .08s, background .15s; }
+.btn:hover { background: var(--brand-ink); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.ghost { background: var(--card); color: var(--brand-ink); border-color: var(--brand); }
+.btn.ghost:hover { background: var(--brand-soft); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.accent:hover { background: #d8922a; }
+.btn.small { min-height: 42px; padding: 6px 14px; font-size: .9rem; }
+.btn.big { font-size: 1.2rem; min-height: 64px; padding: 12px 28px; }
+.stepper { display: flex; gap: 8px; padding: 0 0 12px; }
+.step-btn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; justify-content: center; border: 2px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.step-btn .n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); flex: none; }
+.step-btn.active { border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); }
+.step-btn.active .n { background: var(--brand); color: #fff; }
+.step-btn.done .n { background: var(--ok); color: #fff; }
+.step-btn:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 640px) {
+  header.top { position: static; }
+  html { font-size: 17px; }
+  .brand h1 { font-size: 1.3rem; } .brand .tag { display: none; }
+  .step-btn { gap: 4px; padding: 4px 8px; font-size: .85rem; } .step-btn .n { width: 24px; height: 24px; }
+}
+
+main { padding: 20px 0 80px; }
+h2 { font-size: 1.5rem; margin: 8px 0 4px; }
+.lead { color: var(--muted); margin: 0 0 16px; }
+.card { background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 第 1 步：清洗 */
+.status { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: space-between; margin-bottom: 16px; }
+.meter { flex: 1; min-width: 220px; }
+.meter .bar { height: 18px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.meter .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--ok), #69db7c); transition: width .3s; }
+.meter .txt { font-weight: 800; font-size: 1.2rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.legend span { border-radius: 999px; padding: 4px 12px; font-weight: 700; font-size: .9rem; background: #fff; border: 2px solid var(--line); }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.src { display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--muted); margin-bottom: 8px; font-size: .95rem; }
+.src .emoji { font-size: 1.5rem; }
+.text { font-size: 1.45rem; line-height: 1.9; }
+.seg { cursor: pointer; border-radius: 8px; padding: 2px 2px; transition: background .15s; }
+.seg:hover { background: var(--accent-soft); }
+.seg.removed { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--bad); color: #b8b8c4; cursor: default; background: none; }
+.seg .label { display: inline-block; text-decoration: none; font-size: .75rem; font-weight: 800; color: #fff; background: var(--bad); border-radius: 6px; padding: 0 6px; margin: 0 4px; vertical-align: middle; line-height: 1.6; }
+.seg.flash { animation: flash .9s ease-in-out 2; }
+@keyframes flash { 50% { background: #ffe066; } }
+.seg.shake { animation: shake .4s; background: #e6fcf5; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.seg.shake { display: inline-block; }
+.card.clean { border-color: var(--ok); }
+.card .done-badge { color: var(--ok); font-weight: 800; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 14px; font-weight: 700; z-index: 60; max-width: calc(100% - 32px); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+.celebrate { background: #ebfbee; border: 3px solid var(--ok); border-radius: var(--radius); padding: 16px 20px; margin: 16px 0; }
+.celebrate b { font-size: 1.4rem; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.stat { background: #fff; border-radius: 12px; padding: 6px 14px; font-weight: 700; }
+
+/* 第 2 步：选文本 */
+.pick { text-align: left; cursor: pointer; width: 100%; }
+.pick:hover { border-color: var(--brand); }
+.pick.selected { border-color: var(--brand); outline: 4px solid var(--brand-soft); }
+
+/* 第 3 步：切词元 */
+.sentence-big { font-size: 2rem; font-weight: 800; background: var(--card); border: 3px dashed var(--line); border-radius: var(--radius); padding: 14px 20px; overflow-wrap: anywhere; }
+.options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+@media (max-width: 860px) { .options { grid-template-columns: minmax(0, 1fr); } }
+.opt { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 10px; }
+.opt:hover { border-color: var(--brand); }
+.opt.selected { border-color: var(--accent); outline: 4px solid var(--accent-soft); }
+.opt .name { font-weight: 900; font-size: 1.3rem; }
+.opt .letter { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; margin-right: 8px; }
+.toks { display: flex; flex-wrap: wrap; gap: 6px; }
+.tok { background: var(--brand-soft); border: 2px solid #c5c6f5; border-radius: 10px; padding: 2px 10px; font-size: 1.35rem; font-weight: 700; }
+.tok.punct { background: #f1f3f5; border-color: #dee2e6; color: var(--muted); }
+.verdict { border-radius: 12px; padding: 10px 14px; font-size: 1rem; }
+.verdict.good { background: #ebfbee; border: 2px solid var(--ok); }
+.verdict.meh { background: #fff9db; border: 2px solid #f59f00; }
+.verdict.bad { background: #fff0f0; border: 2px solid var(--bad); }
+.count { font-weight: 800; color: var(--brand-ink); }
+.diy { margin-top: 20px; }
+.diy-line { display: flex; flex-wrap: wrap; align-items: center; font-size: 2rem; font-weight: 800; row-gap: 10px; }
+.diy-ch { padding: 0 2px; }
+.cut { width: 22px; height: 48px; border: 0; background: none; position: relative; padding: 0; }
+.cut::after { content: ""; position: absolute; left: 50%; top: 6px; bottom: 6px; width: 3px; transform: translateX(-50%); background: var(--line); border-radius: 2px; }
+.cut:hover::after { background: var(--accent); }
+.cut.on::after { background: var(--bad); width: 5px; }
+.ids { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.id-chip { display: flex; flex-direction: column; align-items: center; background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 4px 10px; min-width: 64px; }
+.id-chip b { font-size: 1.3rem; }
+.id-chip span { font-family: ui-monospace, Menlo, monospace; color: var(--brand-ink); font-weight: 800; font-size: 1.1rem; }
+.discuss { margin-top: 20px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.2rem; font-weight: 700; }
+.discuss span { color: #ffd2a8; }
+.nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(20,22,45,.55); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 22px; max-width: 760px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.modal ol li, .modal ul li { margin: 6px 0; }
+.form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .form-grid { grid-template-columns: minmax(0, 1fr); } }
+.form-grid label { font-weight: 700; font-size: .9rem; display: flex; flex-direction: column; gap: 6px; }
+input[type=text], input[type=number], input[type=date] { border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+.export-preview { max-width: 100%; border: 2px solid var(--line); border-radius: 12px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="brand">
+        <h1>数据集工坊</h1>
+        <span class="tag">光语 AI 课堂游戏 · 聊天机器人背后的大脑 · 第 1 课</span>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost small" id="btn-export">📤 导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">📘 老师说明</button>
+      </div>
+    </div>
+    <nav class="stepper" id="stepper"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<div class="toast" id="toast" hidden></div>
+
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>📘 老师说明</h2><button class="btn ghost small" data-close>关闭</button></div>
+    <p>本游戏配套第 1 课《聊天机器人怎么运作》中的“数据集”和“词元”。学生亲手体验 AI 公司准备训练数据的两个步骤：<b>清洗数据</b>和<b>切分词元</b>。建议总时长约 20–25 分钟。</p>
+    <ol>
+      <li><b>清洗数据（约 10 分钟）</b>：屏幕上是从不同渠道收集来的文字。请学生轮流上台（或举手指出），点击其中“不该进入数据集”的内容：广告、个人隐私、不文明用语、乱码、错误信息、重复内容。点错了不扣分，可以借机讨论“为什么这句可以留下”。找不到时点“提示”。</li>
+      <li><b>选一段文本（约 2 分钟）</b>：从清洗好的文本里选一段大家喜欢的。</li>
+      <li><b>切分词元（约 10 分钟）</b>：AI 读文字前要先把句子切成一小块一小块的“词元”。展示四种切法，请全班举手投票“哪种切法最好”，点选全班的选择，再点“揭晓分析”。也可以用“自己动手切”让学生上台切一切。最后看看词元是怎样变成数字的。</li>
+    </ol>
+    <p><b>讨论建议</b>：如果数据没有清洗干净，AI 会学到什么？真正的 AI 要处理几十亿句话，靠人工一句句清洗做得到吗？</p>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。文本中的电话号码、地址、网址都是虚构的。</p>
+  </div>
+</div>
+
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>📤 导出本节课结果</h2><button class="btn ghost small" data-close>关闭</button></div>
+    <div class="form-grid">
+      <label>班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label>参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label>
+      <label>日期<input type="date" id="ex-date"></label>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="btn-ex-png">🖼 下载结果图片 (PNG)</button>
+      <button class="btn ghost" id="btn-ex-csv">📄 下载原始数据 (CSV)</button>
+    </div>
+    <p class="hint">如果没有自动下载（例如在微信里），请长按下面的图片保存。</p>
+    <img id="ex-preview" class="export-preview" alt="导出预览" hidden>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================ 内容 */
+// 不该进入数据集的内容类型
+const KINDS = {
+  ad:      { name: "广告", tip: "广告不是自然的语言，会让 AI 学会推销东西。" },
+  privacy: { name: "个人隐私", tip: "电话、地址等个人信息不能拿去训练 AI，要保护隐私。" },
+  rude:    { name: "不文明用语", tip: "骂人的话会让 AI 也学会不礼貌。" },
+  junk:    { name: "乱码 / 网页代码", tip: "乱码和网页代码不是人说的话，对学语言没有帮助。" },
+  fake:    { name: "错误信息", tip: "错误的知识会让 AI 一本正经地胡说八道。" },
+  dup:     { name: "重复内容", tip: "重复的内容会让 AI 以为这句话特别重要。" },
+};
+// 每张卡片：来源 + 片段。片段是 [文字] 或 [文字, 类型]（有类型的就是要清洗掉的）。
+// words：清洗后文本的“按词切”结果（拼起来必须等于清洗后的文本）。
+// 所有电话、地址、网址、微信号均为虚构。
+const CARDS = [
+  { src: "网络论坛", emoji: "💬",
+    segs: [["周末我和同学去爬山，"], ["【点击领取新人红包 >>> www.hongbao-xx.com】", "ad"], ["山顶的风景特别美。"], ["下次还想再去。"]],
+    words: "周末 我 和 同学 去 爬山 ， 山顶 的 风景 特别 美 。 下次 还 想 再 去 。" },
+  { src: "新闻网站", emoji: "📰",
+    segs: [["本市今年新建了三座图书馆，"], ["<div class=\"ad-box\">", "junk"], ["方便市民借书阅读。"], ["&nbsp;&nbsp;&nbsp;", "junk"]],
+    words: "本市 今年 新建 了 三座 图书馆 ， 方便 市民 借书 阅读 。" },
+  { src: "社交媒体", emoji: "📱",
+    segs: [["今天学会了做番茄炒蛋，"], ["我家住在幸福路 18 号 3 单元，", "privacy"], ["妈妈说味道很不错！"], ["有事打我电话 138 0000 1234", "privacy"]],
+    words: "今天 学会 了 做 番茄 炒蛋 ， 妈妈 说 味道 很 不错 ！" },
+  { src: "网络百科", emoji: "📚",
+    segs: [["大熊猫主要吃竹子，"], ["大熊猫其实是一种大型鸟类，", "fake"], ["生活在中国的山林里。"]],
+    words: "大熊猫 主要 吃 竹子 ， 生活 在 中国 的 山林 里 。" },
+  { src: "视频评论", emoji: "🎬",
+    segs: [["这个实验视频讲得很清楚，"], ["看不懂的人都是傻瓜，", "rude"], ["我学会了怎么做小火山。"], ["我学会了怎么做小火山。", "dup"]],
+    words: "这个 实验 视频 讲 得 很 清楚 ， 我 学会 了 怎么 做 小 火山 。" },
+  { src: "电子书", emoji: "📖",
+    segs: [["从前有一只勇敢的小狐狸，"], ["锟斤拷烫烫烫▯▯▯", "junk"], ["它决定去森林深处寻找宝藏。"]],
+    words: "从前 有 一只 勇敢 的 小狐狸 ， 它 决定 去 森林 深处 寻找 宝藏 。" },
+  { src: "购物网站评价", emoji: "🛒",
+    segs: [["这双运动鞋穿起来很舒服，"], ["加微信 xie-123 买更便宜！", "ad"], ["跑步的时候也不累脚。"]],
+    words: "这双 运动鞋 穿 起来 很 舒服 ， 跑步 的 时候 也 不 累 脚 。" },
+  { src: "学习论坛", emoji: "✏️",
+    segs: [["数学其实没有那么可怕，"], ["闭嘴吧你，什么都不懂！", "rude"], ["多练习就会越来越熟练。"], ["太阳每天从西边升起。", "fake"]],
+    words: "数学 其实 没有 那么 可怕 ， 多 练习 就 会 越来越 熟练 。" },
+];
+
+/* ============================================================ 工具函数 */
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k === "style") e.style.cssText = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const PUNCT = /^[，。！？、；：,.!?;:\s]+$/;
+const isPunct = (t) => PUNCT.test(t);
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2400);
+}
+const cleanText = (c) => c.segs.filter((s) => !s[1]).map((s) => s[0]).join("");
+
+/* ============================================================ 状态 */
+const S = { step: 1, removed: new Set(), mistakes: 0, picked: null, choice: null, revealed: false, cuts: new Set() };
+const BAD = []; // [cardIndex, segIndex]
+CARDS.forEach((c, ci) => c.segs.forEach((s, si) => { if (s[1]) BAD.push(`${ci}-${si}`); }));
+const allClean = () => S.removed.size === BAD.length;
+
+/* ============================================================ 导航 */
+const STEPS = ["清洗数据", "选一段文本", "切分词元"];
+function canGo(n) { return n === 1 || (n === 2 && allClean()) || (n === 3 && allClean() && S.picked != null); }
+function renderStepper() {
+  $("#stepper").replaceChildren(...STEPS.map((name, i) => {
+    const n = i + 1;
+    return el("button", { class: "step-btn" + (S.step === n ? " active" : n < S.step ? " done" : ""), disabled: !canGo(n), onclick: () => go(n) },
+      el("span", { class: "n" }, n < S.step ? "✓" : n), name);
+  }));
+}
+function go(n) {
+  if (!canGo(n)) return;
+  S.step = n;
+  renderStepper();
+  ({ 1: renderClean, 2: renderPick, 3: renderTokens })[n]();
+  window.scrollTo({ top: 0 });
+}
+const navRow = (prev, next) => el("div", { class: "nav-row" }, prev || el("span"), next || el("span"));
+
+/* ============================================================ 第 1 步：清洗数据 */
+function renderClean() {
+  const found = S.removed.size, total = BAD.length;
+  const counts = {};
+  for (const key of S.removed) { const [ci, si] = key.split("-").map(Number); const k = CARDS[ci].segs[si][1]; counts[k] = (counts[k] || 0) + 1; }
+  const kids = [
+    el("h2", {}, "第 1 步：清洗数据"),
+    el("p", { class: "lead" }, "这些文字是从不同渠道收集来的“原始数据”。在拿去训练 AI 之前，要先把不该留下的内容找出来、删掉。点击你觉得不好的部分！"),
+    el("div", { class: "legend" }, el("b", { style: "align-self:center" }, "要删掉的有："), Object.values(KINDS).map((k) => el("span", {}, k.name))),
+    el("div", { class: "status" },
+      el("div", { class: "meter" },
+        el("div", { class: "txt" }, `已清洗 ${found} / ${total} 处`, S.mistakes ? el("span", { class: "hint", style: "font-weight:400;margin-left:12px" }, `（误点了 ${S.mistakes} 次好内容）`) : null),
+        el("div", { class: "bar" }, el("div", { style: `width:${(found / total) * 100}%` }))),
+      el("button", { class: "btn ghost small", disabled: allClean(), onclick: hint }, "💡 提示")),
+  ];
+  if (allClean()) {
+    kids.push(el("div", { class: "celebrate" }, el("b", {}, "🎉 数据清洗完成！"), " 我们一共删掉了：",
+      el("div", { class: "stats" }, Object.entries(counts).map(([k, n]) => el("span", { class: "stat" }, `${KINDS[k].name} × ${n}`)))));
+  }
+  kids.push(el("div", { class: "cards" }, CARDS.map((c, ci) => {
+    const left = c.segs.filter((s, si) => s[1] && !S.removed.has(`${ci}-${si}`)).length;
+    return el("div", { class: "card" + (left === 0 ? " clean" : "") },
+      el("div", { class: "src" }, el("span", { class: "emoji" }, c.emoji), c.src, left === 0 ? el("span", { class: "done-badge" }, "  ✓ 已清洗") : null),
+      el("div", { class: "text" }, c.segs.map((s, si) => {
+        const key = `${ci}-${si}`, gone = S.removed.has(key);
+        return el("span", { class: "seg" + (gone ? " removed" : ""), "data-key": key, onclick: (e) => clickSeg(e.currentTarget, ci, si) },
+          s[0], gone ? el("span", { class: "label" }, KINDS[s[1]].name) : null);
+      })));
+  })));
+  kids.push(navRow(null, el("button", { class: "btn big", disabled: !allClean(), onclick: () => go(2) }, allClean() ? "下一步：选一段文本 →" : `还有 ${total - found} 处没清洗`)));
+  $("#main").replaceChildren(...kids);
+}
+function clickSeg(node, ci, si) {
+  const key = `${ci}-${si}`, kind = CARDS[ci].segs[si][1];
+  if (S.removed.has(key)) return;
+  if (!kind) {
+    S.mistakes++;
+    node.classList.remove("shake"); void node.offsetWidth; node.classList.add("shake");
+    toast("👍 这句是有用的正常内容，可以留下来！");
+    return;
+  }
+  S.removed.add(key);
+  toast(`✅ 找到了：${KINDS[kind].name}。${KINDS[kind].tip}`);
+  renderClean();
+  renderStepper();
+}
+function hint() {
+  const key = BAD.find((k) => !S.removed.has(k));
+  const node = document.querySelector(`.seg[data-key="${key}"]`);
+  if (!node) return;
+  node.scrollIntoView({ behavior: "smooth", block: "center" });
+  node.classList.remove("flash"); void node.offsetWidth; node.classList.add("flash");
+}
+
+/* ============================================================ 第 2 步：选文本 */
+function renderPick() {
+  $("#main").replaceChildren(
+    el("h2", {}, "第 2 步：选一段文本"),
+    el("p", { class: "lead" }, "数据干净了！选一段大家喜欢的文本，下一步我们把它切成“词元”。"),
+    el("div", { class: "cards" }, CARDS.map((c, ci) => el("button", { class: "card pick" + (S.picked === ci ? " selected" : ""), onclick: () => { S.picked = ci; S.choice = null; S.revealed = false; S.cuts = new Set(); renderPick(); renderStepper(); } },
+      el("div", { class: "src" }, el("span", { class: "emoji" }, c.emoji), c.src, S.picked === ci ? el("span", { class: "done-badge" }, "  ✓ 已选择") : null),
+      el("div", { class: "text" }, cleanText(c))))),
+    navRow(el("button", { class: "btn ghost", onclick: () => go(1) }, "← 上一步"),
+      el("button", { class: "btn big", disabled: S.picked == null, onclick: () => go(3) }, "下一步：切分词元 →")));
+}
+
+/* ============================================================ 第 3 步：切分词元 */
+function options(c) {
+  const text = cleanText(c), chars = [...text];
+  const byWord = c.words.split(" ");
+  // “每三个字切一刀”不管词语边界；从几种起点里挑切断词语最多的一种，让问题更明显
+  const boundaries = new Set();
+  let pos = 0;
+  for (const w of byWord) { pos += [...w].length; boundaries.add(pos); }
+  let every3 = [], worst = -1;
+  for (const first of [3, 2, 1]) {
+    const chunks = [], cuts = [];
+    for (let i = 0; i < chars.length; ) { const n = chunks.length ? 3 : first; chunks.push(chars.slice(i, i + n).join("")); i += n; cuts.push(i); }
+    const broken = cuts.filter((c) => c < chars.length && !boundaries.has(c)).length;
+    if (broken > worst) { worst = broken; every3 = chunks; }
+  }
+  const byComma = text.match(/[^，。！？]+[，。！？]?/g) || [text];
+  return [
+    { id: "char", name: "一个字一个字切", toks: chars, level: "meh",
+      why: "可以用，但词元太多了，而且“熊”和“猫”被分开，AI 要自己再去学它们是一个词。" },
+    { id: "word", name: "按词语切", toks: byWord, level: "good",
+      why: "最合理！每个词元都有意思，数量也不多。真正的 AI 也会把常用词当成一个词元。" },
+    { id: "three", name: "每三个字切一刀", toks: every3, level: "bad",
+      why: "不太好：很多词被从中间切断，切出来的块没有意义，AI 很难学到规律。" },
+    { id: "comma", name: "按逗号切成大块", toks: byComma, level: "bad",
+      why: "块太大了：每一块几乎都不会在别的句子里再出现，AI 没法“举一反三”。" },
+  ];
+}
+const LEVEL = { good: "✅ 好切法", meh: "🤔 能用，但不是最好", bad: "❌ 不太好" };
+const tokView = (toks) => el("div", { class: "toks" }, toks.map((t) => el("span", { class: "tok" + (isPunct(t) ? " punct" : "") }, t)));
+
+function renderTokens() {
+  const c = CARDS[S.picked], text = cleanText(c), opts = options(c);
+  const kids = [
+    el("h2", {}, "第 3 步：切分词元"),
+    el("p", { class: "lead" }, "AI 读文字之前，要先把句子切成一小块一小块，每一块叫一个“词元”。下面是四种切法——全班投票：哪种切法最好？"),
+    el("div", { class: "sentence-big" }, text),
+    el("div", { class: "options" }, opts.map((o, i) => el("button", { class: "card opt" + (S.choice === o.id ? " selected" : ""), onclick: () => { S.choice = o.id; renderTokens(); } },
+      el("div", { class: "name" }, el("span", { class: "letter" }, "ABCD"[i]), o.name),
+      tokView(o.toks),
+      el("div", { class: "count" }, `一共 ${o.toks.length} 个词元`),
+      S.revealed ? el("div", { class: "verdict " + o.level }, el("b", {}, LEVEL[o.level]), "：", o.why) : null))),
+    el("div", { class: "row", style: "margin-top:16px" },
+      S.revealed ? null : el("button", { class: "btn big accent", disabled: !S.choice, onclick: () => { S.revealed = true; renderTokens(); } }, S.choice ? "🎉 揭晓分析" : "先点选全班选择的切法"),
+      S.revealed && S.choice ? el("p", { style: "margin:0;font-size:1.2rem" }, "全班选择了：", el("b", {}, opts.find((o) => o.id === S.choice).name), S.choice === "word" ? " —— 和 AI 的想法一样！" : "") : null),
+  ];
+  if (S.revealed) {
+    kids.push(diy(text), idsView(c.words.split(" ")),
+      el("div", { class: "discuss" }, "💬 讨论：", el("span", {}, "如果数据没有清洗干净，AI 会学到什么？真正的 AI 要处理几十亿句话，靠人工一句句清洗做得到吗？")));
+  }
+  kids.push(navRow(el("button", { class: "btn ghost", onclick: () => go(2) }, "← 换一段文本"),
+    S.revealed ? el("button", { class: "btn", onclick: openExport }, "📤 导出本节课结果") : null));
+  $("#main").replaceChildren(...kids);
+}
+
+// 自己动手切：点击两个字之间的竖线切一刀
+function diy(text) {
+  const chars = [...text];
+  const toks = [];
+  let cur = "";
+  chars.forEach((ch, i) => { cur += ch; if (S.cuts.has(i) || i === chars.length - 1) { toks.push(cur); cur = ""; } });
+  const line = el("div", { class: "diy-line" });
+  chars.forEach((ch, i) => {
+    line.append(el("span", { class: "diy-ch" }, ch));
+    if (i < chars.length - 1) line.append(el("button", { class: "cut" + (S.cuts.has(i) ? " on" : ""), title: "在这里切一刀", "aria-label": `在第 ${i + 1} 个字后切`, onclick: () => { S.cuts.has(i) ? S.cuts.delete(i) : S.cuts.add(i); renderTokens(); } }));
+  });
+  return el("div", { class: "card diy" },
+    el("h2", { style: "margin-top:0" }, "✂️ 自己动手切"),
+    el("p", { class: "hint" }, "点击两个字之间的竖线，就在那里切一刀；再点一次取消。"),
+    line,
+    el("div", { class: "row", style: "margin-top:12px" }, el("span", { class: "count" }, `你切出了 ${toks.length} 个词元：`)),
+    tokView(toks),
+    el("div", { class: "row", style: "margin-top:12px" }, el("button", { class: "btn ghost small", onclick: () => { S.cuts = new Set(); renderTokens(); } }, "清空")));
+}
+
+// 词元变数字：AI 其实只认识数字。用一个固定的“词表编号”把每个词元换成数字。
+function tokenId(t) { let h = 7; for (const ch of t) h = (h * 31 + ch.codePointAt(0)) % 50000; return h; }
+function idsView(toks) {
+  return el("div", { class: "card", style: "margin-top:20px" },
+    el("h2", { style: "margin-top:0" }, "🔢 词元变成数字"),
+    el("p", { class: "hint" }, "AI 其实不认识字，只认识数字。每个词元在“词表”里都有一个编号，AI 看到的句子其实是一串数字："),
+    el("div", { class: "ids" }, toks.map((t) => el("div", { class: "id-chip" }, el("b", {}, t), el("span", {}, tokenId(t))))));
+}
+
+/* ============================================================ 导出 */
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+function openExport() { $("#ex-date").value = $("#ex-date").value || today(); $("#ex-preview").hidden = true; $("#export-modal").hidden = false; }
+const exMeta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: $("#ex-date").value || today() });
+const fileBase = (m) => `数据集工坊_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+function removedCounts() {
+  const counts = {};
+  for (const key of S.removed) { const [ci, si] = key.split("-").map(Number); const k = CARDS[ci].segs[si][1]; counts[k] = (counts[k] || 0) + 1; }
+  return counts;
+}
+function wrapText(ctx, text, maxW) {
+  const lines = []; let line = "";
+  for (const ch of [...text]) { if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else line += ch; }
+  if (line) lines.push(line);
+  return lines;
+}
+function drawPNG() {
+  const m = exMeta(), W = 1600, P = 70, FONT = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  const c = document.createElement("canvas"), ctx = c.getContext("2d");
+  const counts = removedCounts();
+  const card = S.picked != null ? CARDS[S.picked] : null;
+  const opt = card && S.choice ? options(card).find((o) => o.id === S.choice) : null;
+  const plan = (draw) => {
+    let y = 30;
+    const text = (t, size, color, weight = 400) => {
+      ctx.font = `${weight} ${size}px ${FONT}`;
+      for (const l of wrapText(ctx, t, W - 2 * P)) { y += size * 1.45; if (draw) { ctx.fillStyle = color; ctx.fillText(l, P, y - size * 0.32); } }
+    };
+    text("数据集工坊 · 课堂结果", 56, "#1f2340", 800);
+    text(`聊天机器人背后的大脑 · 第 1 课　|　${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 30, "#5b6080");
+    y += 20;
+    text(`🧹 我们清洗了 ${CARDS.length} 条原始数据，删掉了 ${S.removed.size} 处不好的内容`, 38, "#1f7a68", 800);
+    text(Object.entries(counts).map(([k, n]) => `${KINDS[k].name} × ${n}`).join("　　") || "（还没有开始清洗）", 32, "#1f2340");
+    if (card) {
+      y += 20;
+      text("✂️ 我们切分词元的句子", 38, "#1f7a68", 800);
+      text(cleanText(card), 34, "#1f2340");
+      if (opt) {
+        text(`全班选择的切法：${opt.name}（${opt.toks.length} 个词元）`, 32, "#1f2340", 700);
+        text(opt.toks.join(" | "), 30, "#5b6080");
+      }
+    }
+    y += 40;
+    text("光语 × 铺路石 · AI 素养课堂", 26, "#5b6080");
+    return y + 30;
+  };
+  c.width = W; c.height = 10;
+  const H = Math.ceil(plan(false));
+  c.width = W; c.height = H;
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, W, 16);
+  plan(true);
+  return c;
+}
+$("#btn-ex-png").onclick = () => {
+  const c = drawPNG(), img = $("#ex-preview");
+  img.src = c.toDataURL("image/png"); img.hidden = false;
+  c.toBlob((b) => b && downloadBlob(b, fileBase(exMeta()) + ".png"), "image/png");
+};
+function csvCell(v) { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
+$("#btn-ex-csv").onclick = () => {
+  const m = exMeta(), rows = [["日期", "班级", "参与人数", "环节", "项目", "结果"]];
+  const counts = removedCounts();
+  for (const k of Object.keys(KINDS)) rows.push([m.date, m.cls, m.count, "清洗数据", KINDS[k].name, counts[k] || 0]);
+  rows.push([m.date, m.cls, m.count, "清洗数据", "误点好内容次数", S.mistakes]);
+  if (S.picked != null) {
+    const card = CARDS[S.picked];
+    rows.push([m.date, m.cls, m.count, "选文本", card.src, cleanText(card)]);
+    const opt = S.choice && options(card).find((o) => o.id === S.choice);
+    if (opt) rows.push([m.date, m.cls, m.count, "切分词元", `全班选择：${opt.name}`, opt.toks.join(" | ")]);
+  }
+  const csv = "﻿" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+  downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
+};
+
+/* ============================================================ 弹窗 */
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => { if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true; }));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = openExport;
+
+go(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <!-- 一叠文字卡片 → 被删掉的坏内容 → 切成小块的词元 -->
+  <rect width="320" height="180" fill="#dcefe9"/>
+  <rect x="30" y="44" width="100" height="70" rx="10" fill="#ffffff" opacity="0.7" transform="rotate(-6 80 90)"/>
+  <rect x="36" y="52" width="100" height="76" rx="10" fill="#ffffff"/>
+  <rect x="48" y="66" width="68" height="6" rx="3" fill="#1f7a68" opacity="0.8"/>
+  <rect x="48" y="80" width="54" height="6" rx="3" fill="#d9534f" opacity="0.75"/>
+  <line x1="44" y1="83" x2="108" y2="83" stroke="#d9534f" stroke-width="2.5"/>
+  <rect x="48" y="94" width="76" height="6" rx="3" fill="#1f7a68" opacity="0.8"/>
+  <rect x="48" y="108" width="40" height="6" rx="3" fill="#1f7a68" opacity="0.4"/>
+  <path d="M150 90 h34" stroke="#1f7a68" stroke-width="4" stroke-linecap="round"/>
+  <path d="M178 80 l12 10 l-12 10" fill="none" stroke="#1f7a68" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="206" y="58" width="26" height="26" rx="7" fill="#1f7a68" opacity="0.9"/>
+  <rect x="238" y="58" width="26" height="26" rx="7" fill="#ffffff"/>
+  <rect x="270" y="58" width="26" height="26" rx="7" fill="#f2b84b"/>
+  <rect x="206" y="92" width="26" height="26" rx="7" fill="#ffffff"/>
+  <rect x="238" y="92" width="26" height="26" rx="7" fill="#1f7a68" opacity="0.9"/>
+  <rect x="270" y="92" width="26" height="26" rx="7" fill="#ffffff"/>
+  <rect x="206" y="126" width="90" height="6" rx="3" fill="#1f7a68" opacity="0.3"/>
+</svg>

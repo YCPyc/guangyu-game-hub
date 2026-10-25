@@ -1,0 +1,11 @@
+{
+  "title": "数据集工坊",
+  "course": "brain-behind-the-bot",
+  "session": 1,
+  "summary": "亲手为 AI 准备训练数据：先从论坛、新闻、评论等各种来源的文字里删掉广告、隐私和不文明用语，再比较几种把句子切成“词元”的方法。",
+  "minutes": "20–25 分钟",
+  "format": "老师投屏，全班一起操作",
+  "concepts": ["数据集", "数据清洗", "词元"],
+  "authors": ["光语"],
+  "cover": "cover.svg"
+}

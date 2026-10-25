@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- TODO: 改成你的游戏名 -->
+<title>游戏名称 · 光语课堂游戏</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* 顶栏：返回游戏大厅 + 游戏名 + 老师说明 */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 按钮：主按钮（实色）、次按钮（描边） */
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+
+/* 步骤条 */
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; }    /* 关键内容 ≥ 32px */
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 示例：举手计票器 */
+.counter { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; max-width: 320px; }
+.counter button { height: 56px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 1.6rem; font-weight: 700; }
+.counter output { text-align: center; font-size: 2.4rem; font-weight: 800; }
+
+/* 讨论问题条（深色，放在每个环节的结尾） */
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+
+/* 弹窗（老师说明、导出） */
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+
+/* 手机：375px 宽时不能出现横向滚动 */
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <!-- TODO: 改成你的课程 id（见 src/data/courses.json） -->
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title">
+        <!-- TODO: 游戏名 + 对应课程和第几节 -->
+        <h1>游戏名称</h1>
+        <p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 1 节</p>
+      </div>
+      <div class="actions">
+        <button class="btn outline small" id="btn-export">导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">老师说明</button>
+      </div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<!-- 老师说明：课堂流程 + 每个环节的建议时长 -->
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    <!-- TODO: 写清楚这个游戏配合哪节课、要让学生理解什么、课堂怎么组织 -->
+    <p>本游戏配套第 1 节《……》，帮助学生理解……。建议总时长约 15 分钟。</p>
+    <ol>
+      <li><b>第 1 步（约 5 分钟）</b>：……</li>
+      <li><b>第 2 步（约 10 分钟）</b>：……</li>
+    </ol>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。</p>
+  </div>
+</div>
+
+<!-- 导出：PNG 图片（成果展示）+ CSV（原始数据），用于给资助方的成效报告 -->
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button>
+      <button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================================================================== 工具函数 */
+const $ = (s) => document.querySelector(s);
+// 创建元素：el("div", { class: "card", onclick: fn }, "文字", 子元素)
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+// localStorage 只能当作可选的便利功能：读写都要包 try/catch
+const store = {
+  get(k) { try { return localStorage.getItem("guangyu-TODO-slug:" + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("guangyu-TODO-slug:" + k, v); } catch { /* 没有存储也要能正常用 */ } },
+};
+
+/* ===================================================================== 状态 + 步骤 */
+// TODO: 换成你的游戏环节
+const STEPS = ["介绍", "全班投票"];
+const S = { step: 0, votes: 0 };
+
+function render() {
+  $("#steps").replaceChildren(...STEPS.map((name, i) =>
+    el("button", { class: "step" + (i === S.step ? " active" : ""), onclick: () => { S.step = i; render(); } },
+      el("span", { class: "n" }, i + 1), name)));
+  $("#main").replaceChildren(...[stepIntro, stepVote][S.step]());
+}
+
+function stepIntro() {
+  return [
+    el("h2", {}, "第 1 步：介绍"),
+    el("p", { class: "lead" }, "用一两句话告诉同学们这个环节要做什么。"),
+    el("div", { class: "card" }, el("p", { class: "big-answer" }, "关键内容用大字号")),
+    el("div", { class: "row", style: "margin-top:20px" }, el("button", { class: "btn big", onclick: () => { S.step = 1; render(); } }, "下一步 →")),
+  ];
+}
+
+function stepVote() {
+  const counter = el("div", { class: "counter" },
+    el("button", { onclick: () => { S.votes = Math.max(0, S.votes - 1); render(); }, "aria-label": "减一" }, "－"),
+    el("output", {}, S.votes),
+    el("button", { onclick: () => { S.votes++; render(); }, "aria-label": "加一" }, "＋"));
+  return [
+    el("h2", {}, "第 2 步：全班投票"),
+    el("p", { class: "lead" }, "老师数举手人数，用 ＋/－ 录入。"),
+    el("div", { class: "card" }, counter),
+    el("div", { class: "discuss" }, "讨论：", el("span", {}, "在这里放一个引导学生思考的问题。")),
+  ];
+}
+
+/* ===================================================================== 导出 */
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const fileBase = (m) => `游戏名称_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+
+$("#btn-ex-png").onclick = () => {
+  // 用 canvas 画一张结果图，不依赖任何外部库
+  const m = meta(), c = document.createElement("canvas");
+  c.width = 1600; c.height = 600;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 56px ${font}`; ctx.fillText("游戏名称 · 课堂结果", 70, 120);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 30px ${font}`; ctx.fillText(`${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 70, 180);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 40px ${font}`; ctx.fillText(`全班票数：${S.votes}`, 70, 300);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 26px ${font}`; ctx.fillText("光语 × 铺路石 · AI 素养课堂", 70, 540);
+  c.toBlob((b) => b && download(b, fileBase(m) + ".png"), "image/png");
+};
+$("#btn-ex-csv").onclick = () => {
+  const m = meta();
+  const rows = [["日期", "班级", "参与人数", "票数"], [m.date, m.cls, m.count, S.votes]];
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
+};
+
+/* ===================================================================== 弹窗 */
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => {
+  if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true;
+}));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#export-modal").hidden = false; };
+
+render();
+</script>
+</body>
+</html>

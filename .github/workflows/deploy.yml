@@ -1,0 +1,36 @@
+name: Deploy
+
+# Every merge to main deploys the site to the Alibaba Cloud server.
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   DEPLOY_HOST     e.g. root@<server ip>
+#   DEPLOY_SSH_KEY  private key whose public key is in the server's ~/.ssh/authorized_keys
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Set up SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${DEPLOY_HOST#*@}" >> ~/.ssh/known_hosts
+      - name: Build and deploy
+        run: ./deploy.sh "${{ secrets.DEPLOY_HOST }}"

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "brain-behind-the-bot",
+    "title": "聊天机器人背后的大脑",
+    "titleEn": "The Brain Behind the Bot",
+    "source": "MIT Day of AI",
+    "grades": "小学高年级 – 初中",
+    "summary": "聊天机器人是怎么“学会说话”的？它为什么会有偏见？我们又该怎样和它相处？这门课带学生从数据、词元一路走到班级 AI 使用规范。",
+    "sessions": [
+      "聊天机器人怎么运作",
+      "聊天机器人中的偏见",
+      "AI 对人际连接的影响",
+      "共同制定班级 AI 使用规范"
+    ],
+    "tone": "teal"
+  }
+]
