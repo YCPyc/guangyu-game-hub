@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>下一句会是什么 · 光语课堂游戏</title>
+<style>
+:root {
+  --bg: #faf8f3; --card: #ffffff; --ink: #1f2937; --muted: #5f6b7a; --line: #e6e1d6;
+  --primary: #1f7a68; --primary-ink: #165a4d; --primary-soft: #e3f1ec; --accent: #e8a33a;
+  --accent-soft: #fdf1dc; --good: #2f9e44; --bad: #d64545; --radius: 14px;
+}
+* { box-sizing: border-box; }
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; }
+.btn:hover { background: var(--primary-ink); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 44px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.prompt { margin: 16px 0 20px; padding: 24px; border-left: 8px solid var(--primary); font-size: clamp(1.55rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.choice { width: 100%; min-height: 76px; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 1.2rem; font-weight: 700; }
+.choice:hover { border-color: var(--primary); }
+.choice.active { border: 3px solid var(--primary); background: var(--primary-soft); }
+.votes { flex: none; min-width: 52px; text-align: center; border-radius: 999px; background: var(--bg); padding: 4px 10px; font-size: 1.35rem; font-weight: 800; }
+.counter-row { display: flex; gap: 8px; align-items: center; }
+.counter-row button { min-width: 48px; min-height: 48px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-size: 1.2rem; }
+.rank { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: center; font-size: 1.1rem; }
+.rank strong { font-size: 1.2rem; }
+.ai-result { margin: 18px 0; padding: 22px; background: var(--primary-soft); border-radius: var(--radius); text-align: center; }
+.ai-result small { display: block; color: var(--muted); font-size: .9rem; }
+.ai-word { display: block; font-size: clamp(2rem, 7vw, 3rem); font-weight: 900; color: var(--primary-ink); overflow-wrap: anywhere; }
+.samples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sample { padding: 12px; background: var(--bg); border-radius: 10px; }
+.sample b { display: block; font-size: 1.1rem; }
+.result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.result-grid .card { min-width: 0; }
+.big-answer { font-size: clamp(1.7rem, 5vw, 2.5rem); font-weight: 900; overflow-wrap: anywhere; }
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+.modal-bg { position: fixed; inset: 0; background: rgba(17,24,39,.5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+@media (max-width: 640px) {
+  html { font-size: 17px; } header.top { position: static; } .title p { display: none; }
+  .steps { gap: 4px; } .step { font-size: .78rem; padding: 4px 5px; gap: 4px; }
+  .step .n { width: 24px; height: 24px; flex: none; }
+  .choices, .result-grid, .samples { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title"><h1>下一句会是什么</h1><p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 1 节</p></div>
+      <div class="actions"><button class="btn outline small" id="btn-export">导出本节课结果</button><button class="btn accent small" id="btn-guide">老师说明</button></div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    <p>本游戏配套《聊天机器人背后的大脑》第 1 节“聊天机器人怎么运作”，帮助学生理解：聊天机器人会根据上下文和训练数据，预测接下来可能出现的词元；预测不是理解故事，也不保证唯一答案。建议总时长约 15–20 分钟。</p>
+    <ol>
+      <li><b>故事接龙（约 7 分钟）</b>：展示“很久很久以前，森林边住着一只……”，先请同学自由说出后续，再根据全班举手为页面选项计票。选项只是记录课堂主流猜想，老师也可邀请“其他想法”的同学补充。</li>
+      <li><b>AI 预测（约 5 分钟）</b>：先让全班猜 AI 会选什么，再揭晓简化模型如何从几条练习语料中统计开头后最常出现的词。</li>
+      <li><b>比较讨论（约 3–8 分钟）</b>：比较同学的选择和 AI 预测，讨论训练数据变化时，预测为什么也会变化。</li>
+    </ol>
+    <p class="hint">这里的 AI 是离线演示模型：它只统计几条虚构例句里的下一个词，不是真正的大语言模型。游戏不收集学生个人信息。</p>
+  </div>
+</div>
+
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button><button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button></div>
+    <p class="hint">图片和表格记录全班猜想票数、AI 演示预测和对比结果。</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+const START = "很久很久以前，森林边住着一只";
+const OPTIONS = ["小熊", "小狐狸", "小猫", "迷路的小机器人", "其他想法"];
+// 虚构的练习语料；相同开头后各词的出现次数就是本演示模型使用的频次。
+const CORPUS = [
+  `${START}小熊，它最喜欢收集松果。`,
+  `${START}小熊，每天都去河边散步。`,
+  `${START}小熊，发现了一张藏宝图。`,
+  `${START}小熊，和朋友们一起过冬。`,
+  `${START}小熊，在月光下唱起歌。`,
+  `${START}小熊，想知道山那边有什么。`,
+  `${START}小狐狸，借给它一把雨伞。`,
+  `${START}小狐狸，带来了一封信。`,
+  `${START}小狐狸，邀请大家去野餐。`,
+  `${START}小猫，在树洞里找到一本书。`,
+  `${START}小猫，听见远处传来铃声。`,
+  `${START}迷路的小机器人，正在寻找回家的路。`
+];
+const S = { step: 0, votes: Object.fromEntries(OPTIONS.map((x) => [x, 0])), aiRevealed: false };
+const STEPS = ["同学来猜", "AI 来预测", "放在一起看"];
+function voteTotal() { return Object.values(S.votes).reduce((a, b) => a + b, 0); }
+function topGuess() {
+  const max = Math.max(...OPTIONS.map((x) => S.votes[x]));
+  return max ? OPTIONS.find((x) => S.votes[x] === max) : "还没有投票";
+}
+function predictions() {
+  const counts = Object.fromEntries(OPTIONS.slice(0, 4).map((x) => [x, 0]));
+  for (const line of CORPUS) {
+    const next = line.slice(START.length).match(/^[^，。！？、\s]+/);
+    if (next && Object.prototype.hasOwnProperty.call(counts, next[0])) counts[next[0]]++;
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+}
+const AI = predictions();
+function render() {
+  $("#steps").replaceChildren(...STEPS.map((name, i) => el("button", {
+    class: "step" + (i === S.step ? " active" : ""), onclick: () => { if (i <= S.step) { S.step = i; render(); } }
+  }, el("span", { class: "n" }, i + 1), name)));
+  const views = [stepGuess, stepAI, stepCompare];
+  $("#main").replaceChildren(...views[S.step]());
+}
+function stageTitle(title, description) { return [el("h2", {}, title), el("p", { class: "lead" }, description)]; }
+function promptCard() { return el("div", { class: "card prompt" }, START, "……"); }
+function discussion(question) { return el("div", { class: "discuss" }, "讨论：", el("span", {}, question)); }
+function stageNav(back, next, disabled = false) {
+  return el("div", { class: "row", style: "margin-top:20px" },
+    back ? el("button", { class: "btn outline", onclick: () => { S.step--; render(); } }, "← 上一步") : null,
+    el("button", { class: "btn big", disabled, onclick: () => { S.step++; render(); } }, next));
+}
+function stepGuess() {
+  const options = el("div", { class: "choices" }, ...OPTIONS.map((word) => el("button", {
+    class: "card choice" + (topGuess() === word ? " active" : ""),
+    "aria-label": `${word}，${S.votes[word]} 票`,
+    onclick: () => { S.votes[word]++; render(); }
+  }, el("span", {}, word), el("span", { class: "counter-row" },
+    el("span", { class: "votes" }, S.votes[word]),
+    el("span", { class: "hint" }, "票")))));
+  const rank = el("div", { class: "card rank" },
+    el("span", {}, "全班当前票数"), el("strong", {}, `${voteTotal()} 票`),
+    el("span", {}, "目前最多人猜"), el("strong", {}, topGuess()));
+  return [
+    ...stageTitle("第 1 步：同学来猜", "先别看 AI 的答案！大家自由想象故事会怎么发展，老师邀请同学说出理由，再按举手为接近的选项计票。"),
+    promptCard(), options, rank,
+    discussion("你是根据生活经验、故事套路，还是某个特别的想法做出猜测？"),
+    stageNav(false, "下一步：看看 AI 怎么猜 →", voteTotal() === 0)
+  ];
+}
+function stepAI() {
+  const rows = AI.map(([word, count]) => el("div", { class: "sample" }, el("b", {}, word), `在练习语料中出现 ${count} 次`));
+  const result = S.aiRevealed ? el("div", { class: "ai-result" },
+    el("small", {}, "这份练习语料里，开头之后最常出现的是"),
+    el("span", { class: "ai-word" }, AI[0][0]),
+    el("small", {}, `出现 ${AI[0][1]} 次；演示模型因此把它作为最可能的下一个词。`)) : null;
+  return [
+    ...stageTitle("第 2 步：AI 会接什么？", "先让全班猜 AI 最可能接哪个词。然后点击揭晓，看看这个离线小模型怎样从练习语料里数出结果。"),
+    promptCard(),
+    el("div", { class: "card" }, el("h3", {}, "AI 的练习语料（虚构例句）"),
+      el("p", { class: "hint" }, "把相同开头后第一个词数一数，频次最高的词会成为这次演示的预测。"),
+      el("div", { class: "samples" }, ...rows)),
+    result,
+    el("div", { class: "row", style: "margin-top:16px" }, S.aiRevealed ? null : el("button", {
+      class: "btn big accent", onclick: () => { S.aiRevealed = true; render(); }
+    }, "揭晓 AI 的预测")),
+    discussion("如果练习语料里没有小熊的故事，AI 还会把小熊排在第一吗？"),
+    stageNav(true, "下一步：比较两种预测 →", !S.aiRevealed)
+  ];
+}
+function stepCompare() {
+  const same = topGuess() === AI[0][0];
+  return [
+    ...stageTitle("第 3 步：放在一起看", "同学们是自由想象，演示 AI 则根据这份练习语料中的词频选择结果。比较一下两种方法。"),
+    el("div", { class: "result-grid" },
+      el("div", { class: "card" }, el("h3", {}, "全班最受欢迎的猜想"), el("div", { class: "big-answer" }, topGuess()), el("p", { class: "hint" }, `${topGuess() === "还没有投票" ? 0 : S.votes[topGuess()]} 票，共 ${voteTotal()} 票`)),
+      el("div", { class: "card" }, el("h3", {}, "简化 AI 的预测"), el("div", { class: "big-answer" }, AI[0][0]), el("p", { class: "hint" }, `练习语料频次：${AI[0][1]} 次`))),
+    el("div", { class: "card", style: "margin-top:16px;text-align:center" },
+      el("div", { class: "big-answer" }, same ? "这次，两种预测一样！" : "这次，两种预测不一样。"),
+      el("p", { class: "lead", style: "margin-bottom:0" }, same ? "相同的结果也可能来自不同的方法：同学在想象故事，AI 在统计文本。" : "不一样很正常：同学能发挥想象，AI 的结果受练习语料影响。")),
+    discussion("如果把练习语料换成太空故事，AI 的预测会怎样变化？"),
+    el("div", { class: "row", style: "margin-top:20px" },
+      el("button", { class: "btn outline", onclick: () => { S.step = 0; S.votes = Object.fromEntries(OPTIONS.map((x) => [x, 0])); S.aiRevealed = false; render(); } }, "再玩一次（清空票数）"),
+      el("button", { class: "btn", onclick: () => { $("#export-modal").hidden = false; } }, "导出本节课结果"))
+  ];
+}
+function download(blob, name) {
+  const url = URL.createObjectURL(blob), a = el("a", { href: url, download: name });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const fileBase = (m) => `下一句会是什么_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+$("#btn-ex-png").onclick = () => {
+  const m = meta(), c = document.createElement("canvas"); c.width = 1500; c.height = 760;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height); ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 56px ${font}`; ctx.fillText("下一句会是什么 · 课堂结果", 70, 105);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText(`聊天机器人背后的大脑 · 第 1 节　|　${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 70, 160);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 36px ${font}`; ctx.fillText(START, 70, 250);
+  ctx.fillStyle = "#1f7a68"; ctx.font = `700 42px ${font}`; ctx.fillText(`全班猜想：${topGuess()}`, 70, 345);
+  ctx.fillStyle = "#1f2937"; ctx.font = `400 30px ${font}`; ctx.fillText(OPTIONS.map((w) => `${w} ${S.votes[w]}票`).join("　　"), 70, 405);
+  ctx.fillStyle = "#1f7a68"; ctx.font = `700 42px ${font}`; ctx.fillText(`AI 演示预测：${AI[0][0]}（练习语料中 ${AI[0][1]} 次）`, 70, 500);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 26px ${font}`; ctx.fillText("这是一个根据少量虚构例句统计频次的简化演示。", 70, 575);
+  ctx.fillText("光语 × 铺路石 · AI 素养课堂", 70, 700);
+  c.toBlob((b) => b && download(b, fileBase(m) + ".png"), "image/png");
+};
+function csvCell(v) { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
+$("#btn-ex-csv").onclick = () => {
+  const m = meta(), rows = [["日期", "班级", "参与人数", "环节", "项目", "结果"]];
+  for (const word of OPTIONS) rows.push([m.date, m.cls, m.count, "同学猜想", word, S.votes[word]]);
+  rows.push([m.date, m.cls, m.count, "AI 预测", "演示模型选择", AI[0][0]]);
+  rows.push([m.date, m.cls, m.count, "AI 预测", "练习语料频次", AI[0][1]]);
+  rows.push([m.date, m.cls, m.count, "比较结果", "全班最高票猜想", topGuess()]);
+  const csv = "﻿" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+  download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
+};
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => {
+  if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true;
+}));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#export-modal").hidden = false; };
+render();
+</script>
+</body>
+</html>
