@@ -40,6 +40,11 @@ automatically from `games/*/game.json`, so no other file needs to change.
    Keep the template's shared CSS block, header, 老师说明 modal and export modal; replace the TODOs.
 6. **Verify** (see "Before you open the PR").
 7. **Open the PR** on a branch named `game/<slug>`, using the PR template checklist.
+   - **Title format for a game PR**: `【课程名】【第 N 节】游戏名` (for example,
+     `【聊天机器人背后的大脑】【第 1 节】下一句会是什么`).
+   - **Description**: explain the game's purpose and learning goal, then describe how the teacher
+     should run it in class (the activity flow and suggested timing). Complete the PR template
+     checklist and include 1–2 screenshots.
 
 ## Hard requirements (CI rejects games that break these)
 
