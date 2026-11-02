@@ -1,0 +1,11 @@
+{
+  "title": "AI 从哪读来的？",
+  "course": "brain-behind-the-bot",
+  "session": 2,
+  "summary": "学生自由向一个只读过 13 条网络资料的小 AI 提问，先投票“信不信”它自信的回答，再透视每句话的来源，用“追问四问”找出错误、过时、片面、偏见和广告类资料，移出后再问一次。",
+  "minutes": "约 10 分钟",
+  "format": "老师投屏，全班举手投票和讨论",
+  "concepts": ["数据集", "信息来源", "追问", "偏见"],
+  "authors": ["Jerry Liu"],
+  "cover": "cover.svg"
+}
