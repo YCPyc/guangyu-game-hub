@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>下一句会是什么 · 光语课堂游戏</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; line-height: 1.35; margin: 8px 0; }
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+.counter { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; max-width: 360px; margin-top: 16px; }
+.counter button { height: 56px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 1.6rem; font-weight: 700; }
+.counter output { text-align: center; font-size: 2.4rem; font-weight: 800; }
+.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+.option { min-height: 104px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); padding: 14px; text-align: left; font-weight: 600; }
+.option:hover, .option.selected { border-color: var(--primary); background: var(--primary-soft); }
+.option .letter { display: block; color: var(--primary-ink); font-size: .8rem; margin-bottom: 6px; }
+.idea-form { display: flex; gap: 10px; align-items: stretch; margin-top: 18px; }
+.idea-form input { flex: 1; min-width: 0; }
+.result { margin-top: 18px; border-left: 6px solid var(--accent); background: var(--accent-soft); padding: 16px 20px; border-radius: 8px; }
+.result .big-answer { font-size: 1.7rem; }
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+  .options { grid-template-columns: 1fr; }
+  .idea-form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="top-row">
+    <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+    <div class="title"><h1>下一句会是什么</h1><p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 1 节</p></div>
+    <div class="actions"><button class="btn outline small" id="btn-export">导出本节课结果</button><button class="btn accent small" id="btn-guide">老师说明</button></div>
+  </div>
+  <nav class="steps" id="steps"></nav>
+</div></header>
+<main class="wrap" id="main"></main>
+<div class="modal-bg" id="guide-modal" hidden><div class="modal">
+  <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+  <p>本游戏配套第 1 节《聊天机器人怎么运作》，帮助学生理解聊天机器人会根据前文和学到的语言模式，预测接下来可能出现的词语。游戏中的 AI 是简化模拟，真实 AI 使用更复杂的模型和大量训练数据。</p>
+  <ol><li><b>热身猜想（约 3 分钟）</b>：读出故事开头，请学生先自由猜下一句，接受多种合理答案。</li><li><b>全班投票（约 6 分钟）</b>：每轮选一个猜测方向，老师数举手并记录人数。</li><li><b>模拟 AI（约 4 分钟）</b>：揭晓简化预测，比较它与全班猜想的异同。</li><li><b>讨论总结（约 2 分钟）</b>：联系课程内容，说明预测来自学到的模式，并不等于理解故事或保证正确。</li></ol>
+  <p class="hint">本游戏完全离线可用，不收集任何学生信息。计票数据保存在当前页面内存中。</p>
+</div></div>
+<div class="modal-bg" id="export-modal" hidden><div class="modal">
+  <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+  <div class="row"><label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label><label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label></div>
+  <p class="hint">图片和表格会记录每轮预设猜测、课堂补充猜测的举手票数，以及简化 AI 的预测。只导出猜测内容和票数，不记录学生姓名。</p>
+  <div class="row" style="margin-top:16px"><button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button><button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button></div>
+</div></div>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+const ROUNDS = [
+  { start: "很久很久以前，森林里住着一只……", choices: ["会说话的狐狸", "迷路的小机器人", "喜欢种花的熊"], ai: "会说话的狐狸。它每天清晨都会去河边听鸟儿唱歌。", token: "狐狸" },
+  { start: "放学后，小雨打开书包，发现里面……", choices: ["多了一封神秘的信", "有一颗闪闪发光的石头", "课本变成了地图"], ai: "有一张被折起来的纸条，上面写着：‘操场见。’", token: "纸条" },
+  { start: "一艘小船漂到岛边，船上的箱子里……", choices: ["装着一把旧钥匙", "传来轻轻的敲门声", "住着一只小海龟"], ai: "装着许多颜色不同的贝壳。箱子旁边还放着一张地图。", token: "贝壳" }
+];
+const S = { step: 0, round: 0, votes: ROUNDS.map((r) => r.choices.map(() => 0)), selected: [null, null, null], revealed: [false, false, false] };
+const STEPS = ["先来猜想", "举手投票", "看看 AI"];
+function render() {
+  $("#steps").replaceChildren(...STEPS.map((name, i) => el("button", { class: "step" + (i === S.step ? " active" : ""), onclick: () => { S.step = i; render(); } }, el("span", { class: "n" }, i + 1), name)));
+  const views = [stepGuess, stepVote, stepAI];
+  $("#main").replaceChildren(...views[S.step]());
+}
+function roundNav() {
+  return el("div", { class: "row", style: "margin:0 0 16px" }, ...ROUNDS.map((_, i) => el("button", { class: "btn small " + (i === S.round ? "" : "outline"), onclick: () => { S.round = i; render(); } }, "第 " + (i + 1) + " 轮")));
+}
+function promptCard() { return el("div", { class: "card" }, el("p", { class: "hint" }, "故事开头"), el("p", { class: "big-answer" }, ROUNDS[S.round].start)); }
+function stepGuess() {
+  return [el("h2", {}, "第 1 步：先猜一猜"), el("p", { class: "lead" }, "读完开头，先别看选项。请大家想一想：接下来可能发生什么？答案可以很多种。"), roundNav(), promptCard(), el("div", { class: "discuss" }, "想一想：", el("span", {}, "同一个开头，为什么会让大家想到不同的故事？")), el("div", { class: "row", style: "margin-top:20px" }, el("button", { class: "btn big", onclick: () => { S.step = 1; render(); } }, "看看大家的猜测 →"))];
+}
+function stepVote() {
+  const r = ROUNDS[S.round];
+  const opts = el("div", { class: "options" }, ...r.choices.map((choice, i) => el("button", { class: "option" + (S.selected[S.round] === i ? " selected" : ""), onclick: () => { S.selected[S.round] = i; render(); } }, el("span", { class: "letter" }, i < 3 ? "预设猜测 " + String.fromCharCode(65 + i) : "课堂想法 " + (i - 2)), choice)));
+  const choice = S.selected[S.round];
+  const counter = el("div", { class: "counter" }, el("button", { onclick: () => { if (choice != null) S.votes[S.round][choice] = Math.max(0, S.votes[S.round][choice] - 1); render(); }, "aria-label": "减少一票" }, "－"), el("output", {}, choice == null ? "—" : S.votes[S.round][choice]), el("button", { onclick: () => { if (choice != null) S.votes[S.round][choice]++; render(); }, "aria-label": "增加一票" }, "＋"));
+  const ideaInput = el("input", { type: "text", maxlength: "100", placeholder: "输入一个故事猜测，例如：箱子里有一张藏宝图", "aria-label": "课堂补充猜测" });
+  const ideaForm = el("form", { class: "idea-form", onsubmit: (e) => { e.preventDefault(); const idea = ideaInput.value.trim(); if (!idea || r.choices.length >= 9) return; r.choices.push(idea); S.votes[S.round].push(0); S.selected[S.round] = r.choices.length - 1; render(); } }, ideaInput, el("button", { class: "btn" }, "加入课堂猜测"));
+  return [el("h2", {}, "第 2 步：全班投票"), el("p", { class: "lead" }, "先听同学们自由猜想。老师可以把有代表性的想法简短记下来，加入选项；再请全班举手选最想继续听的一种。"), roundNav(), promptCard(), el("div", { class: "card" }, el("b", {}, "加入同学们想到的猜测"), ideaForm, el("p", { class: "hint" }, "每轮最多添加 6 条。只记故事内容，不写姓名或个人信息。题材也可以很不一样，暂时没有标准答案。")), opts, el("p", { class: "hint" }, "点选一种猜测，再用 ＋/－ 记录举手人数。不同猜测的票数会分别保留。"), el("div", { class: "card" }, el("b", {}, choice == null ? "请先选择一种猜测" : "正在记录：" + r.choices[choice]), counter), el("div", { class: "discuss" }, "讨论：", el("span", {}, "哪条线索让你觉得这个猜测更可能？")), el("div", { class: "row", style: "margin-top:20px" }, el("button", { class: "btn big", onclick: () => { S.step = 2; render(); } }, "看看简化 AI 怎么续写 →"))];
+}
+function stepAI() {
+  const r = ROUNDS[S.round];
+  const reveal = el("button", { class: "btn accent big", onclick: () => { S.revealed[S.round] = true; render(); } }, S.revealed[S.round] ? "已揭晓" : "揭晓简化 AI 预测");
+  const box = S.revealed[S.round] ? el("div", { class: "result" }, el("p", { class: "hint" }, "模拟预测（示例，不是联网 AI）"), el("p", { class: "big-answer" }, r.ai), el("p", {}, "在这个简化示例里，模型根据前面的词语，逐步预测后面可能出现的词。这里突出显示的第一个关键词是“" + r.token + "”。")) : el("p", { class: "hint" }, "先请同学猜猜：简化 AI 会接出什么内容？准备好后点击揭晓。" );
+  const next = S.round < ROUNDS.length - 1 ? el("button", { class: "btn big", onclick: () => { S.round++; S.step = 0; render(); } }, "进入下一轮 →") : el("button", { class: "btn big", onclick: () => { S.step = 0; S.round = 0; render(); } }, "再玩一次");
+  return [el("h2", {}, "第 3 步：看看 AI 的预测"), el("p", { class: "lead" }, "这不是唯一正确答案。真实聊天机器人会根据上下文和训练中学到的语言模式，计算后续词语的可能性。"), roundNav(), promptCard(), el("div", { class: "row" }, reveal), box, el("div", { class: "discuss" }, "讨论：", el("span", {}, "AI 的续写和同学们的猜测哪里相似、哪里不同？它预测得合理，就代表它真的理解故事吗？")), el("div", { class: "row", style: "margin-top:20px" }, next)];
+}
+function download(blob, name) { const url = URL.createObjectURL(blob); const a = el("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const safe = (s) => s.replace(/[\\/:*?"<>|\s]+/g, "_");
+function maxChoices() { return Math.max(...ROUNDS.map((r) => r.choices.length)); }
+function csvRows(m) {
+  const header = ["日期", "班级", "参与人数", "轮次", "故事开头"];
+  for (let i = 1; i <= maxChoices(); i++) header.push("猜测" + i + "内容", "猜测" + i + "票数");
+  header.push("简化AI预测");
+  const data = ROUNDS.map((r, i) => { const row = [m.date, m.cls, m.count, "第" + (i + 1) + "轮", r.start]; r.choices.forEach((choice, j) => row.push(choice, S.votes[i][j])); while (row.length < header.length - 1) row.push("", ""); row.push(r.ai); return row; });
+  return [header, ...data];
+}
+$("#btn-ex-png").onclick = () => {
+  const m = meta(), c = document.createElement("canvas"); c.width = 1600; c.height = 1900;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height); ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 54px ${font}`; ctx.fillText("下一句会是什么 · 课堂结果", 70, 100);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText(`${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 70, 150);
+  let y = 230;
+  ROUNDS.forEach((r, i) => { ctx.fillStyle = "#1f2937"; ctx.font = `700 32px ${font}`; ctx.fillText(`第 ${i + 1} 轮：${r.start}`, 70, y); y += 48;
+    r.choices.forEach((choice, j) => { ctx.fillStyle = "#5f6b7a"; ctx.font = `400 25px ${font}`; ctx.fillText(`${String.fromCharCode(65 + j)}. ${choice}　举手：${S.votes[i][j]}`, 90, y); y += 38; });
+    ctx.fillStyle = "#165a4d"; ctx.font = `400 25px ${font}`; ctx.fillText(`简化 AI：${r.ai}`, 90, y); y += 72;
+  });
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 22px ${font}`; ctx.fillText("简化模拟用于课堂讨论；真实 AI 的预测过程更复杂。", 70, 1800);
+  c.toBlob((b) => b && download(b, safe("下一句会是什么_" + m.cls + "_" + m.date) + ".png"), "image/png");
+};
+$("#btn-ex-csv").onclick = () => {
+  const m = meta(), data = csvRows(m);
+  const csv = "\uFEFF" + data.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  download(new Blob([csv], { type: "text/csv;charset=utf-8" }), safe("下一句会是什么_" + m.cls + "_" + m.date) + ".csv");
+};
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => { if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true; }));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#export-modal").hidden = false; };
+render();
+</script>
+</body>
+</html>
