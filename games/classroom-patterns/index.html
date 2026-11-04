@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我是AI小老师：训练AI · 光语课堂游戏</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;        /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+.steps { display: flex; gap: 8px; padding: 0 0 12px; overflow-x: auto; }
+.step { flex: 1; min-width: max-content; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2rem; font-weight: 800; line-height: 1.3; }
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+/* 本游戏的投票、答案和生成结果 */
+.scenario { font-size: 1.55rem; font-weight: 750; margin: 0 0 18px; }
+.options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.option { min-height: 112px; padding: 16px; text-align: left; border: 2px solid var(--line); border-radius: 12px; background: #fff; }
+.option.selected { border-color: var(--primary); background: var(--primary-soft); }
+.option-label { display: block; font-size: 1.1rem; font-weight: 750; margin-bottom: 5px; }
+.option-text { display: block; font-size: 1rem; }
+.vote-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; border-top: 1px solid var(--line); padding: 12px 0; }
+.vote-count { display: flex; align-items: center; gap: 12px; }
+.vote-count output { min-width: 2ch; text-align: center; font-size: 1.65rem; font-weight: 800; }
+.count-btn { width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-size: 1.3rem; font-weight: 700; }
+.result-box { background: var(--accent-soft); border-left: 6px solid var(--accent); border-radius: 10px; padding: 18px; margin-top: 16px; }
+.result-box .big-answer { font-size: 1.6rem; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-ink); font-size: .85rem; font-weight: 700; }
+.bar-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.bar-row strong { font-size: 1.25rem; }
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+  .options { grid-template-columns: 1fr; }
+  .option { min-height: 88px; }
+  .scenario { font-size: 1.3rem; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="top-row">
+    <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+    <div class="title"><h1>我是AI小老师：训练AI</h1><p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 1 节</p></div>
+    <div class="actions"><button class="btn outline small" id="btn-export">导出本节课结果</button><button class="btn accent small" id="btn-guide">老师说明</button></div>
+  </div>
+  <nav class="steps" id="steps" aria-label="游戏环节"></nav>
+</div></header>
+<main class="wrap" id="main"></main>
+
+<div class="modal-bg" id="guide-modal" hidden><div class="modal">
+  <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+  <p>本游戏配套《聊天机器人背后的大脑》第 1 节《聊天机器人怎么运作》，帮助学生理解：训练示例会影响 AI 学到的语言模式，进而影响它生成的回答。</p>
+  <ol>
+    <li><b>说明玩法（约 2 分钟）</b>：介绍“训练示例”和“新问题”，提醒学生选择自己觉得最合适的回答。</li>
+    <li><b>训练示例与投票（约 8 分钟）</b>：每组先读一个生活对话场景，全班举手选 A–D；揭晓后观察哪条回答被记进了模拟示例。</li>
+    <li><b>生成相似问题的回答（约 6 分钟）</b>：紧接着读相似的新场景，先猜 AI 会怎么回答，再点击生成，观察刚才的投票怎样影响答案。共进行三组。</li>
+    <li><b>回顾（约 2–3 分钟）</b>：比较示例和新回答，讨论训练数据的影响与局限。</li>
+  </ol>
+  <p class="hint">这是一个简化的课堂模拟：每次投票后，模拟器记下班级选中的回答示例，并把同一种回答方式用到紧接着的相似问题；真正的 AI 会从大量数据中学习复杂的语言模式。本游戏离线可用，不收集学生个人信息。</p>
+</div></div>
+
+<div class="modal-bg" id="export-modal" hidden><div class="modal">
+  <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+  <div class="row"><label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label><label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label></div>
+  <div class="row" style="margin-top:16px"><button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button><button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button></div>
+</div></div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+
+const styles = {
+  ask: "先问清楚", care: "先回应感受", explain: "解释并核对", act: "给出可行办法"
+};
+const rounds = [
+  { kind: "train", title: "同学说作业有点难", prompt: "同学说：“这道题我想了好久，还是不会。”你会怎么回应？", options: [
+    ["A", "你卡在哪一步？我们一起看看。", "ask"], ["B", "听起来挺让人着急的。", "care"], ["C", "我给你讲讲我怎么理解这道题。", "explain"], ["D", "我们先把题目分成几小步试试。", "act"]
+  ]},
+  { kind: "test", title: "同学担心小组展示", prompt: "相似的新问题：同学说：“我一上台就紧张，怕讲错。”先猜一猜，模拟器会怎么回答？", options: [
+    ["A", "你最担心哪一部分？", "ask"], ["B", "紧张很常见，我能理解。", "care"], ["C", "讲错一处不代表整个展示不好。", "explain"], ["D", "我们可以先一起练开头两句。", "act"]
+  ]},
+  { kind: "train", title: "朋友误会了你的话", prompt: "朋友以为你在批评他，但你其实不是这个意思。你会怎么说？", options: [
+    ["A", "你愿意告诉我，哪句话让你这样觉得吗？", "ask"], ["B", "我不想让你难过，抱歉让你有这种感受。", "care"], ["C", "我刚才的意思是……不是在说你不好。", "explain"], ["D", "我们重新说一遍，看看怎样表达更清楚。", "act"]
+  ]},
+  { kind: "test", title: "小组点子没被选上", prompt: "相似的新问题：小组讨论海报主题时，同学提出的点子没被选上，他看起来有点失落。先猜一猜，模拟器会怎么回答？", options: [
+    ["A", "你觉得这个点子里，哪部分最想保留下来？", "ask"], ["B", "自己的想法没被选上，确实会有点失落。", "care"], ["C", "我们可以先看看这个点子里值得保留的部分。", "explain"], ["D", "把两个想法各写一条，再一起比较看看。", "act"]
+  ]},
+  { kind: "train", title: "想邀请同学一起玩", prompt: "你想邀请一位同学加入游戏，但不确定他愿不愿意。你会怎么开口？", options: [
+    ["A", "你现在想一起玩吗？不想也没关系。", "ask"], ["B", "一个人看起来有点无聊，要不要来？", "care"], ["C", "我们在玩接龙，规则是每人说一个词。", "explain"], ["D", "你可以先看一轮，觉得合适再加入。", "act"]
+  ]},
+  { kind: "test", title: "新同学找不到教室", prompt: "相似的新问题：新同学说：“我找不到科学教室，下一节就要上课了。”先猜一猜，模拟器会怎么回答？", options: [
+    ["A", "你现在在哪一层？记得教室号码吗？", "ask"], ["B", "刚来学校不熟悉路线，确实容易着急。", "care"], ["C", "科学教室在二楼东侧，门口有蓝色标志。", "explain"], ["D", "我带你走到科学教室吧。", "act"]
+  ]}
+];
+const S = { index: 0, votes: rounds.map(() => [0, 0, 0, 0]), winners: rounds.map(() => null), revealed: rounds.map(() => false) };
+const stepNames = ["投票 1", "生成 1", "投票 2", "生成 2", "投票 3", "生成 3", "回顾"];
+function optionForStyle(round, style) { return round.options.findIndex(o => o[2] === style); }
+function render() {
+  $("#steps").replaceChildren(...stepNames.map((name, i) => el("button", { class: "step" + (i === S.index ? " active" : ""), onclick: () => { if (i <= maxUnlocked()) { S.index = i; render(); } } }, el("span", { class: "n" }, i + 1), name)));
+  $("#main").replaceChildren(...(S.index < rounds.length ? renderRound(S.index) : renderReview()));
+}
+function maxUnlocked() {
+  for (let i = 0; i < rounds.length; i++) if (!S.revealed[i] || (rounds[i].kind === "train" && S.winners[i] === null)) return i;
+  return rounds.length;
+}
+function renderRound(i) {
+  const r = rounds[i], isTest = r.kind === "test", trainIndex = isTest ? i - 1 : i;
+  const trainRound = rounds[trainIndex], trainWinner = isTest ? S.winners[trainIndex] : null;
+  const style = isTest ? trainRound.options[trainWinner][2] : null;
+  const choices = r.options.map(o => el("div", { class: "option" },
+    el("span", { class: "option-label" }, o[0]), el("span", { class: "option-text" }, o[1])));
+  const group = Math.floor(i / 2) + 1;
+  const content = [el("h2", {}, `${isTest ? "相似新问题" : "训练示例"} ${group}：${r.title}`),
+    el("p", { class: "lead" }, isTest ? "上一轮的班级选择已经记进训练示例。看看这个相似问题，再让模拟器生成回答。" : "全班选出你觉得最合适的回答。老师统计举手人数；揭晓后，这个选择会作为本组训练示例。"),
+    ...(isTest ? [el("div", { class: "result-box" }, el("span", { class: "tag" }, `刚记下的训练示例：${styles[style]}`), el("p", {}, `“${trainRound.options[trainWinner][1]}”`))] : []),
+    el("section", { class: "card" }, el("p", { class: "scenario" }, r.prompt), el("div", { class: "options" }, ...choices))];
+  if (isTest) {
+    content.push(el("div", { class: "row", style: "margin-top:16px" },
+      el("button", { class: "btn big", onclick: () => { S.revealed[i] = true; S.winners[i] = optionForStyle(r, style); render(); } }, "生成模拟回答")));
+    if (S.revealed[i]) content.push(el("div", { class: "result-box" }, el("span", { class: "tag" }, `沿用本组投票：${styles[style]}`), el("p", { class: "big-answer" }, `“${r.options[S.winners[i]][1]}”`), el("p", { class: "hint" }, `因为刚才训练示例选了“${styles[style]}”这种回答方式，模拟器在相似问题里也选用了这种方式。`), nextButton(i)));
+  } else {
+    r.options.forEach((o, j) => content.push(el("div", { class: "vote-row" }, el("strong", {}, `${o[0]}　${o[1]}`), el("div", { class: "vote-count" }, el("button", { class: "count-btn", "aria-label": `${o[0]}减一票`, onclick: () => { S.votes[i][j] = Math.max(0, S.votes[i][j] - 1); render(); } }, "−"), el("output", {}, S.votes[i][j]), el("button", { class: "count-btn", "aria-label": `${o[0]}加一票`, onclick: () => { S.votes[i][j]++; render(); } }, "+")))));
+    const max = Math.max(...S.votes[i]);
+    const top = S.votes[i].map((v, j) => v === max ? j : -1).filter(j => j >= 0);
+    const needsTieBreak = top.length > 1 && S.winners[i] === null;
+    if (S.revealed[i]) content.push(el("div", { class: "result-box" }, el("p", { class: "big-answer" }, needsTieBreak ? "本轮平票，听听大家的理由" : `班级选择：${r.options[S.winners[i]][0]}　${r.options[S.winners[i]][1]}`), needsTieBreak ? el("p", {}, "请讨论后由老师点击大家最后决定的选项：") : null,
+      ...(needsTieBreak ? top.map(j => el("button", { class: "btn outline", style: "margin:4px", onclick: () => { S.winners[i] = j; render(); } }, `选 ${r.options[j][0]}`)) : []),
+      !needsTieBreak ? el("p", { class: "hint" }, `训练示例已记下：班级选择了“${styles[r.options[S.winners[i]][2]]}”的回答方式。下一步会立刻用在相似问题中。`) : null,
+      S.winners[i] !== null ? nextButton(i) : null));
+    else content.push(el("div", { class: "row", style: "margin-top:16px" }, el("button", { class: "btn big", onclick: () => { S.revealed[i] = true; S.winners[i] = top.length === 1 ? top[0] : null; render(); } }, "结束投票并看班级选择")));
+  }
+  content.push(el("div", { class: "discuss" }, "讨论：", el("span", {}, isTest ? "这个新回答和你们刚才选的回答方式有什么关系？" : "你选这个回答的理由是什么？换个情境还会选它吗？")));
+  return content;
+}
+function nextButton(i) { const label = i === rounds.length - 1 ? "查看三组训练结果 →" : rounds[i].kind === "train" ? "查看对应的新问题 →" : "开始下一组训练 →"; return el("button", { class: "btn big", style: "margin-top:12px", onclick: () => { S.index = i + 1; render(); } }, label); }
+function renderReview() {
+  const pairs = [0, 2, 4].map((i, j) => {
+    const train = rounds[i], test = rounds[i + 1], winner = S.winners[i];
+    const trainingText = winner === null ? "尚未完成投票" : `训练示例：${train.options[winner][1]}（${styles[train.options[winner][2]]}）`;
+    const generatedText = winner === null ? "尚未生成" : `新问题回答：${test.options[optionForStyle(test, train.options[winner][2])][1]}`;
+    return el("div", { class: "result-box" }, el("h3", {}, `第 ${j + 1} 组：${train.title}`), el("p", {}, trainingText), el("p", {}, generatedText), el("p", { class: "hint" }, winner === null ? "" : `班级投票：${S.votes[i][winner]} 票`));
+  });
+  return [el("h2", {}, "回顾：每次投票怎样影响答案"), el("p", { class: "lead" }, "每一组都把刚才的班级选择作为训练示例，并立刻沿用到一个相似的新问题。"), el("section", { class: "card" }, ...pairs), el("div", { class: "discuss" }, "讨论：", el("span", {}, "如果这组投票改选了另一种回答方式，紧接着生成的答案会怎样变？")), el("p", { class: "hint" }, "这是一个简化模拟：每个新答案沿用本组训练示例的回答方式。真正的 AI 会从大量数据中学习更复杂的模式。"), el("button", { class: "btn outline", style: "margin-top:16px", onclick: () => { S.index = 0; render(); } }, "重新开始")];
+}
+function download(blob, name) { const url = URL.createObjectURL(blob), a = el("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const fileBase = m => `我是AI小老师_训练AI_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+function results() { return rounds.map((r, i) => ({ 场景: r.title, 类型: r.kind === "train" ? "训练示例" : "新问题", 票数: S.votes[i].join("/"), 班级选择或生成回答: S.winners[i] === null ? "尚未完成" : r.options[S.winners[i]][1] })); }
+$("#btn-ex-png").onclick = () => {
+  const m = meta(), c = document.createElement("canvas"); c.width = 1600; c.height = 1000;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height); ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 52px ${font}`; ctx.fillText("我是AI小老师：训练AI · 课堂结果", 60, 95);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText(`${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 60, 145);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 30px ${font}`;
+  results().forEach((r, i) => { const y = 205 + i * 112; ctx.fillText(`${i + 1}. ${r.场景}`, 60, y); ctx.font = `400 25px ${font}`; ctx.fillText(`${r.类型}　票数 A/B/C/D：${r.票数}`, 85, y + 36); ctx.fillText(`记录：${r.班级选择或生成回答}`, 85, y + 70); ctx.font = `700 30px ${font}`; });
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 22px ${font}`; ctx.fillText("简化课堂模拟：每个新回答沿用本组投票记下的训练示例。", 60, 950);
+  c.toBlob(b => b && download(b, fileBase(m) + ".png"), "image/png");
+};
+$("#btn-ex-csv").onclick = () => { const m = meta(), rows = [["日期", "班级", "参与人数", "环节", "场景", "票数A/B/C/D", "班级选择或生成回答"], ...results().map(r => [m.date, m.cls, m.count, r.类型, r.场景, r.票数, r.班级选择或生成回答])]; const csv = "\uFEFF" + rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n"); download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv"); };
+document.querySelectorAll(".modal-bg").forEach(bg => bg.addEventListener("click", e => { if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true; }));
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach(m => m.hidden = true); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#export-modal").hidden = false; };
+render();
+</script>
+</body>
+</html>
