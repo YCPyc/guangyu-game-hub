@@ -3,7 +3,7 @@
   "course": "brain-behind-the-bot",
   "session": 1,
   "summary": "全班依次为三个日常对话示例投票；每次投票后，立即观察模拟器怎样把这条训练示例沿用到一个相似的新问题。",
-  "minutes": "15–20 分钟",
+  "minutes": "10–15 分钟",
   "format": "老师投屏，全班举手投票",
   "concepts": ["训练数据", "语言模式", "生成回答"],
   "authors": ["光语课堂"]
