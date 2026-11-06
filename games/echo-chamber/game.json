@@ -2,10 +2,17 @@
   "title": "回音室推送器",
   "course": "brain-behind-the-bot",
   "session": 2,
-  "summary": "全班在虚构社交 App「刷刷」上一起刷帖，举手决定点赞还是点踩，推荐算法据此推送下一批。刷完 4 批后揭晓：平台上三种观点各占三分之一，大家刷到的却越来越偏向一边；再对比只读过这个信息流的 AI 和读过全部帖子的 AI 的回答。",
+  "summary": "全班在虚构 App 上举手点赞或点踩，看推荐算法如何让信息流越来越偏，再对比读过不同内容的 AI。",
   "minutes": "约 10 分钟",
   "format": "老师投屏，全班举手决定点赞或点踩",
   "concepts": ["回音室", "推荐算法", "偏见", "训练数据"],
   "authors": ["Jerry Liu"],
-  "cover": "cover.svg"
+  "cover": "cover.svg",
+  "en": {
+    "title": "Echo Chamber Feed",
+    "summary": "Vote to like or dislike posts in a fictional app, watch the feed narrow, then compare AIs trained on different posts.",
+    "minutes": "About 10 min",
+    "format": "Teacher projects; class votes by hand",
+    "concepts": ["Echo chambers", "Recommenders", "Bias", "Training data"]
+  }
 }

@@ -2,10 +2,17 @@
   "title": "事实还是观点？",
   "course": "brain-behind-the-bot",
   "session": 2,
-  "summary": "老师读出一句贴近学生生活的话，全班举手判断它是事实还是观点。三关由浅入深：观点会“装”成事实，一句话里也可能两者都有，最后发现“可以查证”不等于“一定正确”。",
+  "summary": "老师读出一句贴近生活的话，全班举手判断是事实还是观点。三关由浅入深，可以查证也不等于一定正确。",
   "minutes": "6–8 分钟",
   "format": "老师投屏，全班举手判断",
   "concepts": ["事实", "观点", "可查证", "信息辨别"],
   "authors": ["Jerry Liu"],
-  "cover": "cover.svg"
+  "cover": "cover.svg",
+  "en": {
+    "title": "Fact or Opinion?",
+    "summary": "Judge everyday statements as fact or opinion across three levels, and learn that checkable doesn't always mean correct.",
+    "minutes": "6–8 min",
+    "format": "Teacher projects; class votes by hand",
+    "concepts": ["Facts", "Opinions", "Verifiability", "Media literacy"]
+  }
 }

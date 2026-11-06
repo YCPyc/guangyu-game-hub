@@ -9,6 +9,8 @@ const ROOT = path.resolve(import.meta.dirname, "..")
 const GAMES = path.join(ROOT, "games")
 const courses = JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/courses.json"), "utf8"))
 const MAX_BYTES = 3 * 1024 * 1024
+const MAX_SUMMARY_ZH = 54
+const MAX_SUMMARY_EN = 120
 
 // Anything that would make the browser load something from another host.
 const EXTERNAL = [
@@ -46,6 +48,16 @@ for (const slug of slugs) {
   }
   if (!Array.isArray(meta.concepts) || !meta.concepts.length || !meta.concepts.every((c) => typeof c === "string" && c.trim()))
     fail(slug, 'game.json: "concepts" must be a non-empty list of strings')
+  // Game cards show at most 3 lines of description; longer text would get cut off.
+  if ([...(meta.summary ?? "")].length > MAX_SUMMARY_ZH) fail(slug, `game.json: "summary" must be at most ${MAX_SUMMARY_ZH} characters`)
+  if (meta.en !== undefined) {
+    for (const key of ["title", "summary", "minutes", "format"]) {
+      if (meta.en[key] !== undefined && (typeof meta.en[key] !== "string" || !meta.en[key].trim())) fail(slug, `game.json: "en.${key}" must be a non-empty string`)
+    }
+    if (meta.en.concepts !== undefined && (!Array.isArray(meta.en.concepts) || !meta.en.concepts.every((c) => typeof c === "string" && c.trim())))
+      fail(slug, 'game.json: "en.concepts" must be a list of strings')
+    if ([...(meta.en.summary ?? "")].length > MAX_SUMMARY_EN) fail(slug, `game.json: "en.summary" must be at most ${MAX_SUMMARY_EN} characters`)
+  }
   const course = courses.find((c) => c.id === meta.course)
   if (!course) fail(slug, `game.json: course "${meta.course}" does not exist (see src/data/courses.json: ${courses.map((c) => c.id).join(", ")})`)
   else if (!Number.isInteger(meta.session) || meta.session < 1 || meta.session > course.sessions.length)
@@ -61,6 +73,14 @@ for (const slug of slugs) {
   if (fs.statSync(htmlPath).size > MAX_BYTES) fail(slug, "index.html is larger than 3 MB")
   const html = fs.readFileSync(htmlPath, "utf8")
   if (!/<html[^>]*\slang=["']zh-CN["']/i.test(html)) fail(slug, 'index.html: <html> must have lang="zh-CN"')
+  if (!html.includes('id="game-i18n"')) fail(slug, 'index.html: needs the language block from games/_template (<script id="game-i18n">)')
+  if (!html.includes('id="game-en"') || !/window\.GAME_EN\s*=\s*\{/.test(html)) fail(slug, 'index.html: needs an English dictionary (<script id="game-en">window.GAME_EN = {...})')
+  // Text in CSS (content: "…") isn't on the page, so the translator can't reach it.
+  const css = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join("").replace(/\/\*[\s\S]*?\*\//g, "")
+  for (const [, selector] of css.matchAll(/([^{}]+)\{[^{}]*content:\s*"[^"]*[\u4e00-\u9fff][^"]*"[^{}]*\}/g)) {
+    const sel = selector.trim()
+    if (!css.includes(`html[lang=en] ${sel}`)) fail(slug, `index.html: CSS text in "${sel}" needs an English version: html[lang=en] ${sel} { content: "…"; }`)
+  }
   if (!html.includes("老师说明")) fail(slug, "index.html: needs a 「老师说明」 (teacher guide) button")
   if (meta.course && !html.includes(`href="/classes/${meta.course}"`))
     fail(slug, `index.html: needs a back link to the hub: <a class="back" href="/classes/${meta.course}">← 游戏大厅</a>`)

@@ -2,9 +2,16 @@
   "title": "下一句会是什么",
   "course": "brain-behind-the-bot",
   "session": 1,
-  "summary": "全班先猜故事开头的下一句，再观察简化版 AI 如何根据前文预测后续词语。通过比较不同猜测，认识 AI 会依据学到的语言模式生成内容。",
+  "summary": "全班先猜故事的下一句，再看简化版 AI 如何根据前文预测后续词语，认识 AI 依据语言模式生成内容。",
   "minutes": "10–15 分钟",
   "format": "老师投屏，全班一起操作",
   "concepts": ["下一词预测", "语言模式"],
-  "authors": ["光语课堂"]
+  "authors": ["光语课堂"],
+  "en": {
+    "title": "What Comes Next?",
+    "summary": "Guess the next line of a story, then see how a simplified AI predicts words from what came before.",
+    "minutes": "10–15 min",
+    "format": "Teacher projects; whole class plays",
+    "concepts": ["Next-word prediction", "Language patterns"]
+  }
 }

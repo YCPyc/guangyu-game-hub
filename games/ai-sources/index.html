@@ -139,6 +139,358 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
 @media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .ask-row { flex-direction: column; } .bubble-a { font-size: 1.15rem; } .matched { margin-left: 0; } }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"AI 从哪读来的？": "Where Did AI Read That?",
+"AI 从哪读来的": "Where Did AI Read That?",
+"本游戏配套第 2 节《聊天机器人中的偏见》，放在第 38 页（“我们不能对互联网上的信息照单全收”）之后、第 39 页“追问互联网”之前。学生会看到：": "This game supports Lesson 2, “Bias in chatbots.” Use it after slide 38 (“We can't take everything on the internet at face value”) and before slide 39, “Questioning the internet.” Students will see that ",
+"AI 说对和说错时语气一样肯定": "AI sounds just as sure when it's wrong as when it's right",
+"，它回答的质量取决于它读到的资料；网上说的人多，不代表就是对的。建议总时长约 10 分钟。": ", that the quality of its answers depends on what it has read, and that many people saying something online doesn't make it true. Suggested total time: about 10 minutes.",
+"提问（约 1 分钟）": "Ask (about 1 min)",
+"：请学生出一个问题，或点一个示例问题。也可以问一个资料以外的问题（比如“明天会下雨吗”），看 AI 说“不知道”。": ": Have students come up with a question, or click a sample one. You can also ask something outside the sources (like “Will it rain tomorrow?”) and watch the AI say “I don't know.”",
+"你信吗（约 2 分钟）": "Do you believe it? (about 2 min)",
+"：AI 给出流畅、自信的回答。全班举手，用 ＋/－ 录入“信 / 不确定 / 不信”的人数。": ": The AI gives a smooth, confident answer. The class raises hands; use ＋/－ to record “believe / not sure / don't believe.”",
+"透视来源（约 2 分钟）": "X-ray the sources (about 2 min)",
+"：看每句话来自哪条资料，注意那些“被淹没”的正确资料。": ": See which source each sentence came from, and notice the correct sources that got “drowned out.”",
+"找出问题资料（约 3 分钟）": "Find the bad sources (about 3 min)",
+"：用“追问四问”讨论，先猜再点“揭晓”，把不可靠的资料移出去。": ": Discuss using the “four questions.” Guess first, click “Reveal,” then remove the unreliable sources.",
+"再问一次（约 2 分钟）": "Ask again (about 2 min)",
+"：对比前后两次回答，然后进入第 39 页，点明“刚才你们做的就是追问”。": ": Compare the two answers, then move on to slide 39 and point out: “What you just did is called questioning.”",
+"资料分六类：准确、错误、过时、片面、偏见、广告。所有资料和“AI 回答”都是为教学编写的虚构内容；这个 AI 是简化版，只会从资料里挑句子拼成回答，不连接任何真实的 AI。": "Sources come in six types: accurate, wrong, outdated, one-sided, biased, and ads. All sources and “AI answers” are fictional content written for teaching. This AI is simplified: it only stitches together sentences from the sources and isn't connected to any real AI.",
+"长城能从太空用肉眼看到吗？": "Can the Great Wall be seen from space with the naked eye?",
+"能。": "Yes.",
+"一般来说不能。": "Generally, no.",
+"旅游论坛网友": "Travel forum user",
+"论坛帖子": "Forum post",
+"错误": "Wrong",
+"错误：": "Wrong: ",
+"长城是太空中唯一能用肉眼看到的人类建筑！来中国一定要去看看。": "The Great Wall is the only human structure you can see from space with the naked eye! You have to visit it when you come to China.",
+"长城是太空中唯一能用肉眼看到的人类建筑。": "The Great Wall is the only human structure visible from space with the naked eye.",
+"流传很广的说法，但宇航员的亲身经历否定了它。": "A widely repeated claim, but astronauts' own experience disproves it.",
+"问答平台回答": "Q&A site answer",
+"用户问答": "User Q&A",
+"能啊，宇航员都说过，连在月球上都能看到长城。": "Sure, astronauts have said so. You can even see the Great Wall from the moon.",
+"宇航员也证实过，甚至在月球上都能看到。": "Astronauts have confirmed it. It can even be seen from the moon.",
+"没有给出是哪位宇航员、在哪里说的。月球离地球约 38 万公里，肉眼更不可能看到长城。": "It doesn't say which astronaut said this or where. The moon is about 380,000 km from Earth, so seeing the Great Wall with the naked eye is even less possible.",
+"旧版课外读物": "Old extracurricular book",
+"1990年代": "1990s",
+"书籍": "Book",
+"过时": "Outdated",
+"过时：": "Outdated: ",
+"从月球上看地球，人类唯一能看到的建筑就是万里长城。": "Looking at Earth from the moon, the only human structure you can see is the Great Wall.",
+"很多读物里也记录了这个事实。": "Many books have also recorded this fact.",
+"当时很多书都这样写，后来航天员的实际观察证明这个说法不对。印在书上也可能过时。": "Many books said this at the time, but astronauts' actual observations later proved it wrong. Even printed information can go out of date.",
+"新闻采访 · 杨利伟": "News interview · Yang Liwei",
+"新闻": "News",
+"准确": "Accurate",
+"准确：": "Accurate: ",
+"中国首位航天员杨利伟在返回地球后接受采访时说：他在太空中没有看到长城。": "Yang Liwei, China's first astronaut, said in an interview after returning to Earth that he did not see the Great Wall from space.",
+"中国首位航天员杨利伟在 2003 年飞行后表示，他在太空中没有看到长城。": "Yang Liwei, China's first astronaut, said after his 2003 flight that he did not see the Great Wall from space.",
+"当事人亲口说的，有明确的时间和出处。": "It comes from the person who was there, with a clear time and source.",
+"科普文章": "Popular science article",
+"科普": "Popular science",
+"长城大部分地段宽度只有 4 到 10 米，颜色和周围的土地、山石相近。从几百公里高的太空中，肉眼很难分辨。": "Most of the Great Wall is only 4 to 10 meters wide, and its color is close to the surrounding land and rock. From hundreds of kilometers up, it's very hard to make out with the naked eye.",
+"长城宽度只有几米，颜色又和周围的土地接近，从几百公里高的太空中很难用肉眼分辨。": "The Great Wall is only a few meters wide and close in color to the land around it, so it's very hard to make out with the naked eye from hundreds of kilometers up.",
+"用可以核实的数据解释原因。": "It explains the reason using data you can verify.",
+"金鱼的记忆真的只有 7 秒吗？": "Do goldfish really have only a 7-second memory?",
+"是的，金鱼只有 7 秒记忆。": "Yes, goldfish have only a 7-second memory.",
+"不是。金鱼的记忆远不止 7 秒。": "No. Goldfish memory lasts far longer than 7 seconds.",
+"网络段子": "Internet joke",
+"社交媒体": "Social media",
+"金鱼只有7秒记忆，所以它游一圈回来就忘了，永远不会觉得无聊～": "Goldfish only have a 7-second memory, so by the time they swim a lap they've forgotten it and never get bored~",
+"所以它游一圈回来就会忘记，永远不会觉得无聊。": "So by the time one swims a lap it has forgotten, and it never gets bored.",
+"好玩的段子被当成了科学事实，没有任何研究支持。": "A fun joke got treated as scientific fact, with no research behind it.",
+"鱼缸店推广": "Fish tank shop promotion",
+"广告": "Ad",
+"广告：": "Ad: ",
+"金鱼只有7秒记忆，小鱼缸也能让它天天开心！迷你鱼缸限时特价 39 元。": "Goldfish only have a 7-second memory, so even a small tank keeps them happy! Mini fish tanks on sale now for 39 yuan.",
+"因为记忆很短，小鱼缸也足够让金鱼开心。": "Because their memory is so short, a small tank is enough to keep goldfish happy.",
+"商家用这个说法来卖小鱼缸。写资料的人能从中赚钱时，要多问一句。": "The shop uses this claim to sell small tanks. When the writer can profit, ask an extra question.",
+"网友分享": "User post",
+"评论": "Comment",
+"片面": "One-sided",
+"片面：": "One-sided: ",
+"我家金鱼每次看到我都像第一次见面，肯定记不住我。": "My goldfish acts like it's meeting me for the first time every time. It definitely can't remember me.",
+"很多养鱼的人也发现，金鱼每次见到主人都像第一次见面。": "Many fish owners have also found that goldfish act like they're meeting their owner for the first time, every time.",
+"只是一个人的感觉，不能代表所有金鱼，也不是实验。": "It's just one person's impression. It can't speak for all goldfish, and it isn't an experiment.",
+"科学研究报道": "Science news report",
+"科学报道": "Science report",
+"研究人员训练金鱼在听到特定声音时游去吃食。几个月后再播放这个声音，金鱼仍然会游过去。": "Researchers trained goldfish to swim to food when they heard a certain sound. When the sound was played months later, the goldfish still swam over.",
+"科学家训练金鱼听到声音就去吃食，几个月后它们仍然记得。": "Scientists trained goldfish to go for food at a sound, and months later they still remembered.",
+"通过实验得出，可以重复验证。": "It comes from an experiment that can be repeated and verified.",
+"怎样学习效果最好？": "What's the best way to study?",
+"先找到你的学习类型，再按类型学习。": "First find your learning type, then study according to it.",
+"有两种方法被证明对几乎所有人都有效：主动回忆和间隔复习。": "Two methods are proven to work for almost everyone: active recall and spaced review.",
+"某培训机构": "A tutoring company",
+"测一测你是左脑型还是右脑型学习者！报名“右脑开发”课程，成绩提升 50%！": "Find out if you're a left-brain or right-brain learner! Sign up for our “right-brain development” course and raise your grades 50%!",
+"你可以测一测自己是左脑型还是右脑型学习者，开发右脑能大幅提高成绩。": "You can test whether you're a left-brain or right-brain learner, and developing your right brain can greatly raise your grades.",
+"“左脑型/右脑型”没有科学依据，“提升50%”也没有来源。这是在卖课。": "“Left-brain/right-brain” has no scientific basis, and “raise 50%” has no source. This is selling a course.",
+"偏见": "Biased",
+"偏见：": "Biased: ",
+"男生天生逻辑好，适合学理科；女生细心，更适合背书、学文科。": "Boys are naturally logical and suited to science; girls are careful and better suited to memorizing and the humanities.",
+"一般来说，男生更适合学理科，女生更适合文科。": "Generally speaking, boys are better suited to science and girls to the humanities.",
+"这是刻板印象。把一群人说成“天生”适合什么，忽略了每个人的差异。": "This is a stereotype. Saying a whole group is “naturally” suited to something ignores individual differences.",
+"教育杂志文章": "Education magazine article",
+"文章": "Article",
+"每个人都有自己的学习风格：视觉型、听觉型或动手型。找到你的类型，按类型学习就能事半功倍。": "Everyone has their own learning style: visual, auditory or hands-on. Find your type, study that way, and you'll get twice the results.",
+"每个人都有自己的学习风格，比如视觉型、听觉型或动手型，找到你的类型就能事半功倍。": "Everyone has their own learning style, such as visual, auditory or hands-on, and finding your type gets you twice the results.",
+"这个理论曾经很流行，但后来的研究发现，按“学习风格”学习并不会让成绩更好。": "This theory was once popular, but later research found that studying by “learning style” doesn't improve grades.",
+"认知科学科普": "Cognitive science explainer",
+"大量研究发现：合上书自己回想（主动回忆），以及隔几天再复习一次（间隔复习），对几乎所有学生都有效。": "Lots of research finds that closing the book and recalling on your own (active recall) and reviewing again a few days later (spaced review) work for almost all students.",
+"大量研究发现，合上书自己回想，以及隔几天再复习一次，对几乎所有学生都有效。": "Lots of research finds that closing the book and recalling on your own, and reviewing again a few days later, work for almost all students.",
+"基于大量研究，结论在不同实验中都得到了验证。": "Based on lots of research, with the conclusion confirmed across different experiments.",
+"宇航员在太空能看见长城吗？": "Can astronauts see the Great Wall from space?",
+"金鱼是不是很快就忘事？": "Do goldfish forget things quickly?",
+"怎么复习才能考好？": "How should I review to do well on tests?",
+"明天会下雨吗？": "Will it rain tomorrow?",
+"谁写的？": "Who wrote it?",
+"什么时候写的？": "When was it written?",
+"他为什么要写？能从中得到什么？": "Why did they write it? What do they get out of it?",
+"有证据吗？能查证吗？": "Is there evidence? Can it be checked?",
+"我没有读到相关的资料，没办法回答这个问题。": "I haven't read anything about this, so I can't answer the question.",
+"网上的说法不太一致。": "Sources online don't quite agree.",
+"提问": "Ask",
+"投票": "Vote",
+"透视": "X-ray",
+"追问": "Question",
+"再问": "Ask again",
+"例如：宇航员在太空能看见长城吗？": "e.g. Can astronauts see the Great Wall from space?",
+"用自己的话提问，按回车或点“问 AI”": "Ask in your own words. Press Enter or click “Ask AI”",
+"问 AI": "Ask AI",
+"不知道问什么？试试这些：": "Not sure what to ask? Try these:",
+"第 1 步：问 AI 任何问题": "Step 1: Ask the AI anything",
+"这个小 AI 只读过 13 条网上的资料，内容关于长城、金鱼和学习方法。问它一个问题，看看它怎么回答。": "This little AI has read only 13 sources from the internet, about the Great Wall, goldfish and study methods. Ask it a question and see how it answers.",
+"我不知道。": "I don't know.",
+"我读过的 13 条资料里，没有和这个问题有关的内容。": "Nothing in the 13 sources I've read is related to this question.",
+"这个 AI 只能根据读过的资料回答。真正的 AI 读过的资料多得多，但没读过的，它会怎么办？": "This AI can only answer from what it has read. Real AI has read far more, but what will it do about things it hasn't read?",
+"信": "Believe",
+"不确定": "Not sure",
+"不信": "Don't believe",
+"第 2 步：你信这个回答吗？": "Step 2: Do you believe this answer?",
+"AI 回答得很流畅、很肯定。全班举手，老师数人数，用 ＋/－ 录入。": "The AI answered smoothly and confidently. The class raises hands; the teacher counts and records with ＋/－.",
+"AI 找到的最相关话题：": "Most related topic the AI found: ",
+"透视：这些话从哪来？ →": "X-ray: where did these sentences come from? →",
+"AI 回答得很肯定，就说明它说的是对的吗？": "If the AI answers confidently, does that mean it's right?",
+"AI 的回答没有用到这条：它被别的说法“淹没”了。": "The AI's answer didn't use this one: it was “drowned out” by other claims.",
+"揭晓": "Reveal",
+"放回资料": "Put back",
+"移出资料": "Remove source",
+"第 3 步：透视来源": "Step 3: X-ray the sources",
+"AI 回答里的每句话，都来自它读过的某一条资料。编号对应下面的资料卡片。": "Every sentence in the AI's answer comes from a source it read. The numbers match the source cards below.",
+"说明：这是一个简化版的 AI，它只会从读过的资料里挑句子拼成回答。真正的 AI 读过的资料多得多，也会自己组织语言，而且通常不会告诉你每句话来自哪里。": "Note: this is a simplified AI that only stitches together sentences from its sources. Real AI has read far more, puts things in its own words, and usually doesn't tell you where each sentence came from.",
+"找出问题资料 →": "Find the bad sources →",
+"有的资料说的是对的，AI 却没有用它。为什么正确的说法会被“淹没”？": "Some sources were right, yet the AI didn't use them. Why do correct claims get “drowned out”?",
+"第 4 步：找出问题资料": "Step 4: Find the bad sources",
+"用下面四个问题“追问”每条资料。全班讨论哪几条不可靠，再点“揭晓”看答案，点“移出资料”把它从 AI 的数据里拿掉。": "Use the four questions below to “question” each source. Discuss as a class which are unreliable, click “Reveal” to see the answer, then “Remove source” to take it out of the AI's data.",
+"追问四问": "The four questions",
+"移出后，再问一次 →": "Removed? Ask again →",
+"先移出至少一条资料": "Remove at least one source first",
+"你们是靠哪一个追问问题，发现这条资料不可靠的？": "Which question helped you discover that this source was unreliable?",
+"第 5 步：再问一次": "Step 5: Ask again",
+"读了全部资料时": "After reading all the sources",
+"← 调整资料": "← Adjust sources",
+"换一个问题再试": "Try another question",
+"AI 回答得好不好，取决于什么？我们用 AI 的时候，又该怎么“追问”它？": "What does the quality of an AI's answer depend on? How should we “question” AI when we use it?",
+"还没有提问记录。": "No questions recorded yet.",
+"无": "None",
+"问题": "Question",
+"AI 找到的话题": "Topic the AI found",
+"移出的资料": "Removed sources",
+"修改前的回答": "Answer before",
+"修改后的回答": "Answer after"
+},
+"patterns": [
+[
+"^(.+)减一$",
+"$1: remove one"
+],
+[
+"^(.+)加一$",
+"$1: add one"
+],
+[
+"^(\\S.*) · (\\S+)$",
+"$1 · $2"
+],
+[
+"^已移出 (\\d+) 条资料$",
+"$1 sources removed"
+],
+[
+"^同一个问题：“(.*)”$",
+"Same question: “$1”"
+],
+[
+"^移出 (\\d+) 条资料后$",
+"After removing $1 sources"
+],
+[
+"^(.+)；(.+)$",
+"$1; $2"
+],
+[
+"^(\\d+)号（(.+)）$",
+"#$1 ($2)"
+],
+[
+"^(.+)　\\|　共问了 (\\d+) 个问题$",
+"$1 | $2 questions asked"
+],
+[
+"^共问了 (\\d+) 个问题$",
+"$1 questions asked"
+],
+[
+"^问题 (\\d+)：(.*)$",
+"Question $1: $2"
+],
+[
+"^举手投票　信 (\\d+) 人　不确定 (\\d+) 人　不信 (\\d+) 人$",
+"Show of hands: believe $1, not sure $2, don't believe $3"
+],
+[
+"^移出的资料：(.*)$",
+"Removed sources: $1"
+],
+[
+"^修改前：(.*)$",
+"Before: $1"
+],
+[
+"^修改后：(.*)$",
+"After: $1"
+],
+[
+"^目前记录了 (\\d+) 个问题。$",
+"$1 questions recorded so far."
+],
+[
+"^AI从哪读来的_(.+)$",
+"Where-Did-AI-Read-That_$1"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top">
@@ -213,7 +565,7 @@ const today = () => new Date().toISOString().slice(0, 10);
    stance：资料支持哪种说法；type：资料可不可靠；say：AI 回答时会怎么“转述”它。 */
 const QS=[
  {id:'wall',q:'长城能从太空用肉眼看到吗？',
-  kw:['长城','万里长城','太空','宇宙','宇航员','航天员','月球','月亮','卫星','肉眼','看见','看到','杨利伟','建筑'],
+  kw:['长城','万里长城','太空','宇宙','宇航员','航天员','月球','月亮','卫星','肉眼','看见','看到','杨利伟','建筑','great wall','the wall','space','astronaut','moon','satellite','naked eye'],
   lead:{A:'能。',B:'一般来说不能。'},
   src:[
    {who:'旅游论坛网友',date:'2019',kind:'论坛帖子',stance:'A',type:'错误',
@@ -238,7 +590,7 @@ const QS=[
     why:'用可以核实的数据解释原因。'}
   ]},
  {id:'fish',q:'金鱼的记忆真的只有 7 秒吗？',
-  kw:['金鱼','鱼','记忆','记性','记得','记住','忘记','7秒','七秒','秒','鱼缸','养鱼'],
+  kw:['金鱼','鱼','记忆','记性','记得','记住','忘记','7秒','七秒','秒','鱼缸','养鱼','goldfish','fish','memory','memories','remember','forget','7 second','seven second'],
   lead:{A:'是的，金鱼只有 7 秒记忆。',B:'不是。金鱼的记忆远不止 7 秒。'},
   src:[
    {who:'网络段子',date:'2018',kind:'社交媒体',stance:'A',type:'错误',
@@ -259,7 +611,7 @@ const QS=[
     why:'通过实验得出，可以重复验证。'}
   ]},
  {id:'study',q:'怎样学习效果最好？',
-  kw:['学习','学','复习','背书','背','考试','成绩','方法','效率','理科','文科','数学','左脑','右脑','学习风格','男生','女生','记单词','预习','上课'],
+  kw:['学习','学','复习','背书','背','考试','成绩','方法','效率','理科','文科','数学','左脑','右脑','学习风格','男生','女生','记单词','预习','上课','study','studying','learn','review','exam','test','grades','math','left brain','right brain','learning style','boys','girls','homework'],
   lead:{A:'先找到你的学习类型，再按类型学习。',B:'有两种方法被证明对几乎所有人都有效：主动回忆和间隔复习。'},
   src:[
    {who:'某培训机构',date:'2023',kind:'广告',stance:'A',type:'广告',
@@ -307,7 +659,7 @@ function answerFor(q, removed) {
   const win = a.length > b.length ? a : b;
   return { lead: q.lead[win[0].stance], used: win };
 }
-const answerText = (ans) => ans.lead + ans.used.map((s) => s.say).join("");
+const answerText = (ans) => [ans.lead, ...ans.used.map((s) => s.say)].map(gameT).join(gameLang() === "en" ? " " : "");
 
 /* ===================================================================== 状态 + 步骤 */
 const STEPS = ["提问", "投票", "透视", "追问", "再问"];
@@ -443,7 +795,7 @@ function stepCompare() {
 /* ===================================================================== 导出 */
 function download(blob, name) {
   const url = URL.createObjectURL(blob);
-  const a = el("a", { href: url, download: name });
+  const a = el("a", { href: url, download: gameT(name) });
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
@@ -483,7 +835,7 @@ $("#btn-ex-csv").onclick = () => {
   const m = meta();
   const rows = [["日期", "班级", "参与人数", "问题", "AI 找到的话题", "信", "不确定", "不信", "移出的资料", "修改前的回答", "修改后的回答"],
     ...rounds().map((r) => [m.date, m.cls, m.count, r.text, r.topic, r.votes.yes, r.votes.maybe, r.votes.no, r.removed, r.before, r.after])];
-  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(gameT(String(v))).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
 };
 

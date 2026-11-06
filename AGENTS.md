@@ -27,15 +27,26 @@ automatically from `games/*/game.json`, so no other file needs to change.
      "title": "游戏名（中文，6–10 个字）",
      "course": "<course id>",
      "session": 1,
-     "summary": "一两句话：学生在游戏里做什么、理解什么概念。",
+     "summary": "一两句话（最多 54 个字）：学生在游戏里做什么、理解什么概念。",
      "minutes": "15–20 分钟",
      "format": "老师投屏，全班一起操作",
      "concepts": ["词元", "数据集"],
      "authors": ["作者名字"],
-     "cover": "cover.svg"
+     "cover": "cover.svg",
+     "en": {
+       "title": "English title (short, fits one line)",
+       "summary": "One or two sentences, at most 120 characters.",
+       "minutes": "15–20 min",
+       "format": "Teacher projects; whole class plays",
+       "concepts": ["Tokens", "Datasets"]
+     }
    }
    ```
    `cover` is optional: a simple flat SVG (320×180 viewBox) in the same folder, using the palette below.
+   `en` is the card text for the hub's English version; fill it in (anything missing shows in Chinese).
+   Game cards show 3 lines of description, so `summary` is
+   limited to 54 characters and `en.summary` to 120. Keep titles short enough for one line, and at most
+   4 short `concepts`.
 5. **Build the game in `games/<slug>/index.html`** following the requirements and style guide below.
    Keep the template's shared CSS block, header, 老师说明 modal and export modal; replace the TODOs.
 6. **Verify** (see "Before you open the PR").
@@ -58,13 +69,17 @@ Checked automatically by `npm run validate` (`scripts/validate-games.mjs`):
 - `<html lang="zh-CN">`.
 - A back link to the hub: `<a class="back" href="/classes/<course id>">← 游戏大厅</a>`.
 - A 「老师说明」 button that opens a short teacher guide.
-- `game.json` fields valid; `course` exists; `session` is in range. Under 3 MB.
+- The language blocks from the template: `<script id="game-en">` (this game's English dictionary) and
+  `<script id="game-i18n">` (the translator; copy it unchanged). See "Translating a game" below.
+- `game.json` fields valid; `course` exists; `session` is in range; summaries within the length limits.
+  Under 3 MB.
 
 Not machine-checked, but required:
 
 - Vanilla JS (ES2020+), no frameworks, no build step. Target recent Chrome, Edge, Safari and the WeChat
   in-app browser.
-- **All UI text in Simplified Chinese**, written for students aged 9–15: friendly, plain, not childish.
+- **UI text in Simplified Chinese with a full English translation**, written for students aged 9–15:
+  friendly, plain, not childish.
 - **Teacher-led projection is the main scenario**: a teacher drives the game on a classroom computer
   projected to ~40 students who usually have no devices. Design for "the whole class looks, discusses,
   votes by raising hands, and the teacher clicks". Body text ≥ 20px; key content (answers, results,
@@ -82,6 +97,28 @@ Not machine-checked, but required:
 - Content must be original and age-appropriate. Any example phone numbers, addresses, URLs or "AI outputs"
   are clearly fictional. When simplifying how AI works, say so honestly in the UI
   (e.g. "这是一个简化版……真正的 AI……").
+
+## Translating a game
+
+Every game works in both Chinese and English, and shares the hub's language setting. Write the game in
+Chinese as usual, then add every string to `window.GAME_EN` in the `game-en` script:
+
+- `text`: exact string → translation, e.g. `"下一题 →": "Next question →"`. This covers on-screen text,
+  the 老师说明, placeholders, `title`/`aria-label`, and the PNG/CSV exports.
+- `patterns`: `[regex, replacement]` for strings with variables, e.g.
+  `["^第 (\\d+) 关：(.+)$", "Level $1: $2"]`. Each `$n` is translated too, so nested strings work.
+
+Use `gameT("中文")` where JS needs the translated text before drawing or joining it, and `gameLang()` for
+language-specific logic (for example, joining sentences with a space in English). Logic that depends on
+the text itself needs its own English version instead of a translation: splitting a sentence by character,
+matching typed keywords, or highlighting part of a sentence.
+
+The translator only reaches text on the page. Text inside CSS needs its own rule:
+`html[lang=en] .x::after { content: "…"; }`.
+
+To check for gaps: switch to English, play every stage, open the 老师说明, and export. Then run
+`__i18nMissing` in the browser console; it must be empty, and no Chinese should remain on screen
+(except anything a user typed).
 
 ## Style guide (match the hub)
 
@@ -107,7 +144,8 @@ The hub is clean and calm, like Khan Academy or Code.org — not flashy. Games s
 1. `npm run validate` passes.
 2. `npm run dev`, open `http://localhost:5173/games/<slug>/index.html` and play the whole game.
    Also check the course page `http://localhost:5173/classes/<course id>` shows the new card.
-3. Check at ~1920×1080 (projector) and 375px wide (phone, no horizontal scroll).
+3. Check at ~1920×1080 (projector) and 375px wide (phone, no horizontal scroll), in both languages.
+   In English, `__i18nMissing` in the browser console must be empty after playing through.
 4. Open `games/<slug>/index.html` directly from disk (file://) — it must still work offline.
 5. `npm run build` passes.
 6. Fill in the PR template checklist; include 1–2 screenshots.

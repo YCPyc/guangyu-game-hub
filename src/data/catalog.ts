@@ -12,6 +12,8 @@ export type Course = {
   /** 每节课的标题；游戏的 session 字段是这里的序号（从 1 开始） */
   sessions: string[]
   tone: "teal" | "amber" | "blue" | "coral"
+  /** 英文版文字（英文标题是 titleEn） */
+  en?: { grades?: string; summary?: string; sessions?: string[] }
 }
 
 /** games/<slug>/game.json 的内容 */
@@ -26,6 +28,8 @@ export type GameMeta = {
   authors?: string[]
   /** games/<slug>/ 里的封面图片文件名（可选） */
   cover?: string
+  /** 英文版文字；没有填的字段在英文界面里显示中文 */
+  en?: { title?: string; summary?: string; minutes?: string; format?: string; concepts?: string[] }
 }
 
 export type Game = GameMeta & { slug: string; href: string; coverUrl?: string }

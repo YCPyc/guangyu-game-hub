@@ -87,6 +87,249 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
   .idea-form { flex-direction: column; }
 }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"下一句会是什么": "What Comes Next?",
+"游戏环节": "Game stages",
+"本游戏配套第 1 节《聊天机器人怎么运作》，帮助学生理解聊天机器人会根据前文和学到的语言模式，预测接下来可能出现的词语。游戏中的 AI 是简化模拟，真实 AI 使用更复杂的模型和大量训练数据。建议总时长 10–15 分钟。": "This game supports Lesson 1, “How chatbots work.” It helps students understand that chatbots predict the words likely to come next, based on what came before and the language patterns they have learned. The AI in this game is a simplified simulation; real AI uses far more complex models and huge amounts of training data. Suggested total time: 10–15 minutes.",
+"开场（约 1 分钟）": "Opening (about 1 min)",
+"：说明玩法，提醒同学们可以有不同的合理猜想。": ": Explain how to play, and remind students that many different guesses can be reasonable.",
+"第 1 轮：森林里的故事（约 3–4 分钟）": "Round 1: A story in the forest (about 3–4 min)",
+"：展示故事开头，邀请同学自由猜想；老师可记下 1–2 条匿名想法并带全班举手投票；揭晓简化 AI 续写，比较差异。": ": Show the story opening and invite free guesses. The teacher can note 1–2 anonymous ideas and lead a show-of-hands vote, then reveal the simplified AI's continuation and compare.",
+"第 2 轮：书包里的发现（约 3–4 分钟）": "Round 2: A discovery in the backpack (about 3–4 min)",
+"：重复“自由猜想—记录想法和投票—揭晓并比较”的流程。": ": Repeat the same flow: free guesses, note ideas and vote, reveal and compare.",
+"第 3 轮：小船和箱子（约 3–4 分钟）": "Round 3: The boat and the box (about 3–4 min)",
+"：重复同一流程，邀请学生留意不同开头带来的预测变化。": ": Repeat the same flow, and ask students to notice how different openings change the prediction.",
+"总结（约 1–2 分钟）": "Wrap-up (about 1–2 min)",
+"：回顾 AI 根据学到的语言模式预测后续；预测不等于理解，也可能出错。": ": Review how AI predicts what comes next from the language patterns it learned. Predicting is not the same as understanding, and it can be wrong.",
+"本游戏完全离线可用，不收集任何学生信息。计票数据保存在当前页面内存中。": "This game works fully offline and collects no student data. Vote counts stay in this page's memory.",
+"图片和表格会记录每轮预设猜测、课堂补充猜测的举手票数，以及简化 AI 的预测。只导出猜测内容和票数，不记录学生姓名。": "The image and spreadsheet record the votes for each round's preset and class-added guesses, plus the simplified AI's prediction. Only guesses and vote counts are exported, never student names.",
+"很久很久以前，森林里住着一只……": "Once upon a time, deep in the forest, there lived a…",
+"会说话的狐狸": "talking fox",
+"迷路的小机器人": "lost little robot",
+"喜欢种花的熊": "bear who loved planting flowers",
+"会说话的狐狸。它每天清晨都会去河边听鸟儿唱歌。": "talking fox. Every morning it went down to the river to listen to the birds sing.",
+"狐狸": "fox",
+"放学后，小雨打开书包，发现里面……": "After school, Xiaoyu opened her backpack and found…",
+"多了一封神秘的信": "a mysterious letter",
+"有一颗闪闪发光的石头": "a sparkling stone",
+"课本变成了地图": "her textbook had turned into a map",
+"有一张被折起来的纸条，上面写着：‘操场见。’": "a folded note that said: “Meet me on the playground.”",
+"纸条": "note",
+"一艘小船漂到岛边，船上的箱子里……": "A small boat drifted up to the island, and in the box on board was…",
+"装着一把旧钥匙": "an old key",
+"传来轻轻的敲门声": "a soft knocking sound",
+"住着一只小海龟": "a little sea turtle",
+"装着许多颜色不同的贝壳。箱子旁边还放着一张地图。": "a pile of shells in many colors. Next to the box lay a map.",
+"贝壳": "shells",
+"先来猜想": "Guess first",
+"举手投票": "Class vote",
+"看看 AI": "See the AI",
+"故事开头": "Story opening",
+"第 1 步：先猜一猜": "Step 1: Take a guess",
+"读完开头，先别看选项。请大家想一想：接下来可能发生什么？答案可以很多种。": "Read the opening, and don't look at any options yet. What might happen next? There are many possible answers.",
+"想一想：": "Think about it: ",
+"同一个开头，为什么会让大家想到不同的故事？": "Why does the same opening make people think of different stories?",
+"看看大家的猜测 →": "See everyone's guesses →",
+"减少一票": "Remove one vote",
+"增加一票": "Add one vote",
+"输入一个故事猜测，例如：箱子里有一张藏宝图": "Type a story guess, e.g. a treasure map in the box",
+"课堂补充猜测": "Guess added by the class",
+"加入课堂猜测": "Add class guess",
+"第 2 步：全班投票": "Step 2: Class vote",
+"先听同学们自由猜想。老师可以把有代表性的想法简短记下来，加入选项；再请全班举手选最想继续听的一种。": "First hear students' guesses. The teacher can briefly note representative ideas and add them as options, then have the class raise hands for the one they most want to hear more of.",
+"加入同学们想到的猜测": "Add the class's guesses",
+"每轮最多添加 6 条。只记故事内容，不写姓名或个人信息。题材也可以很不一样，暂时没有标准答案。": "Add up to 6 per round. Record only story ideas, with no names or personal details. Ideas can be very different; there is no right answer yet.",
+"点选一种猜测，再用 ＋/－ 记录举手人数。不同猜测的票数会分别保留。": "Select a guess, then use ＋/－ to record the raised hands. Each guess keeps its own count.",
+"请先选择一种猜测": "Select a guess first",
+"哪条线索让你觉得这个猜测更可能？": "Which clue made this guess feel more likely to you?",
+"看看简化 AI 怎么续写 →": "See how the simplified AI continues →",
+"已揭晓": "Revealed",
+"揭晓简化 AI 预测": "Reveal the simplified AI's prediction",
+"模拟预测（示例，不是联网 AI）": "Simulated prediction (an example, not a live AI)",
+"先请同学猜猜：简化 AI 会接出什么内容？准备好后点击揭晓。": "Ask students first: what will the simplified AI write next? Click reveal when you're ready.",
+"进入下一轮 →": "Next round →",
+"再玩一次": "Play again",
+"第 3 步：看看 AI 的预测": "Step 3: See the AI's prediction",
+"这不是唯一正确答案。真实聊天机器人会根据上下文和训练中学到的语言模式，计算后续词语的可能性。": "This isn't the only right answer. Real chatbots calculate how likely each next word is, based on context and the language patterns learned in training.",
+"AI 的续写和同学们的猜测哪里相似、哪里不同？它预测得合理，就代表它真的理解故事吗？": "How is the AI's continuation similar to or different from your guesses? If its prediction is reasonable, does that mean it truly understands the story?",
+"轮次": "Round",
+"故事开头 ": "Story opening",
+"简化AI预测": "Simplified AI prediction",
+"简化模拟用于课堂讨论；真实 AI 的预测过程更复杂。": "A simplified simulation for class discussion; real AI's prediction process is far more complex."
+},
+"patterns": [
+[
+"^第 (\\d+) 轮$",
+"Round $1"
+],
+[
+"^第(\\d+)轮$",
+"Round $1"
+],
+[
+"^预设猜测 ([A-C])$",
+"Preset guess $1"
+],
+[
+"^课堂想法 (\\d+)$",
+"Class idea $1"
+],
+[
+"^正在记录：(.+)$",
+"Recording: $1"
+],
+[
+"^在这个简化示例里，模型根据前面的词语，逐步预测后面可能出现的词。这里突出显示的第一个关键词是“(.+)”。$",
+"In this simplified example, the model predicts the words likely to come next, step by step, from the words before them. The first key word highlighted here is “$1”."
+],
+[
+"^猜测(\\d+)内容$",
+"Guess $1 text"
+],
+[
+"^猜测(\\d+)票数$",
+"Guess $1 votes"
+],
+[
+"^第 (\\d+) 轮：(.+)$",
+"Round $1: $2"
+],
+[
+"^([A-I])\\. (.+)　举手：(\\d+)$",
+"$1. $2   Votes: $3"
+],
+[
+"^简化 AI：(.+)$",
+"Simplified AI: $1"
+],
+[
+"^下一句会是什么_(.+)$",
+"What-Comes-Next_$1"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -160,7 +403,7 @@ function stepAI() {
   const next = S.round < ROUNDS.length - 1 ? el("button", { class: "btn big", onclick: () => { S.round++; S.step = 0; render(); } }, "进入下一轮 →") : el("button", { class: "btn big", onclick: () => { S.step = 0; S.round = 0; render(); } }, "再玩一次");
   return [el("h2", {}, "第 3 步：看看 AI 的预测"), el("p", { class: "lead" }, "这不是唯一正确答案。真实聊天机器人会根据上下文和训练中学到的语言模式，计算后续词语的可能性。"), roundNav(), promptCard(), el("div", { class: "row" }, reveal), box, el("div", { class: "discuss" }, "讨论：", el("span", {}, "AI 的续写和同学们的猜测哪里相似、哪里不同？它预测得合理，就代表它真的理解故事吗？")), el("div", { class: "row", style: "margin-top:20px" }, next)];
 }
-function download(blob, name) { const url = URL.createObjectURL(blob); const a = el("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
+function download(blob, name) { const url = URL.createObjectURL(blob); const a = el("a", { href: url, download: gameT(name) }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
 const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
 const safe = (s) => s.replace(/[\\/:*?"<>|\s]+/g, "_");
 function maxChoices() { return Math.max(...ROUNDS.map((r) => r.choices.length)); }
@@ -187,7 +430,7 @@ $("#btn-ex-png").onclick = () => {
 };
 $("#btn-ex-csv").onclick = () => {
   const m = meta(), data = csvRows(m);
-  const csv = "\uFEFF" + data.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const csv = "\uFEFF" + data.map((r) => r.map((v) => `"${String(gameT(String(v))).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   download(new Blob([csv], { type: "text/csv;charset=utf-8" }), safe("下一句会是什么_" + m.cls + "_" + m.date) + ".csv");
 };
 document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => { if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true; }));
