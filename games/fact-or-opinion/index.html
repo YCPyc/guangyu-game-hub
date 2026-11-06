@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>事实还是观点 · 光语课堂游戏</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* 顶栏：返回游戏大厅 + 游戏名 + 老师说明 */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 按钮：主按钮（实色）、次按钮（描边） */
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+
+/* 步骤条 */
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; }    /* 关键内容 ≥ 32px */
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 讨论问题条（深色，放在每个环节的结尾） */
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+
+/* 弹窗（老师说明、导出） */
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+
+/* 手机：375px 宽时不能出现横向滚动 */
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+}
+
+/* ===================================================================== 本游戏样式 */
+.board { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.qcard { display: flex; flex-direction: column; gap: 18px; }
+.qmeta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--muted); font-weight: 600; font-size: .9rem; }
+.dots { display: flex; gap: 8px; }
+.dots span { width: 14px; height: 14px; border-radius: 50%; background: var(--line); }
+.dots span.ok { background: var(--good); }
+.dots span.no { background: var(--bad); }
+.dots span.cur { outline: 2px solid var(--primary); outline-offset: 2px; }
+.stmt { font-size: 2rem; font-weight: 800; line-height: 1.6; min-height: 3.2em; }
+.stmt mark { color: inherit; border-radius: 6px; padding: 0 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.stmt mark.fact { background: var(--primary-soft); box-shadow: inset 0 -4px 0 var(--primary); }
+.stmt mark.op { background: var(--accent-soft); box-shadow: inset 0 -4px 0 var(--accent); }
+.clue { text-decoration: underline wavy; text-underline-offset: 8px; text-decoration-thickness: 2px; }
+.clue.fact { text-decoration-color: var(--primary); }
+.clue.op { text-decoration-color: var(--accent); }
+.ask { font-weight: 600; color: var(--muted); }
+.answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.ans { border: 2px solid var(--c); background: var(--card); color: var(--ink); border-radius: var(--radius); padding: 14px 12px; min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ans b { font-size: 1.7rem; }
+.ans small { font-size: .8rem; color: var(--muted); }
+.ans:hover:not(:disabled) { background: var(--cs); }
+.ans:disabled { cursor: default; }
+.ans.picked { background: var(--cs); box-shadow: inset 0 0 0 2px var(--c); }
+.ans.right::after { content: "正确答案"; font-size: .75rem; font-weight: 700; color: var(--good); }
+.ans.dim { opacity: .4; }
+.reveal { border-radius: var(--radius); padding: 16px 18px; background: var(--bg); border-left: 6px solid var(--c); display: flex; flex-direction: column; gap: 8px; }
+.verdict { font-size: 1.6rem; font-weight: 800; }
+.verdict .tag { font-size: .9rem; font-weight: 700; margin-left: 10px; }
+.verdict .tag.ok { color: var(--good); }
+.verdict .tag.no { color: var(--bad); }
+.tips { display: flex; flex-direction: column; gap: 12px; }
+.tips h3 { margin: 0; font-size: 1.05rem; }
+.def { border-radius: 10px; padding: 10px 12px; background: var(--cs); font-size: .85rem; line-height: 1.55; }
+.def b { display: block; font-size: 1rem; }
+.sig { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.sig span { font-size: .75rem; font-weight: 600; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--c); background: var(--card); }
+.score { font-size: 2.2rem; font-weight: 800; line-height: 1.1; }
+.score small { font-size: .9rem; color: var(--muted); font-weight: 600; }
+.sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.sum-grid .card { display: flex; flex-direction: column; gap: 4px; }
+.wrong { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: .9rem; }
+@media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .stmt { font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title">
+        <h1>事实还是观点？</h1>
+        <p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 2 节</p>
+      </div>
+      <div class="actions">
+        <button class="btn outline small" id="btn-export">导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">老师说明</button>
+      </div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    <p>本游戏配套第 2 节《聊天机器人中的偏见》，放在课件讲“互联网”的部分（第 36 页）作为热身。它帮助学生分清<b>事实</b>（可以查证、有标准答案）和<b>观点</b>（个人的感受、喜好或判断），为后面“追问互联网”打基础。建议总时长约 6–8 分钟。</p>
+    <ol>
+      <li><b>第 1 关 · 入门（约 2 分钟）</b>：读出句子，全班举手选“事实”还是“观点”，老师按多数人的选择点击，再一起看解释。</li>
+      <li><b>第 2 关 · 进阶（约 2 分钟）</b>：有些观点会“装”成事实，比如用“大家都”“都不”包装。讨论学生是怎么被骗到的。</li>
+      <li><b>第 3 关 · 挑战（约 3 分钟）</b>：一句话里可能既有事实又有观点。最后两类题特别重要：“某某说……”和“喝冰水会让人长不高”。</li>
+      <li><b>结果（约 1 分钟）</b>：用最后的讨论问题过渡到课件：网上的事实、观点、误导和编造常常混在一起。</li>
+    </ol>
+    <p>每关从 10 句题库里随机抽 3 句，点“换一组题”可以重玩。注意：“事实”指<b>可以被查证</b>的说法，不等于“一定是对的”。</p>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。</p>
+  </div>
+</div>
+
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label>
+    </div>
+    <p class="hint" id="ex-note"></p>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button>
+      <button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================================================================== 工具函数 */
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* ===================================================================== 题库
+   每关 10 句，每次随机抽 3 句。k：fact 事实 | op 观点 | both 两者都有。
+   parts：“两者都有”的句子按事实/观点切开；clue：揭晓时加波浪线的词。 */
+const LEVELS=[
+ {name:'入门',hint:'先从最简单的开始',opts:['fact','op'],lib:[
+  {t:'春节是农历新年的第一天。',k:'fact',why:'查日历就能确认，不管谁查结果都一样。',clue:['农历新年的第一天'],cf:1},
+  {t:'红烧肉是食堂最好吃的菜。',k:'op',why:'“好吃”是个人口味，有人爱红烧肉，有人更喜欢番茄炒蛋。',clue:['最好吃']},
+  {t:'一场篮球比赛，每队同时有 5 名球员在场上。',k:'fact',why:'这是篮球规则，翻规则书就能查到。',clue:['5 名'],cf:1},
+  {t:'数学是最难的一门课。',k:'op',why:'有人觉得数学最难，有人觉得英语或语文更难。难不难因人而异。',clue:['最难']},
+  {t:'中国的首都是北京。',k:'fact',why:'这是可以查证的地理常识，有标准答案。',clue:['首都是北京'],cf:1},
+  {t:'暑假实在太短了。',k:'op',why:'“太短”是感受。学生可能觉得短，家长可能觉得长。',clue:['太短了']},
+  {t:'这次月考一共考了 6 门科目。',k:'fact',why:'看看考试安排表就能确认。',clue:['6 门'],cf:1},
+  {t:'穿校服很难看。',k:'op',why:'好不好看是审美判断，每个人的看法都不一样。',clue:['难看']},
+  {t:'一年有 12 个月。',k:'fact',why:'这是大家都能查证的常识，有标准答案。',clue:['12 个月'],cf:1},
+  {t:'下雨天最适合睡懒觉。',k:'op',why:'“最适合”是个人喜好。也有人觉得下雨天最适合看书，或者出去踩水。',clue:['最适合']}
+ ]},
+ {name:'进阶',hint:'有些观点会“装”成事实',opts:['fact','op'],lib:[
+  {t:'大家都觉得这部电影特别好看。',k:'op',why:'“大家都”听起来像事实，其实没人能问遍所有人。它是在用“大家”包装一个观点。',clue:['大家都','特别好看']},
+  {t:'这次数学考试，全班平均分是 82 分。',k:'fact',why:'分数可以算出来。虽然在说成绩，但这是一个可以查证的数字。',clue:['82 分'],cf:1},
+  {t:'学霸都不玩游戏。',k:'op',why:'这是一种以偏概全的判断。总会有成绩好又爱打游戏的同学。',clue:['都不']},
+  {t:'这款手机有黑、白、蓝三种颜色。',k:'fact',why:'去商品页面看一眼就能确认。',clue:['三种颜色'],cf:1},
+  {t:'这款手机的颜色都很好看。',k:'op',why:'说的是手机的颜色，但“好看”是个人审美，所以是观点。',clue:['很好看']},
+  {t:'体育课应该每天都有。',k:'op',why:'“应该”表示一个人的主张。有人同意，也有人觉得没必要。',clue:['应该']},
+  {t:'睡眠不足会让人注意力下降。',k:'fact',why:'听起来像大人的唠叨，其实是很多科学研究都证实过的结论，可以查证。',clue:['注意力下降'],cf:1},
+  {t:'周一是一周里最烦人的一天。',k:'op',why:'“最烦人”是感受。说不定有人最喜欢周一，因为有体育课。',clue:['最烦人']},
+  {t:'这部电影上映第一周，票房超过了 1 亿元。',k:'fact',why:'听起来像宣传，但票房是有统计数据的，可以查证。',clue:['超过了 1 亿元'],cf:1},
+  {t:'打篮球的人都长得高。',k:'op',why:'“都”是以偏概全。很多篮球打得好的人个子并不高，也有很多高个子从来不打篮球。',clue:['都']}
+ ]},
+ {name:'挑战',hint:'一句话里可能既有事实又有观点',opts:['fact','op','both'],lib:[
+  {t:'今天气温 35 度，热得让人受不了。',k:'both',parts:[['今天气温 35 度，','fact'],['热得让人受不了。','op']],why:'温度可以用温度计测出来，是事实；“受不了”是感受，是观点。'},
+  {t:'小卖部在操场旁边，里面的零食比外面的好吃多了。',k:'both',parts:[['小卖部在操场旁边，','fact'],['里面的零食比外面的好吃多了。','op']],why:'位置可以去看，是事实；“好吃多了”是个人口味，是观点。'},
+  {t:'我们班昨天赢了篮球赛，因为我们是全年级最团结的班。',k:'both',parts:[['我们班昨天赢了篮球赛，','fact'],['因为我们是全年级最团结的班。','op']],why:'比赛结果有记录，是事实；“最团结”是自己的评价，而且赢球的原因也是一种猜测。'},
+  {t:'这本书有 300 页，是我读过最有意思的书。',k:'both',parts:[['这本书有 300 页，','fact'],['是我读过最有意思的书。','op']],why:'页数可以数，是事实；“最有意思”是个人感受，是观点。'},
+  {t:'这首歌在音乐排行榜上排第一，是今年最好听的歌。',k:'both',parts:[['这首歌在音乐排行榜上排第一，','fact'],['是今年最好听的歌。','op']],why:'排行榜名次可以查，是事实；“最好听”是个人感受。排名第一也不代表每个人都觉得它最好听。'},
+  {t:'新来的数学老师姓王，上课特别有意思。',k:'both',parts:[['新来的数学老师姓王，','fact'],['上课特别有意思。','op']],why:'老师姓什么可以确认，是事实；“特别有意思”是学生自己的感受，是观点。'},
+  {t:'老师说明天要考试，这简直是最糟糕的消息。',k:'both',parts:[['老师说明天要考试，','fact'],['这简直是最糟糕的消息。','op']],why:'老师有没有说要考试，可以确认，是事实；“最糟糕”是感受，是观点。'},
+  {t:'运动会上，小明 100 米跑了 13 秒，是全校跑得最帅的人。',k:'both',parts:[['运动会上，小明 100 米跑了 13 秒，','fact'],['是全校跑得最帅的人。','op']],why:'成绩有计时记录，是事实；“最帅”是审美评价，是观点。'},
+  {t:'小红说：“这家奶茶店是全城最好喝的。”',k:'fact',why:'小心！这句话说的是“小红说了什么”，这件事本身可以查证，是事实。但小红说的内容是观点。网上很多“某某说”都是这样：转述一个观点，不代表这个观点就是事实。',clue:['小红说'],cf:1},
+  {t:'喝冰水会让人长不高。',k:'fact',why:'这是一句可以查证的说法，所以属于“事实类”的说法。但查一查会发现，没有科学证据支持它，它其实是错的。可以查证的说法，不一定是对的！',clue:['会让人长不高'],cf:1}
+ ]}
+];
+const PER = 3;
+const LABEL = {
+  fact: { name: "事实", sub: "可以查证", c: "var(--primary)", cs: "var(--primary-soft)" },
+  op: { name: "观点", sub: "个人看法", c: "var(--accent)", cs: "var(--accent-soft)" },
+  both: { name: "两者都有", sub: "事实 + 观点", c: "var(--ink)", cs: "var(--bg)" },
+};
+const DISCUSS = [
+  "你是怎么分辨的？哪些词一出现，你就知道这是观点？",
+  "为什么有人会把观点说得像事实一样？你在网上见过这样的说法吗？",
+  "“可以查证”的说法就一定是对的吗？网上还有哪些说法看起来像事实，其实是错的、误导人的，甚至是编出来的？",
+];
+
+/* 抽 3 句：答案不能全一样；尽量不和上一组重复 */
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function drawLevel(lv, prev = []) {
+  const lib = LEVELS[lv].lib;
+  for (let t = 0; t < 200; t++) {
+    const pick = shuffle(lib).slice(0, PER);
+    const kinds = new Set(pick.map((x) => x.k));
+    const overlap = pick.filter((x) => prev.includes(x)).length;
+    if (kinds.size >= 2 && (t > 100 || overlap === 0)) return pick;
+  }
+  return shuffle(lib).slice(0, PER);
+}
+
+/* ===================================================================== 状态 + 步骤 */
+const STEPS = ["入门", "进阶", "挑战", "结果"];
+const S = { step: 0, i: 0, qs: LEVELS.map((_, lv) => drawLevel(lv)), res: LEVELS.map(() => Array(PER).fill(null)) };
+const firstOpen = (lv) => { const j = S.res[lv].findIndex((r) => r === null); return j < 0 ? PER : j; };
+const goStep = (n) => { S.step = n; if (n < LEVELS.length) S.i = firstOpen(n); render(); window.scrollTo(0, 0); };
+const answered = () => S.res.flat().filter(Boolean);
+
+function render() {
+  $("#steps").replaceChildren(...STEPS.map((name, i) =>
+    el("button", { class: "step" + (i === S.step ? " active" : ""), onclick: () => goStep(i) },
+      el("span", { class: "n" }, i + 1), name)));
+  $("#main").replaceChildren(...(S.step < LEVELS.length ? stepLevel(S.step) : stepResult()));
+}
+
+function stmtNode(it, revealed) {
+  const box = el("div", { class: "stmt" });
+  if (!revealed) { box.textContent = it.t; return box; }
+  if (it.parts) { box.append(...it.parts.map(([txt, k]) => el("mark", { class: k }, txt))); return box; }
+  let segs = [it.t];
+  for (const w of it.clue || []) {
+    segs = segs.flatMap((seg) => {
+      if (typeof seg !== "string") return [seg];
+      const out = []; let rest = seg, j;
+      while ((j = rest.indexOf(w)) >= 0) { out.push(rest.slice(0, j)); out.push(el("span", { class: "clue " + (it.cf ? "fact" : "op") }, w)); rest = rest.slice(j + w.length); }
+      out.push(rest); return out;
+    });
+  }
+  box.append(...segs.filter((x) => x !== "")); return box;
+}
+
+function tipsCard() {
+  const total = answered();
+  const def = (k, text, sigs) => el("div", { class: "def", style: `--c:${LABEL[k].c};--cs:${LABEL[k].cs}` },
+    el("b", {}, LABEL[k].name), text, el("div", { class: "sig" }, sigs.map((s) => el("span", {}, s))));
+  return el("aside", { class: "tips" },
+    el("div", { class: "card tips" },
+      el("h3", {}, "怎么分辨？"),
+      def("fact", "可以查证、有标准答案。不管谁来查，结果都一样。", ["数字", "时间地点", "规定", "可以测量"]),
+      def("op", "个人的感受、喜好或判断。每个人都可以不一样。", ["最", "好吃", "应该", "太……了", "大家都"])),
+    el("div", { class: "card" }, el("h3", { style: "margin:0 0 4px;font-size:1.05rem" }, "全班得分"),
+      el("div", { class: "score" }, total.filter((r) => r.ok).length, el("small", {}, ` / ${total.length} 题`))));
+}
+
+function stepLevel(lv) {
+  const L = LEVELS[lv], items = S.qs[lv], res = S.res[lv];
+  const head = [el("h2", {}, `第 ${lv + 1} 关：${L.name}`), el("p", { class: "lead" }, L.hint + "。老师读出句子，全班举手判断，按多数人的选择点击。")];
+  if (S.i >= PER) return [...head, el("div", { class: "board" }, levelEnd(lv), tipsCard()), el("div", { class: "discuss" }, "讨论：", el("span", {}, DISCUSS[lv]))];
+  const it = items[S.i], r = res[S.i];
+  const card = el("section", { class: "card qcard", "aria-live": "polite" },
+    el("div", { class: "qmeta" }, el("div", { class: "dots" }, items.map((_, j) => el("span", { class: (res[j] ? (res[j].ok ? "ok" : "no") : "") + (j === S.i ? " cur" : "") }))), el("span", {}, `第 ${S.i + 1} / ${PER} 题`)),
+    stmtNode(it, !!r),
+    r ? null : el("div", { class: "ask" }, "全班举手：这句话是……"),
+    el("div", { class: "answers" }, L.opts.map((k) => {
+      const lb = LABEL[k];
+      const cls = ["ans"]; if (r) { if (r.pick === k) cls.push("picked"); if (it.k === k) cls.push("right"); if (r.pick !== k && it.k !== k) cls.push("dim"); }
+      return el("button", { class: cls.join(" "), style: `--c:${lb.c};--cs:${lb.cs}`, disabled: !!r, onclick: () => { res[S.i] = { pick: k, ok: k === it.k }; render(); } },
+        el("b", {}, lb.name), el("small", {}, lb.sub));
+    })));
+  if (r) {
+    const lb = LABEL[it.k];
+    card.append(el("div", { class: "reveal", style: `--c:${lb.c}` },
+      el("div", { class: "verdict" }, `答案：${lb.name}`, el("span", { class: "tag " + (r.ok ? "ok" : "no") }, r.ok ? "答对了！" : "这题有点难，看看为什么")),
+      el("div", {}, it.why),
+      el("div", { class: "hint" }, it.parts ? "绿色底的是事实部分，黄色底的是观点部分。" : it.k === "op" ? "带波浪线的词是“观点信号词”。" : "带波浪线的部分是可以查证的内容。")),
+      el("div", { class: "row" },
+        el("button", { class: "btn big", onclick: () => { S.i++; render(); } }, S.i + 1 < PER ? "下一题 →" : "看本关结果 →"),
+        el("button", { class: "btn outline", onclick: () => { res[S.i] = null; render(); } }, "重新判断这题")));
+  }
+  return [...head, el("div", { class: "board" }, card, tipsCard())];
+}
+
+function levelEnd(lv) {
+  const L = LEVELS[lv], items = S.qs[lv], res = S.res[lv], ok = res.filter((r) => r && r.ok).length;
+  const wrong = items.filter((_, j) => res[j] && !res[j].ok);
+  return el("section", { class: "card qcard" },
+    el("div", { class: "qmeta" }, el("span", {}, `第 ${lv + 1} 关 · ${L.name} 完成`)),
+    el("div", { class: "big-answer" }, `${ok} / ${PER} 题答对`),
+    wrong.length ? el("div", {}, el("div", { class: "hint" }, "答错的题："), el("ul", { class: "wrong" }, wrong.map((x) => el("li", {}, x.t)))) : null,
+    el("div", { class: "row" },
+      lv < LEVELS.length - 1
+        ? el("button", { class: "btn big", onclick: () => goStep(lv + 1) }, `进入第 ${lv + 2} 关 →`)
+        : el("button", { class: "btn big", onclick: () => goStep(LEVELS.length) }, "看全班结果 →"),
+      el("button", { class: "btn outline", onclick: () => { S.qs[lv] = drawLevel(lv, S.qs[lv]); S.res[lv] = Array(PER).fill(null); S.i = 0; render(); } }, "本关换一组题")));
+}
+
+function stepResult() {
+  const total = answered();
+  return [
+    el("h2", {}, "全班结果"),
+    el("p", { class: "lead" }, "看看哪一关最难。"),
+    el("div", { class: "card", style: "margin-bottom:16px" }, el("div", { class: "big-answer" }, `${total.filter((r) => r.ok).length} / ${total.length} 题答对`)),
+    el("div", { class: "sum-grid" }, LEVELS.map((L, lv) => {
+      const res = S.res[lv], done = res.filter(Boolean);
+      return el("div", { class: "card" }, el("b", {}, `第 ${lv + 1} 关 · ${L.name}`),
+        el("div", { class: "score" }, done.filter((r) => r.ok).length, el("small", {}, ` / ${done.length} 题`)),
+        done.length < PER ? el("button", { class: "btn outline small", onclick: () => goStep(lv) }, "去完成这一关") : null);
+    })),
+    el("div", { class: "row", style: "margin-top:20px" },
+      el("button", { class: "btn", onclick: () => { $("#export-modal").hidden = false; } }, "导出本节课结果"),
+      el("button", { class: "btn outline", onclick: () => { S.qs = LEVELS.map((_, lv) => drawLevel(lv, S.qs[lv])); S.res = LEVELS.map(() => Array(PER).fill(null)); goStep(0); } }, "全部换题，重新开始")),
+    el("div", { class: "discuss" }, "讨论：", el("span", {}, DISCUSS[2])),
+  ];
+}
+
+/* ===================================================================== 导出 */
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const fileBase = (m) => `事实还是观点_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+function rowsDone() {
+  const out = [];
+  LEVELS.forEach((L, lv) => S.qs[lv].forEach((it, j) => { const r = S.res[lv][j]; if (r) out.push({ lv, L, it, r }); }));
+  return out;
+}
+
+$("#btn-ex-png").onclick = () => {
+  const m = meta(), rows = rowsDone(), c = document.createElement("canvas");
+  c.width = 1600; c.height = 420 + Math.max(1, rows.length) * 64;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 56px ${font}`; ctx.fillText("事实还是观点？ · 课堂结果", 70, 120);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 30px ${font}`; ctx.fillText(`${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}`, 70, 180);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 40px ${font}`;
+  ctx.fillText(`全班答对 ${rows.filter((x) => x.r.ok).length} / ${rows.length} 题　　` + LEVELS.map((L, lv) => { const d = S.res[lv].filter(Boolean); return `${L.name} ${d.filter((r) => r.ok).length}/${d.length}`; }).join("　"), 70, 270);
+  let y = 350;
+  if (!rows.length) { ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText("还没有答题记录。", 70, y); }
+  for (const { L, it, r } of rows) {
+    ctx.fillStyle = r.ok ? "#2f9e44" : "#d64545"; ctx.font = `700 28px ${font}`; ctx.fillText(r.ok ? "✓" : "✗", 70, y);
+    ctx.fillStyle = "#5f6b7a"; ctx.font = `400 24px ${font}`; ctx.fillText(L.name, 110, y);
+    ctx.fillStyle = "#1f2937"; ctx.font = `400 28px ${font}`;
+    let t = it.t; while (ctx.measureText(t).width > 1000 && t.length > 4) t = t.slice(0, -2); if (t !== it.t) t += "…";
+    ctx.fillText(t, 190, y);
+    ctx.fillStyle = "#5f6b7a"; ctx.font = `400 24px ${font}`; ctx.fillText(`答案：${LABEL[it.k].name}　全班选：${LABEL[r.pick].name}`, 1220, y);
+    y += 64;
+  }
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 26px ${font}`; ctx.fillText("光语 × 铺路石 · AI 素养课堂", 70, c.height - 40);
+  c.toBlob((b) => b && download(b, fileBase(m) + ".png"), "image/png");
+};
+$("#btn-ex-csv").onclick = () => {
+  const m = meta();
+  const rows = [["日期", "班级", "参与人数", "关卡", "句子", "正确答案", "全班选择", "是否答对"],
+    ...rowsDone().map(({ L, it, r }) => [m.date, m.cls, m.count, L.name, it.t, LABEL[it.k].name, LABEL[r.pick].name, r.ok ? "是" : "否"])];
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
+};
+
+/* ===================================================================== 弹窗 */
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => {
+  if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true;
+}));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#ex-note").textContent = `目前已记录 ${answered().length} 道题的全班答案。`; $("#export-modal").hidden = false; };
+
+render();
+</script>
+</body>
+</html>
