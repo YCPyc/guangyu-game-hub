@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>回音室推送器 · 光语课堂游戏</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* 顶栏：返回游戏大厅 + 游戏名 + 老师说明 */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 按钮：主按钮（实色）、次按钮（描边） */
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+
+/* 步骤条 */
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; }    /* 关键内容 ≥ 32px */
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 示例：举手计票器 */
+.counter { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; max-width: 320px; }
+.counter button { height: 56px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 1.6rem; font-weight: 700; }
+.counter output { text-align: center; font-size: 2.4rem; font-weight: 800; }
+
+/* 讨论问题条（深色，放在每个环节的结尾） */
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+
+/* 弹窗（老师说明、导出） */
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+
+/* 手机：375px 宽时不能出现横向滚动 */
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+}
+
+/* ===================================================================== 本游戏样式 */
+.step:disabled { opacity: .5; cursor: not-allowed; }
+.step .n { flex: none; }
+.board { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.side .card { display: flex; flex-direction: column; gap: 12px; }
+.side h3 { margin: 0; font-size: 1.1rem; }
+.batch-count { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+.batch-count small { font-size: 1rem; color: var(--muted); font-weight: 600; }
+.bar-track { display: flex; gap: 6px; }
+.bar-track span { flex: 1; height: 10px; border-radius: 5px; background: var(--line); }
+.bar-track span.on { background: var(--primary); }
+.flow { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+
+/* 手机外框 + 虚构 App「刷刷」 */
+.phone { background: var(--ink); border-radius: 40px; padding: 10px; }
+.screen { background: #fff; border-radius: 31px; overflow: hidden; height: clamp(520px, calc(100vh - 230px), 780px); display: flex; flex-direction: column; }
+.status { display: flex; justify-content: space-between; padding: 10px 24px 2px; font-size: .65rem; font-weight: 700; }
+.appbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 18px 8px; }
+.logo { font-weight: 800; font-size: 1rem; color: var(--primary); }
+.tabs { display: flex; gap: 16px; font-size: .75rem; color: var(--muted); }
+.tabs b { color: var(--ink); border-bottom: 3px solid var(--primary); }
+.feed-label { font-size: .6rem; color: var(--muted); text-align: center; padding: 2px 0 6px; border-bottom: 1px solid var(--line); }
+.scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.post { padding: 14px 18px; border-bottom: 8px solid var(--bg); transition: opacity .25s; }
+.post.down { opacity: .45; }
+.ph { display: flex; align-items: center; gap: 10px; }
+.av { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .75rem; flex: none; }
+.ph .nm { font-weight: 700; font-size: .75rem; line-height: 1.3; }
+.ph .tm { font-size: .6rem; color: var(--muted); }
+.post p { margin: 10px 0 4px; font-size: 1rem; line-height: 1.6; }
+.hashtag { color: var(--primary); font-size: .8rem; }
+.cover { margin-top: 8px; border-radius: 12px; padding: 16px; background: var(--ink); color: #fff; font-weight: 800; font-size: 1.05rem; }
+.actbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.pill { display: inline-flex; align-items: center; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+.vbtn { display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 8px 16px; min-height: 48px; font-size: .8rem; font-weight: 700; }
+.vbtn:hover:not(:disabled) { background: var(--primary-soft); }
+.vbtn:disabled { cursor: default; }
+.vbtn.up[aria-pressed="true"] { color: var(--primary); }
+.vbtn.up[aria-pressed="true"] svg { fill: var(--primary); }
+.vbtn.down[aria-pressed="true"] svg { fill: var(--ink); }
+.sep { width: 1px; height: 22px; background: var(--line); }
+.mis { display: flex; gap: 12px; color: var(--muted); font-size: .65rem; }
+.mi { display: flex; align-items: center; gap: 3px; }
+.hot { margin-top: 10px; background: var(--bg); border-radius: 10px; padding: 8px 10px; font-size: .7rem; line-height: 1.55; }
+.hot b { color: var(--primary); margin-right: 4px; }
+.stance { display: inline-block; margin-top: 8px; font-size: .65rem; font-weight: 700; color: #fff; padding: 1px 10px; border-radius: 999px; }
+.newbatch { text-align: center; font-size: .6rem; color: var(--muted); padding: 10px 0; }
+.feed-end { padding: 18px 16px 28px; text-align: center; font-size: .7rem; color: var(--muted); }
+.feed-end .arrow { font-size: 1.4rem; line-height: .6; color: var(--primary); animation: bob 1.2s ease-in-out infinite; }
+.feed-end .more { margin-top: 6px; border: 0; background: none; color: var(--muted); font-size: .7rem; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+.spin { display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; border-radius: 50%; border: 2.5px solid var(--line); border-top-color: var(--primary); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes bob { 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .spin, .feed-end .arrow { animation: none; } }
+
+/* 揭晓 */
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: .85rem; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; }
+.barrow { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; align-items: center; }
+.barrow .lbl { font-weight: 700; }
+.barrow .lbl small { display: block; font-weight: 400; color: var(--muted); font-size: .75rem; }
+.stack { display: flex; height: 40px; border-radius: 10px; overflow: hidden; background: var(--line); }
+.stack span { display: flex; align-items: center; justify-content: center; color: #fff; font-size: .9rem; font-weight: 800; white-space: nowrap; overflow: hidden; transition: width .45s ease; }
+.hist { display: grid; gap: 6px; }
+.hist-row { display: flex; gap: 6px; align-items: center; font-size: .8rem; color: var(--muted); }
+.hist-row b { width: 4.5em; font-weight: 600; }
+.dot { width: 22px; height: 22px; border-radius: 6px; }
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.answers .card { display: flex; flex-direction: column; gap: 10px; }
+.answers h3 { margin: 0; font-size: 1rem; color: var(--muted); }
+.answers .say { font-size: 1.2rem; line-height: 1.75; }
+.note { border-radius: var(--radius); background: var(--accent-soft); padding: 14px 18px; font-size: .9rem; }
+@media (max-width: 900px) { .board, .answers { grid-template-columns: 1fr; } .barrow { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .phone { border-radius: 32px; padding: 8px; } .screen { border-radius: 25px; height: 70vh; } .mis .mi:not(:first-child) { display: none; } }
+.mi { white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title">
+        <h1>回音室推送器</h1>
+        <p>光语课堂游戏 · 聊天机器人背后的大脑 · 第 2 节</p>
+      </div>
+      <div class="actions">
+        <button class="btn outline small" id="btn-export">导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">老师说明</button>
+      </div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    <p>本游戏配套第 2 节《聊天机器人中的偏见》，放在课件讲“回音室效应”的第 44 页。学生会亲身体验：平台上什么观点都有，但推荐算法会让我们越来越只看到自己喜欢的那一种；用这样的信息训练出来的 AI，回答也会变得片面。建议总时长约 10 分钟。</p>
+    <ol>
+      <li><b>刷帖（约 6 分钟）</b>：在虚构 App「刷刷」上一共刷 4 批、每批 5 条帖子。老师读出每条帖子，全班举手决定 👍 点赞还是 👎 点踩，老师按多数人的选择点击；一批选完后在手机画面上往下刷，就会自动加载下一批。</li>
+      <li><b>揭晓（约 2 分钟）</b>：对比“平台上的全部帖子”（三种观点各占三分之一）和“你们刷到的帖子”，看信息流是怎么一批批偏向一边的。</li>
+      <li><b>问 AI（约 2 分钟）</b>：同一个问题分别问“只读过信息流的 AI”和“读过全部帖子的 AI”，对比两个回答，再回到课件讨论回音室。</li>
+    </ol>
+    <p><b>揭晓之前，先不要和学生讲帖子分成哪几类观点。</b>「刷刷」和所有帖子都是为教学编写的虚构内容，不代表任何真实平台；推荐算法和 AI 都是简化版（点赞让同类观点的推送概率翻倍，点踩则减半），请向学生说明这一点。</p>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。</p>
+  </div>
+</div>
+
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" placeholder="例如：42"></label>
+    </div>
+    <p class="hint" id="ex-note"></p>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button>
+      <button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================================================================== 工具函数 */
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const kid of kids.flat(Infinity)) if (kid != null) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+};
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* ===================================================================== 帖子库
+   话题：中学生该不该带手机上学？三种观点各 20 条，全部为教学虚构内容。
+   每条：[观点, 作者, 帖子内容, AI 转述时说的话, 热评, 话题标签, 封面文字(可空)] */
+const ST = {
+  pro: { name: "支持带手机", c: "var(--primary)", hex: "#1f7a68", lead: "当然应该让中学生带手机上学。" },
+  con: { name: "反对带手机", c: "var(--accent)", hex: "#e8a33a", lead: "不应该让中学生带手机上学。" },
+  neu: { name: "中立 / 事实", c: "var(--muted)", hex: "#5f6b7a", lead: "这个问题没有简单的答案。" },
+};
+const RAW=[
+ ['pro','初二·小林','放学路上遇到事情，没手机怎么联系爸妈？安全第一啊。','带手机可以随时联系家长，更安全。','+1，我妈每天都要确认我到家了没','#手机进校园',''],
+ ['pro','学习小能手','查资料、背单词、听网课全靠手机，不让带太落后了。','手机能查资料、背单词，是很好的学习工具。','背单词软件真的好用','#学习方法','手机=随身图书馆？'],
+ ['pro','初三·阿杰','我们班用手机扫码交作业，效率高多了。','用手机交作业效率更高。','我们学校也是，方便太多','#校园生活',''],
+ ['pro','一位家长','学会管理手机本身就是一种能力，一直禁止反而学不会。','学会管理手机本身就是一种能力。','一直管着反而更想玩','#家长说',''],
+ ['pro','住校生日记','住校一周见不到家人，手机是唯一能聊天的方式。','住校生需要手机和家人保持联系。','住校的懂，周末打个电话太重要了','#住校生活',''],
+ ['pro','初一·朵朵','遇到不会的题，拍照问同学，比干着急强。','遇到难题可以随时问同学。','互帮互助才是学习','#作业求助',''],
+ ['pro','科技小达人','以后工作都要用电子设备，从小就该学会用。','从小学会使用电子设备，对将来有帮助。','早用早熟练','#未来已来','数字时代，你准备好了吗'],
+ ['pro','初二·小雨','老师都用手机发通知，没手机经常错过消息。','学校的通知常常通过手机发送。','群里的通知错过一次就完了','#手机进校园',''],
+ ['pro','路人甲','带了不代表一定要玩，关键看自觉。','带不带手机不是问题，关键在于自觉。','自觉的人带了也不会玩','#说说而已',''],
+ ['pro','初三·大鹏','周末出去参加活动，没手机连导航都没有。','外出活动时手机可以导航。','现在出门真离不开手机','#周末去哪儿',''],
+ ['pro','初一·小胖','下雨天爸妈来接我，没手机根本不知道他们停在哪个门。','下雨天家长来接时，用手机更容易找到彼此。','每次放学门口都乱成一锅粥','#放学啦',''],
+ ['pro','英语课代表','用手机听英语原声材料，口语进步特别明显。','用手机听英语材料，能帮助练习口语。','求推荐听力材料！','#学习方法',''],
+ ['pro','初三·小雪','万一路上不舒服或者遇到危险，第一时间能打电话求助。','遇到紧急情况，可以第一时间打电话求助。','这个真的很重要','#安全教育','紧急时刻，一个电话有多重要？'],
+ ['pro','一位妈妈','孩子坐公交上下学，有手机定位我才放心。','家长可以通过手机定位确认孩子是否安全。','做家长的都懂','#家长说',''],
+ ['pro','初二·文艺委员','班级活动要拍照记录，手机最方便。','用手机可以方便地记录班级活动。','我们班的相册全靠她','#班级日常',''],
+ ['pro','编程社社长','我是用手机自学编程入门的，手机用好了就是学习机。','用好手机，它也可以成为学习工具。','大佬带带我','#自学成才',''],
+ ['pro','初三·阿飞','查公交、扫码乘车都离不开手机，没有手机出行很麻烦。','出行坐车经常需要用到手机。','现在坐车都扫码了','#周末去哪儿',''],
+ ['pro','路人戊','只禁止不教育，等上了大学一下子没人管，更容易沉迷。','只靠禁止，不教学生怎么用，以后反而更容易沉迷。','说得很有道理','#说说而已',''],
+ ['pro','初二·小可','和外地的好朋友聊天、分享生活，全靠手机。','手机能帮助学生和远方的朋友保持联系。','异地好友+1','#友情',''],
+ ['pro','科普小站','很多博物馆、科技馆都有手机导览，能学到课本外的知识。','用手机可以接触到课本外的知识。','上次去科技馆就是扫码听讲解','#课外知识',''],
+ ['con','初二·小周','上课偷偷刷短视频的同学太多了，根本没法专心。','带手机会让学生上课分心。','我同桌一节课刷了二十个视频','#课堂实录',''],
+ ['con','初三·晴晴','自从有了手机，我每天晚上都熬到很晚，第二天困死。','玩手机会影响睡眠。','说的就是我……','#熬夜党','凌晨一点，你还在刷吗？'],
+ ['con','体育委员','课间大家都低头玩手机，都没人一起打球聊天了。','手机让同学之间面对面的交流变少了。','怀念以前课间抢球台的日子','#校园生活',''],
+ ['con','班主任','有人在班级群里发别人的丑照，手机让欺负变得更容易。','手机可能让网络欺凌更容易发生。','这个真的很严重，学校应该管','#老师说',''],
+ ['con','一位家长','攀比新手机的风气很严重，家里条件一般的孩子压力很大。','学生之间会攀比手机，带来压力。','看到别人用最新款，心里确实不好受','#家长说',''],
+ ['con','初三·学委','考试时有人用手机作弊，对认真复习的人不公平。','手机可能被用来作弊。','对认真的人太不公平了','#考试周',''],
+ ['con','初二·眼镜','眼睛近视越来越严重，一直盯着屏幕真的不行。','长时间看屏幕对视力不好。','我的度数一年涨了两百度','#保护视力',''],
+ ['con','读书社','没有手机的那一年，我反而看完了十几本书。','不带手机，就有更多时间读书。','羡慕，我也想试试','#读书打卡','放下手机的第365天'],
+ ['con','初一·小飞','游戏一打就停不下来，作业全拖到半夜。','手机游戏容易让人拖延作业。','一局接一局，根本停不下来','#作业拖延症',''],
+ ['con','树洞','学校就该是一个能暂时离开手机的地方。','学校应该是可以暂时离开手机的地方。','同意，学校就是学习的地方','#说说而已',''],
+ ['con','初一·跳跳','一放学大家就围在一起看短视频，操场都空了。','手机让学生的户外活动变少了。','以前放学都去踢球的','#校园生活',''],
+ ['con','初二·安静','群里消息一直响，写作业根本静不下心。','手机消息会打断学习，让人难以专心。','开了免打扰都没用','#作业拖延症',''],
+ ['con','一位爸爸','孩子在网上乱买东西，一个月花了好几百。','学生用手机可能会乱花钱。','我家也发生过','#家长说',''],
+ ['con','初三·小樱','刷到别人晒的生活，总觉得自己哪里都不如别人。','刷社交媒体容易让人和别人比较，产生焦虑。','有同感','#心里话','为什么越刷越焦虑？'],
+ ['con','初二·课代表','作业遇到难题直接搜答案，抄完了其实什么都没学会。','用手机搜答案，容易让人不独立思考。','搜题软件真的害人','#作业求助',''],
+ ['con','初一·圆圆','上课手机一震，全班都转头看，老师也很生气。','手机在课堂上会打扰其他同学。','老师当场就没收了','#课堂实录',''],
+ ['con','路人庚','网上的陌生人很难分辨好坏，中学生容易被骗。','学生在网上容易遇到陌生人诈骗。','新闻里经常看到','#安全教育',''],
+ ['con','初三·班长','食堂吃饭大家都低头看手机，饭桌上都没人说话了。','手机让同学吃饭聊天的时间变少了。','怀念以前一起吹牛的日子','#校园生活',''],
+ ['con','体育老师','体测成绩一年比一年差，课余时间都花在手机上了。','花在手机上的时间多了，运动时间就少了。','跑八百米快要了我的命','#体育课',''],
+ ['con','初二·阿明','本来只想看五分钟，抬头一看已经过了两个小时。','手机很容易让人不知不觉花掉大量时间。','真实写照','#熬夜党','你今天刷了多久？'],
+ ['neu','教育资讯','2021年教育部规定：中小学生原则上不得将手机带入校园；确有需要的，须家长同意并书面申请，进校后由学校统一保管。','2021年教育部规定，中小学生原则上不得带手机进校园；确有需要的须家长书面申请，进校后统一保管。','原来有正式规定，学到了','#政策解读','手机进校园，规定怎么说？'],
+ ['neu','路人乙','很多学校的做法是：可以带，但进校后统一交给老师保管。','很多学校允许带手机，但进校后要统一保管。','我们学校就是这么做的','#手机进校园',''],
+ ['neu','班长','关键可能不是带不带，而是怎么定规矩。全班一起商量规则怎么样？','关键也许不在于带不带，而在于怎么定规则。','规则大家定，才会有人遵守','#班级日常',''],
+ ['neu','初三·思思','我觉得两边都有道理：联系家人确实需要，但上课确实不该玩。','支持和反对的一方都有道理。','理性发言','#说说而已',''],
+ ['neu','校报','有的学校在门口设了公用电话，解决了联系家长的问题。','学校的公用电话也能解决联系家长的问题。','公用电话还挺方便','#校园新闻',''],
+ ['neu','路人丙','可以试试只在午休和放学后用手机，看看效果。','可以只在特定时间使用手机。','可以试试','#手机进校园',''],
+ ['neu','一位老师','不同年龄差别很大，小学生和高中生的情况不一样。','不同年龄的学生，情况并不一样。','确实不能一刀切','#老师说',''],
+ ['neu','初二·小班','我们班投过票，支持和反对的人差不多一半一半。','同学们对这个问题的看法差不多各占一半。','那就看怎么定规则了','#班级日常',''],
+ ['neu','路人丁','手机本身没有好坏，看你用它来做什么。','手机本身没有好坏，关键看怎么用。','工具没错，看人怎么用','#说说而已',''],
+ ['neu','家委会','建议学校和家长一起制定手机使用公约。','学校和家长可以一起制定手机使用公约。','支持，大家一起商量','#家长说','一起定一份手机公约'],
+ ['neu','校报','有的学校给每个班配了一部公用手机，需要联系家长时可以借用。','有的学校给班级配公用手机，供学生联系家长。','这个办法不错','#校园新闻',''],
+ ['neu','路人辛','手机好不好，可能要看具体用在哪儿：查资料和刷视频是两回事。','用手机查资料和刷视频是两回事，要分开看。','有道理','#说说而已',''],
+ ['neu','初三·辩论队','我们辩论赛刚好辩了这个题，正方反方都说得很有道理。','这个问题正反两方都有道理。','那场辩论真的很精彩','#班级日常',''],
+ ['neu','一位校长','我们学校的做法是：手机进校后锁进柜子，放学再拿。','有的学校让学生进校后把手机锁进柜子，放学再取。','我们也是这样','#校园新闻',''],
+ ['neu','教育资讯','教育部的通知还要求：学校要通过设公用电话、班主任热线等方式，解决学生和家长的联系需求。','教育部要求学校通过公用电话、班主任热线等方式，解决学生和家长的联系需求。','原来还有这个要求','#政策解读',''],
+ ['neu','家长群','家里也可以和孩子商量：每天用多久、什么时候用。','家长和孩子可以一起商量手机的使用时间。','我们家签了一份“手机协议”','#家长说',''],
+ ['neu','初一·小敏','我觉得周末可以多用一点，上学日少用一点。','可以区分上学日和周末，分别定规则。','周末万岁','#说说而已',''],
+ ['neu','科技小科普','很多手机和应用都有“青少年模式”，可以限制使用时间。','很多手机和应用有青少年模式，可以限制使用时间。','我妈给我开了','#科技','什么是青少年模式？'],
+ ['neu','一位班主任','比起没收，我更愿意和学生一起讨论手机该怎么用。','老师和学生可以一起讨论手机该怎么用。','好老师','#老师说',''],
+ ['neu','初二·思考者','带不带手机，可能还要看学校离家远不远、家里方不方便。','带不带手机，还要看每个学生的具体情况。','确实每个人情况不同','#说说而已','']
+];
+const NICK=['橘子汽水','不吃香菜','晚风','学渣逆袭中','小熊软糖','追光','柠檬不萌','今天也要早睡','奶茶续命','一只咸鱼'];
+const AVC = ["var(--primary)", "var(--accent)", "var(--ink)", "var(--muted)"];
+const POSTS = RAW.map(([s, who, text, point, hot, tag, cover], i) => ({ i, s, who, text, point, hot, tag, cover,
+  likes: ((i * 7919) % 4800) + 120, cmts: ((i * 331) % 380) + 12, mins: ((i * 13) % 55) + 3, nick: NICK[(i * 3) % NICK.length], av: AVC[i % AVC.length] }));
+const KEYS = ["pro", "con", "neu"];
+const PER = 5, ROUNDS = 4;   // 每批 5 条，一共 4 批
+
+const SV = (d, w) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  up: SV('<path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3z"/><path d="M7 10l4-7a2.2 2.2 0 0 1 2.9 2.6L13 10h6a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.7 21H7"/>', 22),
+  down: SV('<path d="M17 14V3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3z"/><path d="M17 14l-4 7a2.2 2.2 0 0 1-2.9-2.6L11 14H5a2 2 0 0 1-2-2.3l1.3-7A2 2 0 0 1 6.3 3H17"/>', 22),
+  cmt: SV('<path d="M21 12a8 8 0 0 1-11.8 7L4 20l1-4.6A8 8 0 1 1 21 12z"/>', 15),
+  star: SV('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>', 15),
+  share: SV('<path d="M14 5l7 7-7 7"/><path d="M21 12H10a7 7 0 0 0-7 7"/>', 15),
+};
+
+/* ===================================================================== 推荐算法（简化版）
+   每种观点有一个“权重”。点赞：这种观点的权重翻倍；点踩：减半。
+   每次按权重随机抽下一批帖子；优先推没看过的，某种观点用完了才会重复。 */
+function newFeed() { return { w: { pro: 1, con: 1, neu: 1 }, seen: [], cur: [], dec: {}, round: 0, hist: [], hdec: [] }; }
+function draw(f) {
+  const pick = [];
+  for (let k = 0; k < PER; k++) {
+    const tot = KEYS.reduce((a, s) => a + f.w[s], 0); let r = Math.random() * tot, st = KEYS[KEYS.length - 1];
+    for (const s of KEYS) { r -= f.w[s]; if (r <= 0) { st = s; break; } }
+    const pool = POSTS.filter((p) => p.s === st && !pick.includes(p));
+    const fresh = pool.filter((p) => !f.seen.includes(p.i));
+    const opts = fresh.length ? fresh : pool; pick.push(opts[Math.floor(Math.random() * opts.length)]);
+  }
+  f.cur = pick; f.dec = {}; f.round++; pick.forEach((p) => f.seen.push(p.i));
+}
+const probs = (f) => { const t = KEYS.reduce((a, s) => a + f.w[s], 0); return Object.fromEntries(KEYS.map((s) => [s, f.w[s] / t])); };
+
+/* ===================================================================== 状态 + 步骤 */
+const STEPS = ["刷帖", "揭晓", "问 AI"];
+let F, LOADING = false;
+const S = { step: 0 };
+function start() { F = newFeed(); draw(F); LOADING = false; S.step = 0; render(); const sc = $(".scroll"); if (sc) sc.scrollTop = 0; }
+const doneRound = () => F.cur.every((_, j) => F.dec[j]);
+const finished = () => F.round >= ROUNDS && doneRound();
+const shown = () => [...F.hist.flat(), ...F.cur];
+const share = (list) => { const c = { pro: 0, con: 0, neu: 0 }; list.forEach((p) => c[p.s]++); const n = list.length || 1; return Object.fromEntries(KEYS.map((s) => [s, c[s] / n])); };
+const fmt = (n) => (n >= 1000 ? (n / 1000).toFixed(1) + "k" : String(n));
+const goStep = (n) => { if (n > 0 && !finished()) return; S.step = n; render(); window.scrollTo(0, 0); };
+
+function render() {
+  const sc = $(".scroll"), top = sc ? sc.scrollTop : 0;
+  $("#steps").replaceChildren(...STEPS.map((name, i) =>
+    el("button", { class: "step" + (i === S.step ? " active" : ""), disabled: i > 0 && !finished(), onclick: () => goStep(i) }, el("span", { class: "n" }, i + 1), name)));
+  $("#main").replaceChildren(...[stepFeed, stepReveal, stepAI][S.step]());
+  const ns = $(".scroll"); if (ns) ns.scrollTop = top;
+}
+
+/* ---------- 手机里的一条帖子 ---------- */
+function postNode(p, d, onPick, reveal) {
+  const locked = !onPick;
+  const up = el("button", { class: "vbtn up", disabled: locked, "aria-label": "点赞", "aria-pressed": String(d === "up") });
+  up.innerHTML = ICON.up; up.append(fmt(p.likes + (d === "up" ? 1 : 0)));
+  const down = el("button", { class: "vbtn down", disabled: locked, "aria-label": "点踩", "aria-pressed": String(d === "down") });
+  down.innerHTML = ICON.down;
+  if (!locked) { up.onclick = () => onPick(d === "up" ? undefined : "up"); down.onclick = () => onPick(d === "down" ? undefined : "down"); }
+  const mi = (icon, txt) => { const m = el("span", { class: "mi" }); m.innerHTML = icon; m.append(txt); return m; };
+  return el("article", { class: "post" + (d === "down" ? " down" : "") },
+    el("div", { class: "ph" }, el("div", { class: "av", style: `background:${p.av}` }, p.who[0]), el("div", {}, el("div", { class: "nm" }, p.who), el("div", { class: "tm" }, p.mins + "分钟前"))),
+    el("p", {}, p.text, " ", el("span", { class: "hashtag" }, p.tag)),
+    p.cover ? el("div", { class: "cover" }, p.cover) : null,
+    el("div", { class: "actbar" }, el("div", { class: "pill" }, up, el("i", { class: "sep" }), down),
+      el("div", { class: "mis" }, mi(ICON.cmt, fmt(p.cmts)), mi(ICON.star, "收藏"), mi(ICON.share, "分享"))),
+    el("div", { class: "hot" }, el("b", {}, "热评"), p.nick + "：" + p.hot),
+    reveal ? el("span", { class: "stance", style: `background:${ST[p.s].c}` }, ST[p.s].name) : null);
+}
+
+function phone(reveal) {
+  const sc = el("div", { class: "scroll" });
+  F.hist.forEach((batch, bi) => {
+    if (bi > 0) sc.append(el("div", { class: "newbatch" }, "以下是新的推荐"));
+    batch.forEach((p, j) => sc.append(postNode(p, F.hdec[bi][j], null, reveal)));
+  });
+  if (F.hist.length) sc.append(el("div", { class: "newbatch" }, "以下是新的推荐"));
+  F.cur.forEach((p, j) => sc.append(postNode(p, F.dec[j], reveal ? null : (v) => { F.dec[j] = v; render(); }, reveal)));
+  let end;
+  if (reveal || finished()) end = el("div", { class: "feed-end" }, "今天的推荐看完啦");
+  else if (LOADING) end = el("div", { class: "feed-end" }, el("span", { class: "spin" }), "正在为你推荐……");
+  else if (!doneRound()) end = el("div", { class: "feed-end" }, "↑ 给上面每条帖子点赞或点踩，再往下刷");
+  else end = el("div", { class: "feed-end" }, el("div", { class: "arrow" }, "⌄"), el("button", { class: "more", onclick: tryLoad }, "继续往下刷，加载更多"));
+  sc.append(end);
+  if (!reveal) {
+    // 刷到底（或在底部继续往下滚）就自动加载下一批
+    const atBottom = () => sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 24;
+    sc.addEventListener("scroll", () => { if (atBottom()) tryLoad(); }, { passive: true });
+    sc.addEventListener("wheel", (e) => { if (e.deltaY > 0 && atBottom()) tryLoad(); }, { passive: true });
+    let ty = null;
+    sc.addEventListener("touchstart", (e) => { ty = e.touches[0].clientY; }, { passive: true });
+    sc.addEventListener("touchmove", (e) => { if (ty !== null && ty - e.touches[0].clientY > 30 && atBottom()) tryLoad(); }, { passive: true });
+  }
+  return el("div", { class: "phone" }, el("div", { class: "screen" },
+    el("div", { class: "status" }, el("span", {}, "9:41"), el("span", {}, "●●●")),
+    el("div", { class: "appbar" }, el("span", { class: "logo" }, "刷刷"), el("div", { class: "tabs" }, el("span", {}, "关注"), el("b", {}, "推荐"), el("span", {}, "同城"))),
+    el("div", { class: "feed-label" }, "为你推荐"), sc));
+}
+
+function tryLoad() {
+  if (LOADING || S.step !== 0 || !doneRound() || F.round >= ROUNDS) return;
+  LOADING = true; render();
+  const sc = $(".scroll"); if (sc) sc.scrollTop = sc.scrollHeight;
+  setTimeout(() => {
+    F.cur.forEach((p, j) => { F.w[p.s] *= F.dec[j] === "up" ? 2 : 0.5; F.w[p.s] = Math.min(64, Math.max(0.03, F.w[p.s])); });
+    F.hist.push(F.cur.slice()); F.hdec.push(F.cur.map((_, j) => F.dec[j]));
+    draw(F); LOADING = false;
+    render();
+  }, 700);
+}
+
+/* ---------- 第 1 步：刷帖 ---------- */
+function stepFeed() {
+  const side = el("div", { class: "side" },
+    el("div", { class: "card" },
+      el("h3", {}, "全班一起刷"),
+      el("div", { class: "batch-count" }, F.round, el("small", {}, ` / ${ROUNDS} 批推荐`)),
+      el("div", { class: "bar-track" }, Array.from({ length: ROUNDS }, (_, i) => el("span", { class: i < F.round ? "on" : "" }))),
+      el("ol", { class: "flow" },
+        el("li", {}, "老师读出每条帖子，全班举手：👍 点赞，还是 👎 点踩？"),
+        el("li", {}, "按多数人的选择点击。"),
+        el("li", {}, "这一批都选完后，在手机上往下刷，就会自动加载下一批。")),
+      finished() ? el("button", { class: "btn big accent", onclick: () => goStep(1) }, "揭晓：你们的信息流里到底是什么？") : null),
+    el("div", { class: "card" },
+      el("p", { style: "margin:0" }, "「刷刷」是一个虚构的 App。话题：", el("b", {}, "中学生该不该带手机上学？")),
+      el("button", { class: "btn outline small", onclick: start }, "重新开始")));
+  return [
+    el("h2", {}, "第 1 步：刷帖"),
+    el("p", { class: "lead" }, `一共要刷 ${ROUNDS} 批，每批 ${PER} 条。你们的每一次点赞和点踩，App 都会记下来。`),
+    el("div", { class: "board" }, phone(false), side),
+    el("div", { class: "discuss" }, "讨论：", el("span", {}, "你觉得这个 App 给你们推的内容，和平台上所有的帖子一样吗？")),
+  ];
+}
+
+/* ---------- 第 2 步：揭晓 ---------- */
+function stackBar(p) {
+  return el("div", { class: "stack" }, KEYS.map((s) => el("span", { style: `width:${p[s] * 100}%;background:${ST[s].c}`, title: `${ST[s].name} ${Math.round(p[s] * 100)}%` }, p[s] >= 0.12 ? Math.round(p[s] * 100) + "%" : "")));
+}
+const legend = () => el("div", { class: "legend" }, KEYS.map((s) => el("span", {}, el("i", { style: `background:${ST[s].c}` }), ST[s].name)));
+function stepReveal() {
+  const all = shown(), per = POSTS.length / 3;
+  const card = el("div", { class: "card side" },
+    el("h3", {}, "揭晓"), legend(),
+    el("div", { class: "barrow" }, el("div", { class: "lbl" }, "平台上的全部帖子", el("small", {}, `${POSTS.length} 条，三种观点各 ${per} 条`)), stackBar({ pro: 1 / 3, con: 1 / 3, neu: 1 / 3 })),
+    el("div", { class: "barrow" }, el("div", { class: "lbl" }, "你们刷到的帖子", el("small", {}, `${all.length} 条`)), stackBar(share(all))),
+    el("div", { class: "barrow" }, el("div", { class: "lbl" }, "最后一批推荐", el("small", {}, `第 ${ROUNDS} 批`)), stackBar(share(F.cur))),
+    el("b", {}, "每一批推送了什么"),
+    el("div", { class: "hist" }, [...F.hist, F.cur].map((row, ri) => el("div", { class: "hist-row" }, el("b", {}, `第 ${ri + 1} 批`), row.map((x) => el("span", { class: "dot", style: `background:${ST[x.s].c}`, title: ST[x.s].name }))))),
+    el("p", { class: "note", style: "margin:0" }, "这是一个简化的推荐算法：点赞让同类观点的推送概率翻倍，点踩让它减半。真实平台的算法复杂得多，还会看你停留多久、和你相似的人喜欢什么，但“你喜欢什么，就给你推更多什么”这一点是一样的。"),
+    el("button", { class: "btn big", onclick: () => goStep(2) }, "用信息流训练 AI，问它一个问题 →"));
+  return [
+    el("h2", {}, "第 2 步：揭晓"),
+    el("p", { class: "lead" }, "手机里的帖子现在都标上了观点。往上翻翻，你们点赞的都是哪一类？"),
+    el("div", { class: "board" }, phone(true), card),
+    el("div", { class: "discuss" }, "讨论：", el("span", {}, "平台上什么观点都有，为什么你们看到的越来越只剩一种？这就是“回音室”。")),
+  ];
+}
+
+/* ---------- 第 3 步：问 AI ---------- */
+function answer(posts) {
+  const cnt = { pro: 0, con: 0, neu: 0 }; posts.forEach((p) => cnt[p.s]++);
+  const win = KEYS.slice().sort((a, b) => cnt[b] - cnt[a])[0];
+  if (cnt[win] / posts.length < 0.5) return balanced(posts);
+  return { lead: ST[win].lead, body: posts.filter((p) => p.s === win).slice(0, 3).map((p) => p.point).join(""), cnt, n: posts.length };
+}
+function balanced(posts) {
+  const by = (s) => posts.find((p) => p.s === s), cnt = { pro: 0, con: 0, neu: 0 }; posts.forEach((p) => cnt[p.s]++);
+  const parts = []; if (by("pro")) parts.push("支持的人认为，" + by("pro").point); if (by("con")) parts.push("反对的人认为，" + by("con").point); if (by("neu")) parts.push("另外，" + by("neu").point);
+  return { lead: ST.neu.lead, body: parts.join(""), cnt, n: posts.length };
+}
+const feedAnswer = () => answer([...new Set(shown())]);
+const fullAnswer = () => balanced(POSTS);
+function stepAI() {
+  const box = (title, a) => el("div", { class: "card" }, el("h3", {}, title),
+    el("div", { class: "say" }, el("b", {}, a.lead), a.body),
+    el("div", { class: "hint" }, `它读过的 ${a.n} 条帖子：`), stackBar({ pro: a.cnt.pro / a.n, con: a.cnt.con / a.n, neu: a.cnt.neu / a.n }));
+  return [
+    el("h2", {}, "第 3 步：问 AI"),
+    el("p", { class: "lead" }, "同一个问题：“中学生该不该带手机上学？”分别问两个 AI。"),
+    el("div", { class: "answers" }, box("只读过你们信息流的 AI", feedAnswer()), box(`读过平台上全部 ${POSTS.length} 条帖子的 AI`, fullAnswer())),
+    el("p", { class: "note", style: "margin:16px 0 0" }, "说明：这两个都是简化版的 AI，只会把读过的帖子里最多的观点拼成回答。真正的 AI 读过的资料多得多，也会自己组织语言，但如果它读到的资料大多偏向一边，它的回答也可能偏向一边。"),
+    el("div", { class: "row", style: "margin-top:20px" },
+      el("button", { class: "btn", onclick: () => { $("#export-modal").hidden = false; } }, "导出本节课结果"),
+      el("button", { class: "btn outline", onclick: start }, "重新开始")),
+    el("div", { class: "discuss" }, "讨论：", el("span", {}, "如果 AI 的训练数据也来自“回音室”，它的回答会有什么问题？我们该怎么办？")),
+  ];
+}
+
+/* ===================================================================== 导出 */
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
+const fileBase = (m) => `回音室推送器_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
+const decided = () => {
+  const out = [];
+  F.hist.forEach((b, bi) => b.forEach((p, j) => out.push({ batch: bi + 1, p, d: F.hdec[bi][j] })));
+  F.cur.forEach((p, j) => { if (F.dec[j]) out.push({ batch: F.round, p, d: F.dec[j] }); });
+  return out;
+};
+const VOTE = { up: "点赞", down: "点踩" };
+
+$("#btn-ex-png").onclick = () => {
+  const m = meta(), all = decided().map((x) => x.p), c = document.createElement("canvas");
+  c.width = 1600; c.height = 980;
+  const ctx = c.getContext("2d"), font = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  ctx.fillStyle = "#faf8f3"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#1f7a68"; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 56px ${font}`; ctx.fillText("回音室推送器 · 课堂结果", 70, 120);
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 30px ${font}`; ctx.fillText(`${m.cls}　|　${m.date}${m.count ? `　|　参与人数：${m.count} 人` : ""}　|　话题：中学生该不该带手机上学？`, 70, 180);
+  const bar = (label, sub, p, y) => {
+    ctx.fillStyle = "#1f2937"; ctx.font = `700 32px ${font}`; ctx.fillText(label, 70, y + 34);
+    ctx.fillStyle = "#5f6b7a"; ctx.font = `400 24px ${font}`; ctx.fillText(sub, 70, y + 68);
+    let x = 420; const W = 1110;
+    for (const s of KEYS) { const w = W * p[s]; ctx.fillStyle = ST[s].hex; ctx.fillRect(x, y, w, 64);
+      if (p[s] >= 0.08) { ctx.fillStyle = "#ffffff"; ctx.font = `700 28px ${font}`; ctx.fillText(Math.round(p[s] * 100) + "%", x + 16, y + 43); } x += w; }
+  };
+  bar("平台上的全部帖子", `${POSTS.length} 条`, { pro: 1 / 3, con: 1 / 3, neu: 1 / 3 }, 250);
+  bar("全班刷到的帖子", `${all.length} 条`, share(all.length ? all : POSTS), 360);
+  bar("最后一批推荐", `第 ${F.round} 批`, share(F.cur), 470);
+  let lx = 420; ctx.font = `400 26px ${font}`;
+  for (const s of KEYS) { ctx.fillStyle = ST[s].hex; ctx.fillRect(lx, 572, 24, 24); ctx.fillStyle = "#1f2937"; ctx.fillText(ST[s].name, lx + 34, 594); lx += 260; }
+  const fa = feedAnswer();
+  ctx.fillStyle = "#1f2937"; ctx.font = `700 32px ${font}`; ctx.fillText("只读过全班信息流的 AI 说：", 70, 690);
+  ctx.font = `400 28px ${font}`; let t = fa.lead + fa.body; while (ctx.measureText(t).width > 1440 && t.length > 4) t = t.slice(0, -2); if (t !== fa.lead + fa.body) t += "…";
+  ctx.fillText(t, 70, 740);
+  const ups = decided().filter((x) => x.d === "up").length;
+  ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText(`全班一共点赞 ${ups} 次，点踩 ${decided().length - ups} 次。`, 70, 820);
+  ctx.font = `400 26px ${font}`; ctx.fillText("光语 × 铺路石 · AI 素养课堂", 70, c.height - 40);
+  c.toBlob((b) => b && download(b, fileBase(m) + ".png"), "image/png");
+};
+$("#btn-ex-csv").onclick = () => {
+  const m = meta();
+  const rows = [["日期", "班级", "参与人数", "批次", "帖子", "观点", "全班选择"],
+    ...decided().map(({ batch, p, d }) => [m.date, m.cls, m.count, batch, p.text, ST[p.s].name, VOTE[d]])];
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
+};
+
+/* ===================================================================== 弹窗 */
+document.querySelectorAll(".modal-bg").forEach((bg) => bg.addEventListener("click", (e) => {
+  if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true;
+}));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach((m) => (m.hidden = true)); });
+$("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
+$("#btn-export").onclick = () => { $("#ex-note").textContent = `目前记录了全班对 ${decided().length} 条帖子的选择。`; $("#export-modal").hidden = false; };
+
+start();
+</script>
+</body>
+</html>
