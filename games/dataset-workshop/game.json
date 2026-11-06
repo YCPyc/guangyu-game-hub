@@ -2,10 +2,17 @@
   "title": "数据集工坊",
   "course": "brain-behind-the-bot",
   "session": 1,
-  "summary": "亲手为 AI 准备训练数据：先从论坛、新闻、评论等各种来源的文字里删掉广告、隐私和不文明用语，再比较几种把句子切成“词元”的方法。",
+  "summary": "亲手准备 AI 训练数据：删掉各种来源文字里的广告、隐私和不文明用语，再比较几种切分词元的方法。",
   "minutes": "20–25 分钟",
   "format": "老师投屏，全班一起操作",
   "concepts": ["数据集", "数据清洗", "词元"],
   "authors": ["光语"],
-  "cover": "cover.svg"
+  "cover": "cover.svg",
+  "en": {
+    "title": "Dataset Workshop",
+    "summary": "Clean ads, private info and rude words out of raw text, then compare ways to split sentences into tokens.",
+    "minutes": "20–25 min",
+    "format": "Teacher projects; whole class plays",
+    "concepts": ["Datasets", "Data cleaning", "Tokens"]
+  }
 }

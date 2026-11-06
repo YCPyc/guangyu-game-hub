@@ -6,5 +6,12 @@
   "minutes": "10–15 分钟",
   "format": "老师投屏，全班举手投票",
   "concepts": ["训练数据", "语言模式", "生成回答"],
-  "authors": ["光语课堂"]
+  "authors": ["光语课堂"],
+  "en": {
+    "title": "Little AI Teacher: Train the AI",
+    "summary": "Vote on three everyday chat examples and watch the simulator apply each one to a similar new question.",
+    "minutes": "10–15 min",
+    "format": "Teacher projects; class votes by hand",
+    "concepts": ["Training data", "Language patterns", "Generating answers"]
+  }
 }

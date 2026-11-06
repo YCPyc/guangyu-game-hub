@@ -173,6 +173,544 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
 @media (max-width: 640px) { .phone { border-radius: 32px; padding: 8px; } .screen { border-radius: 25px; height: 70vh; } .mis .mi:not(:first-child) { display: none; } }
 .mi { white-space: nowrap; }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"初二·小林": "Grade 8 · Lin",
+"学习小能手": "Study Whiz",
+"初三·阿杰": "Grade 9 · Jie",
+"一位家长": "A parent",
+"住校生日记": "Boarder's Diary",
+"初一·朵朵": "Grade 7 · Duoduo",
+"科技小达人": "Tech Kid",
+"初二·小雨": "Grade 8 · Xiaoyu",
+"路人甲": "Passerby A",
+"初三·大鹏": "Grade 9 · Dapeng",
+"初一·小胖": "Grade 7 · Xiaopang",
+"英语课代表": "English Class Rep",
+"初三·小雪": "Grade 9 · Xiaoxue",
+"一位妈妈": "A mom",
+"初二·文艺委员": "Grade 8 · Arts Rep",
+"编程社社长": "Coding Club President",
+"初三·阿飞": "Grade 9 · Afei",
+"路人戊": "Passerby E",
+"初二·小可": "Grade 8 · Xiaoke",
+"科普小站": "Science Corner",
+"初二·小周": "Grade 8 · Zhou",
+"初三·晴晴": "Grade 9 · Qingqing",
+"体育委员": "Sports Rep",
+"班主任": "Homeroom Teacher",
+"初三·学委": "Grade 9 · Study Rep",
+"初二·眼镜": "Grade 8 · Specs",
+"读书社": "Reading Club",
+"初一·小飞": "Grade 7 · Xiaofei",
+"树洞": "Secret Hollow",
+"初一·跳跳": "Grade 7 · Tiaotiao",
+"初二·安静": "Grade 8 · Anjing",
+"一位爸爸": "A dad",
+"初三·小樱": "Grade 9 · Xiaoying",
+"初二·课代表": "Grade 8 · Class Rep",
+"初一·圆圆": "Grade 7 · Yuanyuan",
+"路人庚": "Passerby G",
+"初三·班长": "Grade 9 · Class Monitor",
+"体育老师": "PE Teacher",
+"初二·阿明": "Grade 8 · Aming",
+"教育资讯": "Education News",
+"路人乙": "Passerby B",
+"班长": "Class Monitor",
+"初三·思思": "Grade 9 · Sisi",
+"校报": "School Paper",
+"路人丙": "Passerby C",
+"一位老师": "A teacher",
+"初二·小班": "Grade 8 · Xiaoban",
+"路人丁": "Passerby D",
+"家委会": "Parent Committee",
+"路人辛": "Passerby H",
+"初三·辩论队": "Grade 9 · Debate Team",
+"一位校长": "A principal",
+"家长群": "Parent Group",
+"初一·小敏": "Grade 7 · Xiaomin",
+"科技小科普": "Tech Explainer",
+"一位班主任": "A homeroom teacher",
+"初二·思考者": "Grade 8 · Thinker",
+"橘子汽水": "Orange Soda",
+"不吃香菜": "No Cilantro",
+"晚风": "Evening Breeze",
+"学渣逆袭中": "Comeback Kid",
+"小熊软糖": "Gummy Bear",
+"追光": "Light Chaser",
+"柠檬不萌": "Sour Lemon",
+"今天也要早睡": "Early Night Today",
+"奶茶续命": "Milk Tea Fuel",
+"一只咸鱼": "Lazy Fish",
+"#手机进校园": "#PhonesAtSchool",
+"#学习方法": "#StudyTips",
+"#校园生活": "#SchoolLife",
+"#家长说": "#ParentsSay",
+"#住校生活": "#BoardingLife",
+"#作业求助": "#HomeworkHelp",
+"#未来已来": "#FutureIsHere",
+"#说说而已": "#JustSaying",
+"#周末去哪儿": "#WeekendPlans",
+"#放学啦": "#SchoolsOut",
+"#安全教育": "#SafetyEd",
+"#班级日常": "#ClassLife",
+"#自学成才": "#SelfTaught",
+"#友情": "#Friendship",
+"#课外知识": "#BeyondTextbooks",
+"#课堂实录": "#InClass",
+"#熬夜党": "#NightOwls",
+"#老师说": "#TeachersSay",
+"#考试周": "#ExamWeek",
+"#保护视力": "#EyeCare",
+"#读书打卡": "#ReadingLog",
+"#作业拖延症": "#HomeworkDelay",
+"#心里话": "#RealTalk",
+"#体育课": "#PEClass",
+"#政策解读": "#PolicyExplained",
+"#校园新闻": "#SchoolNews",
+"#科技": "#Tech",
+"放学路上遇到事情，没手机怎么联系爸妈？安全第一啊。": "If something happens on the way home, how do you reach your parents without a phone? Safety first.",
+"带手机可以随时联系家长，更安全。": "With a phone, students can reach parents anytime, which is safer.",
+"+1，我妈每天都要确认我到家了没": "+1, my mom checks every day whether I got home",
+"查资料、背单词、听网课全靠手机，不让带太落后了。": "Looking things up, memorizing words, online classes: it all takes a phone. Banning it is so behind the times.",
+"手机能查资料、背单词，是很好的学习工具。": "Phones can look things up and help memorize words, so they're great study tools.",
+"背单词软件真的好用": "Vocab apps really work",
+"手机=随身图书馆？": "Phone = pocket library?",
+"我们班用手机扫码交作业，效率高多了。": "Our class hands in homework by scanning codes on phones. It's way more efficient.",
+"用手机交作业效率更高。": "Handing in homework by phone is more efficient.",
+"我们学校也是，方便太多": "Same at our school, so much easier",
+"学会管理手机本身就是一种能力，一直禁止反而学不会。": "Learning to manage a phone is a skill in itself. If it's always banned, kids never learn.",
+"学会管理手机本身就是一种能力。": "Learning to manage a phone is a skill in itself.",
+"一直管着反而更想玩": "The more it's controlled, the more you want it",
+"住校一周见不到家人，手机是唯一能聊天的方式。": "At boarding school I don't see my family all week. My phone is the only way to talk.",
+"住校生需要手机和家人保持联系。": "Boarding students need phones to stay in touch with family.",
+"住校的懂，周末打个电话太重要了": "Boarders get it, that weekend call means so much",
+"遇到不会的题，拍照问同学，比干着急强。": "When I'm stuck on a problem, I take a photo and ask a classmate. Better than just stressing.",
+"遇到难题可以随时问同学。": "Students can ask classmates about hard problems anytime.",
+"互帮互助才是学习": "Helping each other is real learning",
+"以后工作都要用电子设备，从小就该学会用。": "Every future job will use devices, so kids should learn young.",
+"从小学会使用电子设备，对将来有帮助。": "Learning to use devices young helps in the future.",
+"早用早熟练": "Start early, get good early",
+"数字时代，你准备好了吗": "The digital age: are you ready?",
+"老师都用手机发通知，没手机经常错过消息。": "Teachers send notices by phone. Without one I often miss them.",
+"学校的通知常常通过手机发送。": "School notices are often sent by phone.",
+"群里的通知错过一次就完了": "Miss one group notice and you're done for",
+"带了不代表一定要玩，关键看自觉。": "Bringing one doesn't mean playing with it. It comes down to self-discipline.",
+"带不带手机不是问题，关键在于自觉。": "Bringing a phone isn't the issue; self-discipline is what matters.",
+"自觉的人带了也不会玩": "Disciplined people won't play even if they bring it",
+"周末出去参加活动，没手机连导航都没有。": "When I go to weekend activities, without a phone I don't even have navigation.",
+"外出活动时手机可以导航。": "Phones can navigate during outings.",
+"现在出门真离不开手机": "You really can't go out without a phone now",
+"下雨天爸妈来接我，没手机根本不知道他们停在哪个门。": "When my parents pick me up in the rain, without a phone I have no idea which gate they're at.",
+"下雨天家长来接时，用手机更容易找到彼此。": "When parents pick kids up in the rain, phones make it easier to find each other.",
+"每次放学门口都乱成一锅粥": "The gate is total chaos after school every time",
+"用手机听英语原声材料，口语进步特别明显。": "Listening to native English audio on my phone has really improved my speaking.",
+"用手机听英语材料，能帮助练习口语。": "Listening to English materials on a phone helps practice speaking.",
+"求推荐听力材料！": "Please recommend listening materials!",
+"万一路上不舒服或者遇到危险，第一时间能打电话求助。": "If you feel sick or run into danger on the way, you can call for help right away.",
+"遇到紧急情况，可以第一时间打电话求助。": "In an emergency, students can call for help right away.",
+"这个真的很重要": "This one really matters",
+"紧急时刻，一个电话有多重要？": "In an emergency, how much does one call matter?",
+"孩子坐公交上下学，有手机定位我才放心。": "My kid takes the bus to school. I only feel at ease with phone location on.",
+"家长可以通过手机定位确认孩子是否安全。": "Parents can use phone location to check their kids are safe.",
+"做家长的都懂": "Every parent gets it",
+"班级活动要拍照记录，手机最方便。": "We need photos of class activities, and a phone is the easiest.",
+"用手机可以方便地记录班级活动。": "Phones make it easy to record class activities.",
+"我们班的相册全靠她": "Our class album is all thanks to her",
+"我是用手机自学编程入门的，手机用好了就是学习机。": "I taught myself the basics of coding on my phone. Used well, a phone is a learning machine.",
+"用好手机，它也可以成为学习工具。": "Used well, a phone can also be a study tool.",
+"大佬带带我": "Teach me, master",
+"查公交、扫码乘车都离不开手机，没有手机出行很麻烦。": "Checking buses and scanning to ride all need a phone. Getting around without one is a pain.",
+"出行坐车经常需要用到手机。": "Getting around by bus or train often requires a phone.",
+"现在坐车都扫码了": "You scan to ride everything now",
+"只禁止不教育，等上了大学一下子没人管，更容易沉迷。": "If you only ban and never teach, then when college comes with nobody watching, it's easier to get hooked.",
+"只靠禁止，不教学生怎么用，以后反而更容易沉迷。": "Only banning phones without teaching how to use them makes getting hooked more likely later.",
+"说得很有道理": "That makes a lot of sense",
+"和外地的好朋友聊天、分享生活，全靠手机。": "Chatting and sharing life with my best friend in another city all happens by phone.",
+"手机能帮助学生和远方的朋友保持联系。": "Phones help students stay in touch with faraway friends.",
+"异地好友+1": "Long-distance friends +1",
+"很多博物馆、科技馆都有手机导览，能学到课本外的知识。": "Many museums and science centers have phone guides, so you learn things beyond the textbook.",
+"用手机可以接触到课本外的知识。": "Phones give access to knowledge beyond the textbook.",
+"上次去科技馆就是扫码听讲解": "Last time at the science center I scanned a code for the audio guide",
+"上课偷偷刷短视频的同学太多了，根本没法专心。": "So many classmates sneak short videos in class. It's impossible to focus.",
+"带手机会让学生上课分心。": "Bringing phones distracts students in class.",
+"我同桌一节课刷了二十个视频": "My desk mate watched twenty videos in one class",
+"自从有了手机，我每天晚上都熬到很晚，第二天困死。": "Since I got a phone, I stay up late every night and I'm exhausted the next day.",
+"玩手机会影响睡眠。": "Using phones affects sleep.",
+"说的就是我……": "That's so me…",
+"凌晨一点，你还在刷吗？": "1 a.m. and still scrolling?",
+"课间大家都低头玩手机，都没人一起打球聊天了。": "At break everyone's head is down on their phone. Nobody plays ball or chats anymore.",
+"手机让同学之间面对面的交流变少了。": "Phones reduce face-to-face talk between classmates.",
+"怀念以前课间抢球台的日子": "I miss racing for the ping-pong table at break",
+"有人在班级群里发别人的丑照，手机让欺负变得更容易。": "Someone posted an embarrassing photo in the class group. Phones make bullying easier.",
+"手机可能让网络欺凌更容易发生。": "Phones can make cyberbullying more likely.",
+"这个真的很严重，学校应该管": "This is really serious. The school should step in",
+"攀比新手机的风气很严重，家里条件一般的孩子压力很大。": "Competing over new phones is a real problem. Kids from ordinary families feel a lot of pressure.",
+"学生之间会攀比手机，带来压力。": "Students compete over phones, which creates pressure.",
+"看到别人用最新款，心里确实不好受": "Seeing others with the newest model really does sting",
+"考试时有人用手机作弊，对认真复习的人不公平。": "Some people cheat with phones on exams. That's unfair to those who study hard.",
+"手机可能被用来作弊。": "Phones can be used to cheat.",
+"对认真的人太不公平了": "So unfair to people who work hard",
+"眼睛近视越来越严重，一直盯着屏幕真的不行。": "My nearsightedness keeps getting worse. Staring at screens all the time is really bad.",
+"长时间看屏幕对视力不好。": "Long screen time is bad for eyesight.",
+"我的度数一年涨了两百度": "My prescription got much stronger in one year",
+"没有手机的那一年，我反而看完了十几本书。": "The year I had no phone, I actually finished more than ten books.",
+"不带手机，就有更多时间读书。": "Without phones, there's more time to read.",
+"羡慕，我也想试试": "Jealous, I want to try that too",
+"放下手机的第365天": "Day 365 without my phone",
+"游戏一打就停不下来，作业全拖到半夜。": "Once I start a game I can't stop, and homework gets pushed to midnight.",
+"手机游戏容易让人拖延作业。": "Phone games make it easy to put off homework.",
+"一局接一局，根本停不下来": "One round after another, I just can't stop",
+"学校就该是一个能暂时离开手机的地方。": "School should be a place where you can take a break from your phone.",
+"学校应该是可以暂时离开手机的地方。": "School should be a place to take a break from phones.",
+"同意，学校就是学习的地方": "Agreed, school is a place for learning",
+"一放学大家就围在一起看短视频，操场都空了。": "As soon as school's out, everyone crowds around short videos and the playground is empty.",
+"手机让学生的户外活动变少了。": "Phones reduce students' outdoor activity.",
+"以前放学都去踢球的": "We used to go play soccer after school",
+"群里消息一直响，写作业根本静不下心。": "Group messages keep buzzing. I can't settle down to do homework.",
+"手机消息会打断学习，让人难以专心。": "Phone messages interrupt studying and make it hard to focus.",
+"开了免打扰都没用": "Even do-not-disturb doesn't help",
+"孩子在网上乱买东西，一个月花了好几百。": "My kid buys random stuff online and spent hundreds in one month.",
+"学生用手机可能会乱花钱。": "Students may waste money on their phones.",
+"我家也发生过": "That happened in our family too",
+"刷到别人晒的生活，总觉得自己哪里都不如别人。": "Seeing others show off their lives, I always feel I'm worse than everyone at everything.",
+"刷社交媒体容易让人和别人比较，产生焦虑。": "Scrolling social media makes people compare themselves to others and feel anxious.",
+"有同感": "I feel the same",
+"为什么越刷越焦虑？": "Why does scrolling make me more anxious?",
+"作业遇到难题直接搜答案，抄完了其实什么都没学会。": "When homework gets hard I just search for the answer, copy it, and don't actually learn anything.",
+"用手机搜答案，容易让人不独立思考。": "Searching answers on a phone makes it easy to stop thinking independently.",
+"搜题软件真的害人": "Homework-search apps really do harm",
+"上课手机一震，全班都转头看，老师也很生气。": "When a phone buzzes in class, everyone turns to look, and the teacher gets angry.",
+"手机在课堂上会打扰其他同学。": "Phones in class disturb other students.",
+"老师当场就没收了": "The teacher took it on the spot",
+"网上的陌生人很难分辨好坏，中学生容易被骗。": "It's hard to tell good strangers from bad online, and teens get tricked easily.",
+"学生在网上容易遇到陌生人诈骗。": "Students can easily run into scams from strangers online.",
+"新闻里经常看到": "You see it on the news all the time",
+"食堂吃饭大家都低头看手机，饭桌上都没人说话了。": "In the cafeteria everyone stares at their phone. Nobody talks at the table anymore.",
+"手机让同学吃饭聊天的时间变少了。": "Phones cut down the time classmates spend chatting over meals.",
+"怀念以前一起吹牛的日子": "I miss when we'd all sit around and joke",
+"体测成绩一年比一年差，课余时间都花在手机上了。": "Fitness test results get worse every year. Free time all goes to phones.",
+"花在手机上的时间多了，运动时间就少了。": "More time on phones means less time exercising.",
+"跑八百米快要了我的命": "The 800-meter run nearly killed me",
+"本来只想看五分钟，抬头一看已经过了两个小时。": "I only meant to look for five minutes. I looked up and two hours were gone.",
+"手机很容易让人不知不觉花掉大量时间。": "Phones easily eat up lots of time without you noticing.",
+"真实写照": "So true",
+"你今天刷了多久？": "How long did you scroll today?",
+"2021年教育部规定：中小学生原则上不得将手机带入校园；确有需要的，须家长同意并书面申请，进校后由学校统一保管。": "A 2021 Ministry of Education rule: students in principle may not bring phones to school. Those with a real need must have parental consent and apply in writing, and the school holds phones on arrival.",
+"2021年教育部规定，中小学生原则上不得带手机进校园；确有需要的须家长书面申请，进校后统一保管。": "A 2021 Ministry of Education rule says students in principle may not bring phones to school; those with a real need apply in writing through parents, and phones are held on arrival.",
+"原来有正式规定，学到了": "So there's an official rule, good to know",
+"手机进校园，规定怎么说？": "Phones at school: what do the rules say?",
+"很多学校的做法是：可以带，但进校后统一交给老师保管。": "Many schools let you bring one but hand it to the teacher on arrival.",
+"很多学校允许带手机，但进校后要统一保管。": "Many schools allow phones, but they're held once students arrive.",
+"我们学校就是这么做的": "That's exactly what our school does",
+"关键可能不是带不带，而是怎么定规矩。全班一起商量规则怎么样？": "Maybe the key isn't whether to bring one but how to set rules. How about the whole class discusses them?",
+"关键也许不在于带不带，而在于怎么定规则。": "The key may not be whether to bring phones, but how to set the rules.",
+"规则大家定，才会有人遵守": "When everyone makes the rules, people follow them",
+"我觉得两边都有道理：联系家人确实需要，但上课确实不该玩。": "I think both sides have a point: you do need to reach family, but you really shouldn't play in class.",
+"支持和反对的一方都有道理。": "Both supporters and opponents have a point.",
+"理性发言": "Sensible take",
+"有的学校在门口设了公用电话，解决了联系家长的问题。": "Some schools put a public phone at the gate, which solves the problem of reaching parents.",
+"学校的公用电话也能解决联系家长的问题。": "School public phones can also solve the problem of reaching parents.",
+"公用电话还挺方便": "Public phones are pretty handy",
+"可以试试只在午休和放学后用手机，看看效果。": "We could try using phones only at lunch and after school, and see how it goes.",
+"可以只在特定时间使用手机。": "Phones could be used only at set times.",
+"可以试试": "Worth a try",
+"不同年龄差别很大，小学生和高中生的情况不一样。": "Age makes a big difference. Elementary and high school students are in different situations.",
+"不同年龄的学生，情况并不一样。": "Students of different ages are in different situations.",
+"确实不能一刀切": "One size really doesn't fit all",
+"我们班投过票，支持和反对的人差不多一半一半。": "Our class voted, and it was about half for and half against.",
+"同学们对这个问题的看法差不多各占一半。": "Classmates are about evenly split on this question.",
+"那就看怎么定规则了": "Then it comes down to how the rules are set",
+"手机本身没有好坏，看你用它来做什么。": "Phones aren't good or bad in themselves. It depends what you use them for.",
+"手机本身没有好坏，关键看怎么用。": "Phones aren't good or bad in themselves; what matters is how they're used.",
+"工具没错，看人怎么用": "The tool's not at fault, it's how people use it",
+"建议学校和家长一起制定手机使用公约。": "We suggest schools and parents draw up a phone-use agreement together.",
+"学校和家长可以一起制定手机使用公约。": "Schools and parents can draw up a phone-use agreement together.",
+"支持，大家一起商量": "Agreed, let's all discuss it",
+"一起定一份手机公约": "Make a phone agreement together",
+"有的学校给每个班配了一部公用手机，需要联系家长时可以借用。": "Some schools give each class a shared phone to borrow when students need to reach parents.",
+"有的学校给班级配公用手机，供学生联系家长。": "Some schools give classes a shared phone for reaching parents.",
+"这个办法不错": "That's a good idea",
+"手机好不好，可能要看具体用在哪儿：查资料和刷视频是两回事。": "Whether phones are good may depend on the use: looking things up and scrolling videos are two different things.",
+"用手机查资料和刷视频是两回事，要分开看。": "Looking things up and scrolling videos are different things and should be considered separately.",
+"有道理": "Makes sense",
+"我们辩论赛刚好辩了这个题，正方反方都说得很有道理。": "Our debate competition just took this topic, and both sides made good points.",
+"这个问题正反两方都有道理。": "Both sides of this question have a point.",
+"那场辩论真的很精彩": "That debate was really great",
+"我们学校的做法是：手机进校后锁进柜子，放学再拿。": "At our school, phones get locked in a cabinet on arrival and picked up after school.",
+"有的学校让学生进校后把手机锁进柜子，放学再取。": "Some schools have students lock phones in a cabinet on arrival and collect them after school.",
+"我们也是这样": "Same for us",
+"教育部的通知还要求：学校要通过设公用电话、班主任热线等方式，解决学生和家长的联系需求。": "The Ministry's notice also requires schools to meet students' and parents' need for contact through public phones, homeroom teacher hotlines and the like.",
+"教育部要求学校通过公用电话、班主任热线等方式，解决学生和家长的联系需求。": "The Ministry requires schools to meet the need for contact between students and parents through public phones, homeroom hotlines and the like.",
+"原来还有这个要求": "I didn't know that was required too",
+"家里也可以和孩子商量：每天用多久、什么时候用。": "Families can also discuss with kids how long and when to use phones each day.",
+"家长和孩子可以一起商量手机的使用时间。": "Parents and kids can decide phone time together.",
+"我们家签了一份“手机协议”": "Our family signed a “phone agreement”",
+"我觉得周末可以多用一点，上学日少用一点。": "I think we can use phones a bit more on weekends and less on school days.",
+"可以区分上学日和周末，分别定规则。": "Rules could differ for school days and weekends.",
+"周末万岁": "Long live weekends",
+"很多手机和应用都有“青少年模式”，可以限制使用时间。": "Many phones and apps have a “teen mode” that can limit usage time.",
+"很多手机和应用有青少年模式，可以限制使用时间。": "Many phones and apps have a teen mode that can limit usage time.",
+"我妈给我开了": "My mom turned it on for me",
+"什么是青少年模式？": "What is teen mode?",
+"比起没收，我更愿意和学生一起讨论手机该怎么用。": "Rather than confiscating, I'd rather discuss with students how phones should be used.",
+"老师和学生可以一起讨论手机该怎么用。": "Teachers and students can discuss together how phones should be used.",
+"好老师": "Great teacher",
+"带不带手机，可能还要看学校离家远不远、家里方不方便。": "Whether to bring a phone may also depend on how far school is and each family's situation.",
+"带不带手机，还要看每个学生的具体情况。": "Whether to bring a phone also depends on each student's situation.",
+"确实每个人情况不同": "Everyone's situation really is different",
+"回音室推送器": "Echo Chamber Feed",
+"本游戏配套第 2 节《聊天机器人中的偏见》，放在课件讲“回音室效应”的第 44 页。学生会亲身体验：平台上什么观点都有，但推荐算法会让我们越来越只看到自己喜欢的那一种；用这样的信息训练出来的 AI，回答也会变得片面。建议总时长约 10 分钟。": "This game supports Lesson 2, “Bias in chatbots,” on slide 44 about the echo chamber effect. Students experience firsthand that a platform has every point of view, but recommendation algorithms show us more and more of only the kind we like, and an AI trained on that information gives one-sided answers too. Suggested total time: about 10 minutes.",
+"刷帖（约 6 分钟）": "Scroll (about 6 min)",
+"：在虚构 App「刷刷」上一共刷 4 批、每批 5 条帖子。老师读出每条帖子，全班举手决定 👍 点赞还是 👎 点踩，老师按多数人的选择点击；一批选完后在手机画面上往下刷，就会自动加载下一批。": ": On the fictional app “Scrolly,” go through 4 batches of 5 posts each. The teacher reads each post aloud, the class raises hands for 👍 like or 👎 dislike, and the teacher clicks the majority choice. After a batch, scroll down on the phone screen to load the next one.",
+"揭晓（约 2 分钟）": "Reveal (about 2 min)",
+"：对比“平台上的全部帖子”（三种观点各占三分之一）和“你们刷到的帖子”，看信息流是怎么一批批偏向一边的。": ": Compare “all posts on the platform” (a third for each of three views) with “the posts you saw,” and see how the feed tilted to one side batch by batch.",
+"问 AI（约 2 分钟）": "Ask the AI (about 2 min)",
+"：同一个问题分别问“只读过信息流的 AI”和“读过全部帖子的 AI”，对比两个回答，再回到课件讨论回音室。": ": Ask the same question of “the AI that only read the feed” and “the AI that read all posts,” compare the answers, then return to the lesson to discuss echo chambers.",
+"揭晓之前，先不要和学生讲帖子分成哪几类观点。": "Before the reveal, don't tell students what kinds of views the posts fall into.",
+"「刷刷」和所有帖子都是为教学编写的虚构内容，不代表任何真实平台；推荐算法和 AI 都是简化版（点赞让同类观点的推送概率翻倍，点踩则减半），请向学生说明这一点。": "“Scrolly” and all posts are fictional content written for teaching and don't represent any real platform. The recommendation algorithm and AI are simplified (a like doubles the chance of that view being shown; a dislike halves it). Please explain this to students.",
+"支持带手机": "For phones",
+"反对带手机": "Against phones",
+"中立 / 事实": "Neutral / facts",
+"当然应该让中学生带手机上学。": "Of course students should bring phones to school.",
+"不应该让中学生带手机上学。": "Students shouldn't bring phones to school.",
+"这个问题没有简单的答案。": "There's no simple answer to this question.",
+"刷帖": "Scroll",
+"揭晓": "Reveal",
+"问 AI": "Ask the AI",
+"点赞": "Like",
+"点踩": "Dislike",
+"收藏": "Save",
+"分享": "Share",
+"热评": "Top comment",
+"以下是新的推荐": "New recommendations below",
+"今天的推荐看完啦": "That's all your recommendations for today",
+"正在为你推荐……": "Finding recommendations for you…",
+"↑ 给上面每条帖子点赞或点踩，再往下刷": "↑ Like or dislike each post above, then keep scrolling",
+"继续往下刷，加载更多": "Keep scrolling to load more",
+"刷刷": "Scrolly",
+"关注": "Following",
+"推荐": "For You",
+"同城": "Nearby",
+"为你推荐": "Recommended for you",
+"全班一起刷": "Scroll as a class",
+"老师读出每条帖子，全班举手：👍 点赞，还是 👎 点踩？": "The teacher reads each post aloud and the class raises hands: 👍 like or 👎 dislike?",
+"按多数人的选择点击。": "Click the majority choice.",
+"这一批都选完后，在手机上往下刷，就会自动加载下一批。": "After finishing a batch, scroll down on the phone to load the next one.",
+"揭晓：你们的信息流里到底是什么？": "Reveal: what's really in your feed?",
+"「刷刷」是一个虚构的 App。话题：": "“Scrolly” is a fictional app. Topic: ",
+"中学生该不该带手机上学？": "Should students bring phones to school?",
+"重新开始": "Start over",
+"第 1 步：刷帖": "Step 1: Scroll",
+"你觉得这个 App 给你们推的内容，和平台上所有的帖子一样吗？": "Do you think what this app shows you matches all the posts on the platform?",
+"平台上的全部帖子": "All posts on the platform",
+"你们刷到的帖子": "The posts you saw",
+"最后一批推荐": "The last batch",
+"每一批推送了什么": "What each batch showed",
+"这是一个简化的推荐算法：点赞让同类观点的推送概率翻倍，点踩让它减半。真实平台的算法复杂得多，还会看你停留多久、和你相似的人喜欢什么，但“你喜欢什么，就给你推更多什么”这一点是一样的。": "This is a simplified recommendation algorithm: a like doubles the chance of showing that view; a dislike halves it. Real platforms' algorithms are far more complex, and also look at how long you linger and what similar people like, but “show you more of what you like” is the same.",
+"用信息流训练 AI，问它一个问题 →": "Train an AI on the feed and ask it a question →",
+"第 2 步：揭晓": "Step 2: Reveal",
+"手机里的帖子现在都标上了观点。往上翻翻，你们点赞的都是哪一类？": "The posts on the phone are now labeled by view. Scroll back up: which kind did you like?",
+"平台上什么观点都有，为什么你们看到的越来越只剩一种？这就是“回音室”。": "The platform has every view, so why did you see more and more of just one? That's an “echo chamber.”",
+"支持的人认为，": "Supporters say: ",
+"反对的人认为，": "Opponents say: ",
+"另外，": "Also: ",
+"第 3 步：问 AI": "Step 3: Ask the AI",
+"同一个问题：“中学生该不该带手机上学？”分别问两个 AI。": "Same question for two AIs: “Should students bring phones to school?”",
+"只读过你们信息流的 AI": "The AI that read only your feed",
+"说明：这两个都是简化版的 AI，只会把读过的帖子里最多的观点拼成回答。真正的 AI 读过的资料多得多，也会自己组织语言，但如果它读到的资料大多偏向一边，它的回答也可能偏向一边。": "Note: both are simplified AIs that only stitch the most common view from their posts into an answer. Real AI has read far more and puts things in its own words, but if most of what it read leans one way, its answers may lean that way too.",
+"如果 AI 的训练数据也来自“回音室”，它的回答会有什么问题？我们该怎么办？": "If an AI's training data also comes from an “echo chamber,” what problems will its answers have? What should we do?",
+"全班刷到的帖子": "Posts the class saw",
+"只读过全班信息流的 AI 说：": "The AI that read only the class's feed says:",
+"观点": "View",
+"全班选择": "Class choice",
+"批次": "Batch",
+"帖子": "Post"
+},
+"patterns": [
+[
+"^(\\d+)分钟前$",
+"$1 min ago"
+],
+[
+"^/ (\\d+) 批推荐$",
+"/ $1 batches"
+],
+[
+"^一共要刷 (\\d+) 批，每批 (\\d+) 条。你们的每一次点赞和点踩，App 都会记下来。$",
+"You'll scroll $1 batches of $2 posts each. The app records every like and dislike."
+],
+[
+"^(\\d+) 条，三种观点各 (\\d+) 条$",
+"$1 posts, $2 per view"
+],
+[
+"^(\\d+) 条$",
+"$1 posts"
+],
+[
+"^第 (\\d+) 批$",
+"Batch $1"
+],
+[
+"^它读过的 (\\d+) 条帖子：$",
+"The $1 posts it read:"
+],
+[
+"^读过平台上全部 (\\d+) 条帖子的 AI$",
+"The AI that read all $1 posts on the platform"
+],
+[
+"^(.+)　\\|　话题：中学生该不该带手机上学？$",
+"$1 | Topic: Should students bring phones to school?"
+],
+[
+"^话题：中学生该不该带手机上学？$",
+"Topic: Should students bring phones to school?"
+],
+[
+"^全班一共点赞 (\\d+) 次，点踩 (\\d+) 次。$",
+"The class liked $1 times and disliked $2 times."
+],
+[
+"^目前记录了全班对 (\\d+) 条帖子的选择。$",
+"The class's choices on $1 posts recorded so far."
+],
+[
+"^(.+) (\\d+)%$",
+"$1 $2%"
+],
+[
+"^回音室推送器_(.+)$",
+"Echo-Chamber-Feed_$1"
+],
+[
+"^([^：]+)：(.+)$",
+"$1: $2"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top">
@@ -373,7 +911,7 @@ function postNode(p, d, onPick, reveal) {
   if (!locked) { up.onclick = () => onPick(d === "up" ? undefined : "up"); down.onclick = () => onPick(d === "down" ? undefined : "down"); }
   const mi = (icon, txt) => { const m = el("span", { class: "mi" }); m.innerHTML = icon; m.append(txt); return m; };
   return el("article", { class: "post" + (d === "down" ? " down" : "") },
-    el("div", { class: "ph" }, el("div", { class: "av", style: `background:${p.av}` }, p.who[0]), el("div", {}, el("div", { class: "nm" }, p.who), el("div", { class: "tm" }, p.mins + "分钟前"))),
+    el("div", { class: "ph" }, el("div", { class: "av", style: `background:${p.av}` }, gameT(p.who)[0]), el("div", {}, el("div", { class: "nm" }, p.who), el("div", { class: "tm" }, p.mins + "分钟前"))),
     el("p", {}, p.text, " ", el("span", { class: "hashtag" }, p.tag)),
     p.cover ? el("div", { class: "cover" }, p.cover) : null,
     el("div", { class: "actbar" }, el("div", { class: "pill" }, up, el("i", { class: "sep" }), down),
@@ -475,18 +1013,18 @@ function answer(posts) {
   const cnt = { pro: 0, con: 0, neu: 0 }; posts.forEach((p) => cnt[p.s]++);
   const win = KEYS.slice().sort((a, b) => cnt[b] - cnt[a])[0];
   if (cnt[win] / posts.length < 0.5) return balanced(posts);
-  return { lead: ST[win].lead, body: posts.filter((p) => p.s === win).slice(0, 3).map((p) => p.point).join(""), cnt, n: posts.length };
+  return { lead: ST[win].lead, body: posts.filter((p) => p.s === win).slice(0, 3).map((p) => gameT(p.point)).join(gameLang() === "en" ? " " : ""), cnt, n: posts.length };
 }
 function balanced(posts) {
   const by = (s) => posts.find((p) => p.s === s), cnt = { pro: 0, con: 0, neu: 0 }; posts.forEach((p) => cnt[p.s]++);
-  const parts = []; if (by("pro")) parts.push("支持的人认为，" + by("pro").point); if (by("con")) parts.push("反对的人认为，" + by("con").point); if (by("neu")) parts.push("另外，" + by("neu").point);
-  return { lead: ST.neu.lead, body: parts.join(""), cnt, n: posts.length };
+  const parts = []; if (by("pro")) parts.push(gameT("支持的人认为，") + gameT(by("pro").point)); if (by("con")) parts.push(gameT("反对的人认为，") + gameT(by("con").point)); if (by("neu")) parts.push(gameT("另外，") + gameT(by("neu").point));
+  return { lead: ST.neu.lead, body: parts.join(gameLang() === "en" ? " " : ""), cnt, n: posts.length };
 }
 const feedAnswer = () => answer([...new Set(shown())]);
 const fullAnswer = () => balanced(POSTS);
 function stepAI() {
   const box = (title, a) => el("div", { class: "card" }, el("h3", {}, title),
-    el("div", { class: "say" }, el("b", {}, a.lead), a.body),
+    el("div", { class: "say" }, el("b", {}, a.lead), gameLang() === "en" ? " " : "", a.body),
     el("div", { class: "hint" }, `它读过的 ${a.n} 条帖子：`), stackBar({ pro: a.cnt.pro / a.n, con: a.cnt.con / a.n, neu: a.cnt.neu / a.n }));
   return [
     el("h2", {}, "第 3 步：问 AI"),
@@ -503,7 +1041,7 @@ function stepAI() {
 /* ===================================================================== 导出 */
 function download(blob, name) {
   const url = URL.createObjectURL(blob);
-  const a = el("a", { href: url, download: name });
+  const a = el("a", { href: url, download: gameT(name) });
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
@@ -539,7 +1077,7 @@ $("#btn-ex-png").onclick = () => {
   for (const s of KEYS) { ctx.fillStyle = ST[s].hex; ctx.fillRect(lx, 572, 24, 24); ctx.fillStyle = "#1f2937"; ctx.fillText(ST[s].name, lx + 34, 594); lx += 260; }
   const fa = feedAnswer();
   ctx.fillStyle = "#1f2937"; ctx.font = `700 32px ${font}`; ctx.fillText("只读过全班信息流的 AI 说：", 70, 690);
-  ctx.font = `400 28px ${font}`; let t = fa.lead + fa.body; while (ctx.measureText(t).width > 1440 && t.length > 4) t = t.slice(0, -2); if (t !== fa.lead + fa.body) t += "…";
+  ctx.font = `400 28px ${font}`; const full = gameT(fa.lead) + (gameLang() === "en" ? " " : "") + fa.body; let t = full; while (ctx.measureText(t).width > 1440 && t.length > 4) t = t.slice(0, -2); if (t !== full) t += "…";
   ctx.fillText(t, 70, 740);
   const ups = decided().filter((x) => x.d === "up").length;
   ctx.fillStyle = "#5f6b7a"; ctx.font = `400 28px ${font}`; ctx.fillText(`全班一共点赞 ${ups} 次，点踩 ${decided().length - ups} 次。`, 70, 820);
@@ -550,7 +1088,7 @@ $("#btn-ex-csv").onclick = () => {
   const m = meta();
   const rows = [["日期", "班级", "参与人数", "批次", "帖子", "观点", "全班选择"],
     ...decided().map(({ batch, p, d }) => [m.date, m.cls, m.count, batch, p.text, ST[p.s].name, VOTE[d]])];
-  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(gameT(String(v))).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
 };
 

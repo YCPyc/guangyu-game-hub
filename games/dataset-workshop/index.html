@@ -112,7 +112,7 @@ h2 { font-size: 1.5rem; margin: 8px 0 4px; }
 .count { font-weight: 800; color: var(--brand-ink); }
 .diy { margin-top: 20px; }
 .diy-line { display: flex; flex-wrap: wrap; align-items: center; font-size: 2rem; font-weight: 800; row-gap: 10px; }
-.diy-ch { padding: 0 2px; }
+.diy-ch { padding: 0 2px; white-space: pre; }
 .cut { width: 22px; height: 48px; border: 0; background: none; position: relative; padding: 0; }
 .cut::after { content: ""; position: absolute; left: 50%; top: 6px; bottom: 6px; width: 3px; transform: translateX(-50%); background: var(--line); border-radius: 2px; }
 .cut:hover::after { background: var(--accent); }
@@ -136,6 +136,276 @@ h2 { font-size: 1.5rem; margin: 8px 0 4px; }
 input[type=text], input[type=number], input[type=date] { border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
 .export-preview { max-width: 100%; border: 2px solid var(--line); border-radius: 12px; margin-top: 14px; }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"数据集工坊": "Dataset Workshop",
+"聊天机器人背后的大脑 · 第 1 课": "The Brain Behind the Bot · Lesson 1",
+"📤 导出本节课结果": "📤 Export class results",
+"📘 老师说明": "📘 Teacher guide",
+"🖼 下载结果图片 (PNG)": "🖼 Download results image (PNG)",
+"📄 下载原始数据 (CSV)": "📄 Download raw data (CSV)",
+"如果没有自动下载（例如在微信里），请长按下面的图片保存。": "If it doesn't download automatically (for example in WeChat), press and hold the image below to save it.",
+"导出预览": "Export preview",
+"💬 讨论：": "💬 Discuss: ",
+"本游戏配套第 1 课《聊天机器人怎么运作》中的“数据集”和“词元”。学生亲手体验 AI 公司准备训练数据的两个步骤：": "This game supports the “datasets” and “tokens” parts of Lesson 1, “How chatbots work.” Students try two steps AI companies use to prepare training data: ",
+"清洗数据": "Clean the data",
+"和": " and ",
+"切分词元": "Tokenize",
+"。建议总时长约 20–25 分钟。": ". Suggested total time: about 20–25 minutes.",
+"清洗数据（约 10 分钟）": "Clean the data (about 10 min)",
+"：屏幕上是从不同渠道收集来的文字。请学生轮流上台（或举手指出），点击其中“不该进入数据集”的内容：广告、个人隐私、不文明用语、乱码、错误信息、重复内容。点错了不扣分，可以借机讨论“为什么这句可以留下”。找不到时点“提示”。": ": The screen shows text collected from different sources. Have students take turns (or raise hands to point out) and click what shouldn't go into a dataset: ads, private information, rude language, garbled text, false information and duplicates. Wrong clicks cost nothing; use them to discuss why that sentence can stay. Click “Hint” if you get stuck.",
+"选一段文本（约 2 分钟）": "Choose a text (about 2 min)",
+"：从清洗好的文本里选一段大家喜欢的。": ": Pick a cleaned text the class likes.",
+"切分词元（约 10 分钟）": "Tokenize (about 10 min)",
+"：AI 读文字前要先把句子切成一小块一小块的“词元”。展示四种切法，请全班举手投票“哪种切法最好”，点选全班的选择，再点“揭晓分析”。也可以用“自己动手切”让学生上台切一切。最后看看词元是怎样变成数字的。": ": Before reading text, AI splits sentences into small pieces called “tokens.” Show the four ways to split, have the class vote on which is best, select the class's choice, then click “Reveal analysis.” Students can also try “Cut it yourself.” Finally, see how tokens become numbers.",
+"讨论建议": "Discussion ideas",
+"：如果数据没有清洗干净，AI 会学到什么？真正的 AI 要处理几十亿句话，靠人工一句句清洗做得到吗？": ": If data isn't cleaned properly, what will an AI learn? Real AI handles billions of sentences. Could people clean them one by one?",
+"本游戏完全离线可用，不收集任何学生信息。文本中的电话号码、地址、网址都是虚构的。": "This game works fully offline and collects no student data. Phone numbers, addresses and URLs in the text are fictional.",
+"广告": "Ad",
+"广告不是自然的语言，会让 AI 学会推销东西。": "Ads aren't natural language and would teach AI to sell things.",
+"个人隐私": "Private info",
+"电话、地址等个人信息不能拿去训练 AI，要保护隐私。": "Phone numbers, addresses and other personal details must not be used to train AI. Protect privacy.",
+"不文明用语": "Rude language",
+"骂人的话会让 AI 也学会不礼貌。": "Insults would teach AI to be rude too.",
+"乱码 / 网页代码": "Garbled text / web code",
+"乱码和网页代码不是人说的话，对学语言没有帮助。": "Garbled text and web code aren't human language and don't help with learning language.",
+"错误信息": "False information",
+"错误的知识会让 AI 一本正经地胡说八道。": "False knowledge would make AI confidently talk nonsense.",
+"重复内容": "Duplicate",
+"重复的内容会让 AI 以为这句话特别重要。": "Duplicates would make AI think a sentence is especially important.",
+"选一段文本": "Choose a text",
+"第 1 步：清洗数据": "Step 1: Clean the data",
+"这些文字是从不同渠道收集来的“原始数据”。在拿去训练 AI 之前，要先把不该留下的内容找出来、删掉。点击你觉得不好的部分！": "This is “raw data” collected from different sources. Before training an AI on it, find and remove what shouldn't stay. Click the parts you think are bad!",
+"要删掉的有：": "Remove these: ",
+"💡 提示": "💡 Hint",
+"🎉 数据清洗完成！": "🎉 Data cleaning complete!",
+" 我们一共删掉了：": " In total we removed:",
+"我们一共删掉了：": "In total we removed:",
+"  ✓ 已清洗": "  ✓ Cleaned",
+"✓ 已清洗": "✓ Cleaned",
+"下一步：选一段文本 →": "Next: choose a text →",
+"👍 这句是有用的正常内容，可以留下来！": "👍 This sentence is useful, normal content. It can stay!",
+"第 2 步：选一段文本": "Step 2: Choose a text",
+"数据干净了！选一段大家喜欢的文本，下一步我们把它切成“词元”。": "The data is clean! Choose a text the class likes, and next we'll split it into “tokens.”",
+"✓ 已选择": "✓ Selected",
+"← 上一步": "← Back",
+"下一步：切分词元 →": "Next: tokenize →",
+"一个字一个字切": "Split letter by letter",
+"可以用，但词元太多了，而且“熊”和“猫”被分开，AI 要自己再去学它们是一个词。": "It works, but there are too many tokens, and the letters of “panda” are split apart, so AI must learn on its own that they form one word.",
+"按词语切": "Split by word",
+"最合理！每个词元都有意思，数量也不多。真正的 AI 也会把常用词当成一个词元。": "Most sensible! Each token has meaning, and there aren't too many. Real AI also treats common words as one token.",
+"每三个字切一刀": "Cut every 3 letters",
+"不太好：很多词被从中间切断，切出来的块没有意义，AI 很难学到规律。": "Not great: many words get cut in the middle, the pieces have no meaning, and AI struggles to learn patterns.",
+"按逗号切成大块": "Split into big chunks at commas",
+"块太大了：每一块几乎都不会在别的句子里再出现，AI 没法“举一反三”。": "The chunks are too big: each one almost never appears in another sentence, so AI can't apply what it learns elsewhere.",
+"✅ 好切法": "✅ Good split",
+"🤔 能用，但不是最好": "🤔 Works, but not the best",
+"❌ 不太好": "❌ Not great",
+"：": ": ",
+"第 3 步：切分词元": "Step 3: Tokenize",
+"AI 读文字之前，要先把句子切成一小块一小块，每一块叫一个“词元”。下面是四种切法——全班投票：哪种切法最好？": "Before reading text, AI splits sentences into small pieces, each called a “token.” Here are four ways to split. Class vote: which is best?",
+"🎉 揭晓分析": "🎉 Reveal analysis",
+"先点选全班选择的切法": "First select the class's choice",
+"全班选择了：": "The class chose: ",
+" —— 和 AI 的想法一样！": " — the same idea as AI!",
+"—— 和 AI 的想法一样！": "— the same idea as AI!",
+"如果数据没有清洗干净，AI 会学到什么？真正的 AI 要处理几十亿句话，靠人工一句句清洗做得到吗？": "If data isn't cleaned properly, what will AI learn? Real AI handles billions of sentences. Could people clean them one by one?",
+"← 换一段文本": "← Choose another text",
+"✂️ 自己动手切": "✂️ Cut it yourself",
+"点击两个字之间的竖线，就在那里切一刀；再点一次取消。": "Click a line between two characters to cut there; click again to undo.",
+"在这里切一刀": "Cut here",
+"清空": "Clear",
+"🔢 词元变成数字": "🔢 Tokens become numbers",
+"AI 其实不认识字，只认识数字。每个词元在“词表”里都有一个编号，AI 看到的句子其实是一串数字：": "AI doesn't actually recognize words, only numbers. Each token has a number in its “vocabulary,” so the sentence AI sees is really a string of numbers:",
+"（还没有开始清洗）": "(Cleaning hasn't started yet)",
+"✂️ 我们切分词元的句子": "✂️ The sentence we tokenized",
+"环节": "Stage",
+"项目": "Item",
+"结果": "Result",
+"误点好内容次数": "Times good content was clicked",
+"选文本": "Choose text",
+"数据集工坊 · 课堂结果": "Dataset Workshop · Class results"
+},
+"patterns": [
+[
+"^已清洗 (\\d+) / (\\d+) 处$",
+"Cleaned $1 / $2"
+],
+[
+"^（误点了 (\\d+) 次好内容）$",
+"(clicked good content $1 times)"
+],
+[
+"^(.+) × (\\d+)$",
+"$1 × $2"
+],
+[
+"^(.+)　　(.+)$",
+"$1    $2"
+],
+[
+"^还有 (\\d+) 处没清洗$",
+"$1 left to clean"
+],
+[
+"^✅ 找到了：(.+)。(.+)$",
+"✅ Found: $1. $2"
+],
+[
+"^一共 (\\d+) 个词元$",
+"$1 tokens total"
+],
+[
+"^在第 (\\d+) 个字后切$",
+"Cut after character $1"
+],
+[
+"^你切出了 (\\d+) 个词元：$",
+"You made $1 tokens:"
+],
+[
+"^聊天机器人背后的大脑 · 第 1 课　\\|　(.+)$",
+"The Brain Behind the Bot · Lesson 1 | $1"
+],
+[
+"^🧹 我们清洗了 (\\d+) 条原始数据，删掉了 (\\d+) 处不好的内容$",
+"🧹 We cleaned $1 pieces of raw data and removed $2 bad parts"
+],
+[
+"^全班选择的切法：(.+)（(\\d+) 个词元）$",
+"The class's split: $1 ($2 tokens)"
+],
+[
+"^全班选择：(.+)$",
+"Class choice: $1"
+],
+[
+"^数据集工坊_(.+)$",
+"Dataset-Workshop_$1"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top">
@@ -232,6 +502,40 @@ const CARDS = [
     words: "数学 其实 没有 那么 可怕 ， 多 练习 就 会 越来越 熟练 。" },
 ];
 
+/* 英文界面用自己的句子（切分词元依赖句子本身，不能逐字翻译）；结构和中文一一对应 */
+{
+  const CARDS_ZH = CARDS.slice();
+  const CARDS_EN = [
+    { src: "Online forum", emoji: "💬",
+      segs: [["Last weekend I went hiking with my classmates, "], ["[Click to claim your cash gift >>> www.hongbao-xx.com] ", "ad"], ["and the view from the top was amazing. "], ["I want to go again."]],
+      words: "Last weekend I went hiking with my classmates , and the view from the top was amazing . I want to go again ." },
+    { src: "News site", emoji: "📰",
+      segs: [["The city built three new libraries this year, "], ["<div class=\"ad-box\"> ", "junk"], ["making it easier for residents to borrow books."], [" &nbsp;&nbsp;&nbsp;", "junk"]],
+      words: "The city built three new libraries this year , making it easier for residents to borrow books ." },
+    { src: "Social media", emoji: "📱",
+      segs: [["Today I learned to cook tomato and eggs, "], ["I live at 18 Xingfu Road, Unit 3, ", "privacy"], ["and my mom said it tasted great! "], ["Call me at 138 0000 1234", "privacy"]],
+      words: "Today I learned to cook tomato and eggs , and my mom said it tasted great !" },
+    { src: "Online encyclopedia", emoji: "📚",
+      segs: [["Giant pandas mainly eat bamboo, "], ["giant pandas are actually a kind of large bird, ", "fake"], ["and they live in the mountain forests of China."]],
+      words: "Giant pandas mainly eat bamboo , and they live in the mountain forests of China ." },
+    { src: "Video comments", emoji: "🎬",
+      segs: [["This science video explains things clearly, "], ["anyone who doesn't get it is an idiot, ", "rude"], ["and I learned how to make a little volcano. "], ["And I learned how to make a little volcano.", "dup"]],
+      words: "This science video explains things clearly , and I learned how to make a little volcano ." },
+    { src: "E-book", emoji: "📖",
+      segs: [["Once there was a brave little fox, "], ["ï¿½ï¿½Ã©â–¯â–¯â–¯ ", "junk"], ["who set out to find treasure deep in the forest."]],
+      words: "Once there was a brave little fox , who set out to find treasure deep in the forest ." },
+    { src: "Shopping site review", emoji: "🛒",
+      segs: [["These sneakers are really comfortable, "], ["Add me on WeChat xie-123 for a better price! ", "ad"], ["and my feet don't get tired when I run."]],
+      words: "These sneakers are really comfortable , and my feet don't get tired when I run ." },
+    { src: "Study forum", emoji: "✏️",
+      segs: [["Math actually isn't that scary, "], ["Shut up, you don't know anything! ", "rude"], ["and with practice you keep getting better. "], ["The sun rises in the west every day.", "fake"]],
+      words: "Math actually isn't that scary , and with practice you keep getting better ." },
+  ];
+  const useLangData = () => CARDS.splice(0, CARDS.length, ...(gameLang() === "en" ? CARDS_EN : CARDS_ZH));
+  useLangData();
+  window.addEventListener("game-langchange", () => { useLangData(); S.cuts = new Set(); });
+}
+
 /* ============================================================ 工具函数 */
 const $ = (s) => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => {
@@ -254,7 +558,7 @@ function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2400);
 }
-const cleanText = (c) => c.segs.filter((s) => !s[1]).map((s) => s[0]).join("");
+const cleanText = (c) => c.segs.filter((s) => !s[1]).map((s) => s[0]).join("").trim();
 
 /* ============================================================ 状态 */
 const S = { step: 1, removed: new Set(), mistakes: 0, picked: null, choice: null, revealed: false, cuts: new Set() };
@@ -349,7 +653,7 @@ function renderPick() {
 
 /* ============================================================ 第 3 步：切分词元 */
 function options(c) {
-  const text = cleanText(c), chars = [...text];
+  const text = cleanText(c), chars = [...text].filter((ch) => ch.trim());
   const byWord = c.words.split(" ");
   // “每三个字切一刀”不管词语边界；从几种起点里挑切断词语最多的一种，让问题更明显
   const boundaries = new Set();
@@ -362,7 +666,7 @@ function options(c) {
     const broken = cuts.filter((c) => c < chars.length && !boundaries.has(c)).length;
     if (broken > worst) { worst = broken; every3 = chunks; }
   }
-  const byComma = text.match(/[^，。！？]+[，。！？]?/g) || [text];
+  const byComma = text.match(/[^，。！？,.!?]+[，。！？,.!?]?/g) || [text];
   return [
     { id: "char", name: "一个字一个字切", toks: chars, level: "meh",
       why: "可以用，但词元太多了，而且“熊”和“猫”被分开，AI 要自己再去学它们是一个词。" },
@@ -433,7 +737,7 @@ function idsView(toks) {
 /* ============================================================ 导出 */
 function downloadBlob(blob, name) {
   const url = URL.createObjectURL(blob);
-  const a = el("a", { href: url, download: name });
+  const a = el("a", { href: url, download: gameT(name) });
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
@@ -447,7 +751,8 @@ function removedCounts() {
 }
 function wrapText(ctx, text, maxW) {
   const lines = []; let line = "";
-  for (const ch of [...text]) { if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else line += ch; }
+  // 英文按单词换行，中文按字换行
+  for (const ch of gameLang() === "en" ? gameT(text).split(/(?<= )/) : [...text]) { if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else line += ch; }
   if (line) lines.push(line);
   return lines;
 }
@@ -494,7 +799,7 @@ $("#btn-ex-png").onclick = () => {
   img.src = c.toDataURL("image/png"); img.hidden = false;
   c.toBlob((b) => b && downloadBlob(b, fileBase(exMeta()) + ".png"), "image/png");
 };
-function csvCell(v) { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
+function csvCell(v) { const s = String(gameT(String(v ?? ""))); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
 $("#btn-ex-csv").onclick = () => {
   const m = exMeta(), rows = [["日期", "班级", "参与人数", "环节", "项目", "结果"]];
   const counts = removedCounts();
@@ -516,6 +821,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.q
 $("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };
 $("#btn-export").onclick = openExport;
 
+window.render = () => go(S.step);
 go(1);
 </script>
 </body>

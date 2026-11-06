@@ -98,6 +98,298 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
   .card { padding: 16px; }
 }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"我是AI小老师：训练AI": "Little AI Teacher: Train the AI",
+"游戏环节": "Game stages",
+"本游戏配套《聊天机器人背后的大脑》第 1 节《聊天机器人怎么运作》，帮助学生理解：训练示例会影响 AI 学到的语言模式，进而影响它生成的回答。": "This game supports Lesson 1, “How chatbots work,” of The Brain Behind the Bot. It helps students understand that training examples shape the language patterns an AI learns, which in turn shape the answers it generates.",
+"说明玩法（约 1–2 分钟）": "Explain the game (about 1–2 min)",
+"：介绍“训练示例”和“新问题”，提醒学生选择自己觉得最合适的回答。": ": Introduce “training examples” and “new questions,” and remind students to choose the answer they think fits best.",
+"完成三组配对活动（共约 6–9 分钟）": "Complete three paired activities (about 6–9 min total)",
+"：每组约 2–3 分钟。先读训练示例并举手投票，观察班级选择怎样被记录；接着读一个相关的新问题，先猜 AI 会怎么回答，再点击生成，观察投票如何影响答案。": ": About 2–3 minutes each. Read the training example and vote by raising hands, and watch how the class's choice is recorded. Then read a related new question, guess how the AI will answer, click generate, and see how the vote shaped the answer.",
+"回顾（约 2–3 分钟）": "Review (about 2–3 min)",
+"：比较三组训练示例和新回答，讨论训练数据会怎样影响 AI，以及这个简化模拟没有呈现什么。": ": Compare the three training examples and new answers. Discuss how training data affects AI, and what this simplified simulation leaves out.",
+"这是一个简化的课堂模拟：每次投票后，模拟器记下班级选中的回答示例，并把同一种回答方式用到紧接着的相似问题；真正的 AI 会从大量数据中学习复杂的语言模式。本游戏离线可用，不收集学生个人信息。": "This is a simplified classroom simulation: after each vote, the simulator records the example answer the class chose and uses the same style on the similar question that follows. Real AI learns complex language patterns from huge amounts of data. This game works offline and collects no personal student data.",
+"先问清楚": "Ask first",
+"先回应感受": "Acknowledge feelings",
+"解释并核对": "Explain and check",
+"给出可行办法": "Offer a practical fix",
+"同学说作业有点难": "A classmate finds the homework hard",
+"同学说：“这道题我想了好久，还是不会。”你会怎么回应？": "A classmate says: “I've been thinking about this problem forever and still can't do it.” How would you respond?",
+"你卡在哪一步？我们一起看看。": "Which step are you stuck on? Let's look together.",
+"听起来挺让人着急的。": "That sounds really frustrating.",
+"我给你讲讲我怎么理解这道题。": "Let me tell you how I understand this problem.",
+"我们先把题目分成几小步试试。": "Let's try breaking the problem into small steps.",
+"同学担心小组展示": "A classmate is worried about a group presentation",
+"相似的新问题：同学说：“我一上台就紧张，怕讲错。”先猜一猜，模拟器会怎么回答？": "Similar new question: A classmate says: “I get nervous as soon as I'm on stage. I'm afraid I'll make a mistake.” First guess: how will the simulator answer?",
+"你最担心哪一部分？": "Which part worries you most?",
+"紧张很常见，我能理解。": "Getting nervous is really common. I understand.",
+"讲错一处不代表整个展示不好。": "One mistake doesn't make the whole presentation bad.",
+"我们可以先一起练开头两句。": "We could practice the first two lines together.",
+"朋友误会了你的话": "A friend misunderstood you",
+"朋友以为你在批评他，但你其实不是这个意思。你会怎么说？": "A friend thinks you were criticizing them, but that's not what you meant. What would you say?",
+"你愿意告诉我，哪句话让你这样觉得吗？": "Would you tell me which thing I said made you feel that way?",
+"我不想让你难过，抱歉让你有这种感受。": "I didn't want to upset you. I'm sorry I made you feel this way.",
+"我刚才的意思是……不是在说你不好。": "What I meant was… I wasn't saying anything bad about you.",
+"我们重新说一遍，看看怎样表达更清楚。": "Let's say it again and find a clearer way to put it.",
+"小组点子没被选上": "A group idea wasn't chosen",
+"相似的新问题：小组讨论海报主题时，同学提出的点子没被选上，他看起来有点失落。先猜一猜，模拟器会怎么回答？": "Similar new question: While a group discusses a poster theme, a classmate's idea isn't chosen, and they look a bit let down. First guess: how will the simulator answer?",
+"你觉得这个点子里，哪部分最想保留下来？": "Which part of your idea would you most like to keep?",
+"自己的想法没被选上，确实会有点失落。": "It really can feel disappointing when your idea isn't chosen.",
+"我们可以先看看这个点子里值得保留的部分。": "We could first look at the parts of this idea worth keeping.",
+"把两个想法各写一条，再一起比较看看。": "Let's write down both ideas and compare them together.",
+"想邀请同学一起玩": "You want to invite a classmate to play",
+"你想邀请一位同学加入游戏，但不确定他愿不愿意。你会怎么开口？": "You want to invite a classmate to join a game, but you aren't sure they'd want to. How would you start?",
+"你现在想一起玩吗？不想也没关系。": "Do you want to play with us now? It's fine if you don't.",
+"一个人看起来有点无聊，要不要来？": "It looks a bit boring on your own. Want to come over?",
+"我们在玩接龙，规则是每人说一个词。": "We're playing a word chain. Everyone says one word.",
+"你可以先看一轮，觉得合适再加入。": "You could watch one round first and join if you like it.",
+"新同学找不到教室": "A new student can't find the classroom",
+"相似的新问题：新同学说：“我找不到科学教室，下一节就要上课了。”先猜一猜，模拟器会怎么回答？": "Similar new question: A new student says: “I can't find the science room, and my next class is about to start.” First guess: how will the simulator answer?",
+"你现在在哪一层？记得教室号码吗？": "Which floor are you on? Do you remember the room number?",
+"刚来学校不熟悉路线，确实容易着急。": "It's easy to feel stressed when you're new and don't know your way around.",
+"科学教室在二楼东侧，门口有蓝色标志。": "The science room is on the east side of the second floor, with a blue sign at the door.",
+"我带你走到科学教室吧。": "Let me walk you to the science room.",
+"回顾": "Review",
+"上一轮的班级选择已经记进训练示例。看看这个相似问题，再让模拟器生成回答。": "The class's last choice is now a training example. Look at this similar question, then have the simulator generate an answer.",
+"全班选出你觉得最合适的回答。老师统计举手人数；揭晓后，这个选择会作为本组训练示例。": "As a class, choose the answer you think fits best. The teacher counts raised hands; once revealed, the choice becomes this group's training example.",
+"生成模拟回答": "Generate simulated answer",
+"本轮平票，听听大家的理由": "It's a tie. Let's hear everyone's reasons",
+"请讨论后由老师点击大家最后决定的选项：": "After discussing, the teacher clicks the option the class finally chose:",
+"结束投票并看班级选择": "End voting and see the class's choice",
+"这个新回答和你们刚才选的回答方式有什么关系？": "How does this new answer relate to the style of answer you just chose?",
+"你选这个回答的理由是什么？换个情境还会选它吗？": "Why did you choose this answer? Would you still choose it in a different situation?",
+"查看三组训练结果 →": "See all three training results →",
+"查看对应的新问题 →": "See the matching new question →",
+"开始下一组训练 →": "Start the next training group →",
+"尚未完成投票": "Voting not finished yet",
+"尚未生成": "Not generated yet",
+"回顾：每次投票怎样影响答案": "Review: how each vote shaped the answer",
+"每一组都把刚才的班级选择作为训练示例，并立刻沿用到一个相似的新问题。": "Each group used the class's choice as a training example, then immediately applied it to a similar new question.",
+"如果这组投票改选了另一种回答方式，紧接着生成的答案会怎样变？": "If this group had voted for a different style of answer, how would the generated answer have changed?",
+"这是一个简化模拟：每个新答案沿用本组训练示例的回答方式。真正的 AI 会从大量数据中学习更复杂的模式。": "This is a simplified simulation: each new answer reuses the style of its group's training example. Real AI learns far more complex patterns from huge amounts of data.",
+"重新开始": "Start over",
+"训练示例": "Training example",
+"新问题": "New question",
+"尚未完成": "Not finished yet",
+"简化课堂模拟：每个新回答沿用本组投票记下的训练示例。": "Simplified classroom simulation: each new answer reuses the training example recorded by that group's vote.",
+"环节": "Stage",
+"场景": "Scenario",
+"票数A/B/C/D": "Votes A/B/C/D",
+"班级选择或生成回答": "Class choice or generated answer"
+},
+"patterns": [
+[
+"^投票 (\\d)$",
+"Vote $1"
+],
+[
+"^生成 (\\d)$",
+"Generate $1"
+],
+[
+"^训练示例 (\\d)：(.+)$",
+"Training example $1: $2"
+],
+[
+"^相似新问题 (\\d)：(.+)$",
+"Similar new question $1: $2"
+],
+[
+"^刚记下的训练示例：(.+)$",
+"Training example just recorded: $1"
+],
+[
+"^沿用本组投票：(.+)$",
+"Using this group's vote: $1"
+],
+[
+"^“(.+)”$",
+"“$1”"
+],
+[
+"^因为刚才训练示例选了“(.+)”这种回答方式，模拟器在相似问题里也选用了这种方式。$",
+"Because the training example chose the “$1” style, the simulator used the same style for the similar question."
+],
+[
+"^([A-D])　(.+)$",
+"$1  $2"
+],
+[
+"^([A-D])减一票$",
+"Remove one vote from $1"
+],
+[
+"^([A-D])加一票$",
+"Add one vote to $1"
+],
+[
+"^班级选择：(.+)$",
+"Class choice: $1"
+],
+[
+"^选 ([A-D])$",
+"Choose $1"
+],
+[
+"^训练示例已记下：班级选择了“(.+)”的回答方式。下一步会立刻用在相似问题中。$",
+"Training example recorded: the class chose the “$1” style. The next step applies it right away to a similar question."
+],
+[
+"^第 (\\d) 组：(.+)$",
+"Group $1: $2"
+],
+[
+"^训练示例：(.+)（(.+)）$",
+"Training example: $1 ($2)"
+],
+[
+"^新问题回答：(.+)$",
+"Answer to the new question: $1"
+],
+[
+"^班级投票：(\\d+) 票$",
+"Class vote: $1"
+],
+[
+"^(\\d+)\\. (.+)$",
+"$1. $2"
+],
+[
+"^(.+)　票数 A/B/C/D：(.+)$",
+"$1   Votes A/B/C/D: $2"
+],
+[
+"^记录：(.+)$",
+"Recorded: $1"
+],
+[
+"^我是AI小老师_训练AI_(.+)$",
+"Little-AI-Teacher_$1"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -216,7 +508,7 @@ function renderReview() {
   });
   return [el("h2", {}, "回顾：每次投票怎样影响答案"), el("p", { class: "lead" }, "每一组都把刚才的班级选择作为训练示例，并立刻沿用到一个相似的新问题。"), el("section", { class: "card" }, ...pairs), el("div", { class: "discuss" }, "讨论：", el("span", {}, "如果这组投票改选了另一种回答方式，紧接着生成的答案会怎样变？")), el("p", { class: "hint" }, "这是一个简化模拟：每个新答案沿用本组训练示例的回答方式。真正的 AI 会从大量数据中学习更复杂的模式。"), el("button", { class: "btn outline", style: "margin-top:16px", onclick: () => { S.index = 0; render(); } }, "重新开始")];
 }
-function download(blob, name) { const url = URL.createObjectURL(blob), a = el("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
+function download(blob, name) { const url = URL.createObjectURL(blob), a = el("a", { href: url, download: gameT(name) }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
 const meta = () => ({ cls: $("#ex-class").value.trim() || "未填写班级", count: $("#ex-count").value.trim(), date: today() });
 const fileBase = m => `我是AI小老师_训练AI_${m.cls}_${m.date}`.replace(/[\\/:*?"<>|\s]+/g, "_");
 function results() { return rounds.map((r, i) => ({ 场景: r.title, 类型: r.kind === "train" ? "训练示例" : "新问题", 票数: S.votes[i].join("/"), 班级选择或生成回答: S.winners[i] === null ? "尚未完成" : r.options[S.winners[i]][1] })); }
@@ -231,7 +523,7 @@ $("#btn-ex-png").onclick = () => {
   ctx.fillStyle = "#5f6b7a"; ctx.font = `400 22px ${font}`; ctx.fillText("简化课堂模拟：每个新回答沿用本组投票记下的训练示例。", 60, 950);
   c.toBlob(b => b && download(b, fileBase(m) + ".png"), "image/png");
 };
-$("#btn-ex-csv").onclick = () => { const m = meta(), rows = [["日期", "班级", "参与人数", "环节", "场景", "票数A/B/C/D", "班级选择或生成回答"], ...results().map(r => [m.date, m.cls, m.count, r.类型, r.场景, r.票数, r.班级选择或生成回答])]; const csv = "\uFEFF" + rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n"); download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv"); };
+$("#btn-ex-csv").onclick = () => { const m = meta(), rows = [["日期", "班级", "参与人数", "环节", "场景", "票数A/B/C/D", "班级选择或生成回答"], ...results().map(r => [m.date, m.cls, m.count, r.类型, r.场景, r.票数, r.班级选择或生成回答])]; const csv = "\uFEFF" + rows.map(row => row.map(v => `"${String(gameT(String(v))).replace(/"/g, '""')}"`).join(",")).join("\r\n"); download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv"); };
 document.querySelectorAll(".modal-bg").forEach(bg => bg.addEventListener("click", e => { if (e.target === bg || e.target.hasAttribute("data-close")) bg.hidden = true; }));
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal-bg").forEach(m => m.hidden = true); });
 $("#btn-guide").onclick = () => { $("#guide-modal").hidden = false; };

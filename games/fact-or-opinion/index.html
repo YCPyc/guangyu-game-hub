@@ -116,6 +116,7 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
 .ans:disabled { cursor: default; }
 .ans.picked { background: var(--cs); box-shadow: inset 0 0 0 2px var(--c); }
 .ans.right::after { content: "正确答案"; font-size: .75rem; font-weight: 700; color: var(--good); }
+html[lang=en] .ans.right::after { content: "Correct answer"; }
 .ans.dim { opacity: .4; }
 .reveal { border-radius: var(--radius); padding: 16px 18px; background: var(--bg); border-left: 6px solid var(--c); display: flex; flex-direction: column; gap: 8px; }
 .verdict { font-size: 1.6rem; font-weight: 800; }
@@ -136,6 +137,359 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
 @media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .stmt { font-size: 1.6rem; } }
 </style>
+<script id="game-en">
+/* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
+window.GAME_EN = {
+"text": {
+"事实还是观点？": "Fact or Opinion?",
+"事实还是观点": "Fact or Opinion?",
+"本游戏配套第 2 节《聊天机器人中的偏见》，放在课件讲“互联网”的部分（第 36 页）作为热身。它帮助学生分清": "This game supports Lesson 2, “Bias in chatbots,” as a warm-up in the section on the internet (slide 36). It helps students tell apart ",
+"事实": "Fact",
+"（可以查证、有标准答案）和": " (can be checked, has a definite answer) and ",
+"观点": "Opinion",
+"（个人的感受、喜好或判断），为后面“追问互联网”打基础。建议总时长约 6–8 分钟。": " (a personal feeling, preference or judgment), laying the groundwork for “questioning the internet” later. Suggested total time: about 6–8 minutes.",
+"第 1 关 · 入门（约 2 分钟）": "Level 1 · Beginner (about 2 min)",
+"：读出句子，全班举手选“事实”还是“观点”，老师按多数人的选择点击，再一起看解释。": ": Read the sentence aloud. The class raises hands for “fact” or “opinion,” the teacher clicks the majority choice, and everyone reads the explanation together.",
+"第 2 关 · 进阶（约 2 分钟）": "Level 2 · Intermediate (about 2 min)",
+"：有些观点会“装”成事实，比如用“大家都”“都不”包装。讨论学生是怎么被骗到的。": ": Some opinions “dress up” as facts, using words like “everyone” or “never.” Discuss how students got fooled.",
+"第 3 关 · 挑战（约 3 分钟）": "Level 3 · Challenge (about 3 min)",
+"：一句话里可能既有事实又有观点。最后两类题特别重要：“某某说……”和“喝冰水会让人长不高”。": ": One sentence can contain both fact and opinion. Two kinds of question matter most: “So-and-so said…” and “Drinking ice water stunts your growth.”",
+"结果（约 1 分钟）": "Results (about 1 min)",
+"：用最后的讨论问题过渡到课件：网上的事实、观点、误导和编造常常混在一起。": ": Use the final discussion question to transition back to the lesson: facts, opinions, misleading claims and fabrications are often mixed together online.",
+"每关从 10 句题库里随机抽 3 句，点“换一组题”可以重玩。注意：“事实”指": "Each level draws 3 random sentences from a bank of 10; click “New questions” to replay. Note: “fact” means a claim that ",
+"可以被查证": "can be checked",
+"的说法，不等于“一定是对的”。": ", which isn't the same as “definitely true.”",
+"入门": "Beginner",
+"进阶": "Intermediate",
+"挑战": "Challenge",
+"结果": "Results",
+"先从最简单的开始": "Start with the easiest ones",
+"有些观点会“装”成事实": "Some opinions “dress up” as facts",
+"一句话里可能既有事实又有观点": "One sentence can contain both fact and opinion",
+"春节是农历新年的第一天。": "Spring Festival is the first day of the lunar new year.",
+"查日历就能确认，不管谁查结果都一样。": "Check a calendar to confirm it. The result is the same no matter who checks.",
+"农历新年的第一天": "the first day of the lunar new year",
+"红烧肉是食堂最好吃的菜。": "Braised pork is the tastiest dish in the cafeteria.",
+"“好吃”是个人口味，有人爱红烧肉，有人更喜欢番茄炒蛋。": "“Tasty” is personal taste. Some love braised pork; others prefer tomato and eggs.",
+"最好吃": "the tastiest",
+"一场篮球比赛，每队同时有 5 名球员在场上。": "In a basketball game, each team has 5 players on the court at a time.",
+"这是篮球规则，翻规则书就能查到。": "This is a basketball rule. You can look it up in the rulebook.",
+"5 名": "5 players",
+"数学是最难的一门课。": "Math is the hardest subject.",
+"有人觉得数学最难，有人觉得英语或语文更难。难不难因人而异。": "Some find math hardest; others find English or Chinese harder. It depends on the person.",
+"最难": "the hardest",
+"中国的首都是北京。": "The capital of China is Beijing.",
+"这是可以查证的地理常识，有标准答案。": "This is checkable geography with a definite answer.",
+"首都是北京": "capital of China is Beijing",
+"暑假实在太短了。": "Summer vacation is way too short.",
+"“太短”是感受。学生可能觉得短，家长可能觉得长。": "“Too short” is a feeling. Students may find it short; parents may find it long.",
+"太短了": "too short",
+"这次月考一共考了 6 门科目。": "This month's exam covered 6 subjects.",
+"看看考试安排表就能确认。": "Check the exam schedule to confirm it.",
+"6 门": "6 subjects",
+"穿校服很难看。": "School uniforms look ugly.",
+"好不好看是审美判断，每个人的看法都不一样。": "Whether something looks good is a judgment of taste, and everyone sees it differently.",
+"难看": "ugly",
+"一年有 12 个月。": "A year has 12 months.",
+"这是大家都能查证的常识，有标准答案。": "This is common knowledge anyone can check, with a definite answer.",
+"12 个月": "12 months",
+"下雨天最适合睡懒觉。": "Rainy days are perfect for sleeping in.",
+"“最适合”是个人喜好。也有人觉得下雨天最适合看书，或者出去踩水。": "“Perfect” is a personal preference. Others think rainy days are best for reading or splashing in puddles.",
+"最适合": "perfect",
+"大家都觉得这部电影特别好看。": "Everyone thinks this movie is really great.",
+"“大家都”听起来像事实，其实没人能问遍所有人。它是在用“大家”包装一个观点。": "“Everyone” sounds like a fact, but nobody can ask every person. It wraps an opinion in the word “everyone.”",
+"大家都": "Everyone",
+"特别好看": "really great",
+"这次数学考试，全班平均分是 82 分。": "On this math test, the class average was 82.",
+"分数可以算出来。虽然在说成绩，但这是一个可以查证的数字。": "Scores can be calculated. Though it's about grades, this is a number you can check.",
+"82 分": "82",
+"学霸都不玩游戏。": "Top students never play games.",
+"这是一种以偏概全的判断。总会有成绩好又爱打游戏的同学。": "This is an overgeneralization. There will always be students with great grades who love games.",
+"都不": "never",
+"这款手机有黑、白、蓝三种颜色。": "This phone comes in three colors: black, white and blue.",
+"去商品页面看一眼就能确认。": "A look at the product page confirms it.",
+"三种颜色": "three colors",
+"这款手机的颜色都很好看。": "All this phone's colors look great.",
+"说的是手机的颜色，但“好看”是个人审美，所以是观点。": "It's about the phone's colors, but “look great” is personal taste, so it's an opinion.",
+"很好看": "look great",
+"体育课应该每天都有。": "There should be PE class every day.",
+"“应该”表示一个人的主张。有人同意，也有人觉得没必要。": "“Should” states someone's position. Some agree; others think it's unnecessary.",
+"应该": "should",
+"睡眠不足会让人注意力下降。": "Not getting enough sleep lowers people's concentration.",
+"听起来像大人的唠叨，其实是很多科学研究都证实过的结论，可以查证。": "It sounds like adults nagging, but many scientific studies have confirmed it, and you can check them.",
+"注意力下降": "lowers people's concentration",
+"周一是一周里最烦人的一天。": "Monday is the most annoying day of the week.",
+"“最烦人”是感受。说不定有人最喜欢周一，因为有体育课。": "“Most annoying” is a feeling. Someone might love Mondays because they have PE.",
+"最烦人": "most annoying",
+"这部电影上映第一周，票房超过了 1 亿元。": "In its first week, this movie earned over 100 million yuan.",
+"听起来像宣传，但票房是有统计数据的，可以查证。": "It sounds like promotion, but box office numbers are recorded and can be checked.",
+"超过了 1 亿元": "over 100 million yuan",
+"打篮球的人都长得高。": "Everyone who plays basketball is tall.",
+"“都”是以偏概全。很多篮球打得好的人个子并不高，也有很多高个子从来不打篮球。": "“Everyone” overgeneralizes. Many good basketball players aren't tall, and many tall people never play.",
+"都": "Everyone",
+"今天气温 35 度，热得让人受不了。": "It's 35 degrees today, and the heat is unbearable.",
+"今天气温 35 度，": "It's 35 degrees today, ",
+"热得让人受不了。": "and the heat is unbearable.",
+"温度可以用温度计测出来，是事实；“受不了”是感受，是观点。": "Temperature can be measured with a thermometer, so that's a fact. “Unbearable” is a feeling, so that's an opinion.",
+"小卖部在操场旁边，里面的零食比外面的好吃多了。": "The snack shop is next to the playground, and its snacks are way better than outside ones.",
+"小卖部在操场旁边，": "The snack shop is next to the playground, ",
+"里面的零食比外面的好吃多了。": "and its snacks are way better than outside ones.",
+"位置可以去看，是事实；“好吃多了”是个人口味，是观点。": "You can go and see the location, so that's a fact. “Way better” is personal taste, so that's an opinion.",
+"我们班昨天赢了篮球赛，因为我们是全年级最团结的班。": "Our class won the basketball game yesterday because we're the most united class in the grade.",
+"我们班昨天赢了篮球赛，": "Our class won the basketball game yesterday ",
+"因为我们是全年级最团结的班。": "because we're the most united class in the grade.",
+"比赛结果有记录，是事实；“最团结”是自己的评价，而且赢球的原因也是一种猜测。": "The game result is on record, so that's a fact. “Most united” is our own judgment, and the reason for winning is also a guess.",
+"这本书有 300 页，是我读过最有意思的书。": "This book has 300 pages and is the most interesting one I've read.",
+"这本书有 300 页，": "This book has 300 pages ",
+"是我读过最有意思的书。": "and is the most interesting one I've read.",
+"页数可以数，是事实；“最有意思”是个人感受，是观点。": "Pages can be counted, so that's a fact. “Most interesting” is a personal feeling, so that's an opinion.",
+"这首歌在音乐排行榜上排第一，是今年最好听的歌。": "This song is number one on the music charts and is the best song this year.",
+"这首歌在音乐排行榜上排第一，": "This song is number one on the music charts ",
+"是今年最好听的歌。": "and is the best song this year.",
+"排行榜名次可以查，是事实；“最好听”是个人感受。排名第一也不代表每个人都觉得它最好听。": "Chart rankings can be checked, so that's a fact. “Best” is a personal feeling. Being number one doesn't mean everyone thinks it's the best.",
+"新来的数学老师姓王，上课特别有意思。": "The new math teacher is named Wang, and the classes are really fun.",
+"新来的数学老师姓王，": "The new math teacher is named Wang, ",
+"上课特别有意思。": "and the classes are really fun.",
+"老师姓什么可以确认，是事实；“特别有意思”是学生自己的感受，是观点。": "The teacher's name can be confirmed, so that's a fact. “Really fun” is students' own feeling, so that's an opinion.",
+"老师说明天要考试，这简直是最糟糕的消息。": "The teacher said there's a test tomorrow, which is simply the worst news.",
+"老师说明天要考试，": "The teacher said there's a test tomorrow, ",
+"这简直是最糟糕的消息。": "which is simply the worst news.",
+"老师有没有说要考试，可以确认，是事实；“最糟糕”是感受，是观点。": "Whether the teacher said so can be confirmed, so that's a fact. “The worst” is a feeling, so that's an opinion.",
+"运动会上，小明 100 米跑了 13 秒，是全校跑得最帅的人。": "At the sports meet, Xiaoming ran 100 meters in 13 seconds and is the coolest runner in the school.",
+"运动会上，小明 100 米跑了 13 秒，": "At the sports meet, Xiaoming ran 100 meters in 13 seconds ",
+"是全校跑得最帅的人。": "and is the coolest runner in the school.",
+"成绩有计时记录，是事实；“最帅”是审美评价，是观点。": "The time was recorded, so that's a fact. “Coolest” is a judgment of taste, so that's an opinion.",
+"小红说：“这家奶茶店是全城最好喝的。”": "Xiaohong said: “This milk tea shop is the best in the city.”",
+"小心！这句话说的是“小红说了什么”，这件事本身可以查证，是事实。但小红说的内容是观点。网上很多“某某说”都是这样：转述一个观点，不代表这个观点就是事实。": "Careful! This sentence is about what Xiaohong said, and that itself can be checked, so it's a fact. But what she said is an opinion. Many “so-and-so said” claims online are like this: repeating an opinion doesn't make it a fact.",
+"小红说": "Xiaohong said",
+"喝冰水会让人长不高。": "Drinking ice water stunts your growth.",
+"这是一句可以查证的说法，所以属于“事实类”的说法。但查一查会发现，没有科学证据支持它，它其实是错的。可以查证的说法，不一定是对的！": "This claim can be checked, so it counts as a “fact-type” claim. But if you check, you'll find no scientific evidence for it. It's actually wrong. A claim you can check isn't necessarily true!",
+"会让人长不高": "stunts your growth",
+"可以查证": "Can be checked",
+"个人看法": "Personal view",
+"两者都有": "Both",
+"事实 + 观点": "Fact + opinion",
+"你是怎么分辨的？哪些词一出现，你就知道这是观点？": "How did you tell them apart? Which words signal an opinion as soon as they appear?",
+"为什么有人会把观点说得像事实一样？你在网上见过这样的说法吗？": "Why do people make opinions sound like facts? Have you seen this online?",
+"“可以查证”的说法就一定是对的吗？网上还有哪些说法看起来像事实，其实是错的、误导人的，甚至是编出来的？": "Is a claim that “can be checked” always true? What other claims online look like facts but are wrong, misleading, or even made up?",
+"怎么分辨？": "How to tell",
+"可以查证、有标准答案。不管谁来查，结果都一样。": "Can be checked and has a definite answer. The result is the same no matter who checks.",
+"数字": "Numbers",
+"时间地点": "Times and places",
+"规定": "Rules",
+"可以测量": "Measurable",
+"个人的感受、喜好或判断。每个人都可以不一样。": "A personal feeling, preference or judgment. It can differ from person to person.",
+"最": "most / best",
+"好吃": "tasty",
+"太……了": "too…",
+"全班得分": "Class score",
+"全班举手：这句话是……": "Raise your hands: this sentence is…",
+"答对了！": "Correct!",
+"这题有点难，看看为什么": "This one's tricky. Let's see why",
+"绿色底的是事实部分，黄色底的是观点部分。": "The green part is fact; the yellow part is opinion.",
+"带波浪线的词是“观点信号词”。": "The words with a wavy underline are “opinion signal words.”",
+"带波浪线的部分是可以查证的内容。": "The part with a wavy underline is what can be checked.",
+"下一题 →": "Next question →",
+"看本关结果 →": "See this level's results →",
+"重新判断这题": "Judge this one again",
+"答错的题：": "Questions missed:",
+"看全班结果 →": "See class results →",
+"本关换一组题": "New questions for this level",
+"全班结果": "Class results",
+"看看哪一关最难。": "See which level was hardest.",
+"去完成这一关": "Finish this level",
+"全部换题，重新开始": "New questions, start over",
+"还没有答题记录。": "No answers recorded yet.",
+"关卡": "Level",
+"句子": "Sentence",
+"正确答案": "Correct answer",
+"全班选择": "Class choice",
+"是否答对": "Correct?",
+"是": "Yes",
+"否": "No"
+},
+"patterns": [
+[
+"^(.+)。老师读出句子，全班举手判断，按多数人的选择点击。$",
+"$1. The teacher reads the sentence, the class votes by raising hands, and the teacher clicks the majority choice."
+],
+[
+"^第 (\\d) 关：(.+)$",
+"Level $1: $2"
+],
+[
+"^第 (\\d) 关 · (.+) 完成$",
+"Level $1 · $2 complete"
+],
+[
+"^第 (\\d) 关 · (.+)$",
+"Level $1 · $2"
+],
+[
+"^第 (\\d) / (\\d) 题$",
+"Question $1 / $2"
+],
+[
+"^/ (\\d+) 题$",
+"/ $1"
+],
+[
+"^答案：(.+)　全班选：(.+)$",
+"Answer: $1   Class chose: $2"
+],
+[
+"^答案：(.+)$",
+"Answer: $1"
+],
+[
+"^(\\d+) / (\\d+) 题答对$",
+"$1 / $2 correct"
+],
+[
+"^进入第 (\\d) 关 →$",
+"Go to Level $1 →"
+],
+[
+"^全班答对 (\\d+) / (\\d+) 题　　(.+)$",
+"Class got $1 / $2 correct   $3"
+],
+[
+"^(.+)　(.+ \\d+/\\d+)$",
+"$1   $2"
+],
+[
+"^(入门|进阶|挑战) (\\d+/\\d+)$",
+"$1 $2"
+],
+[
+"^目前已记录 (\\d+) 道题的全班答案。$",
+"$1 class answers recorded so far."
+],
+[
+"^事实还是观点_(.+)$",
+"Fact-or-Opinion_$1"
+]
+]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
 </head>
 <body>
 <header class="top">
@@ -288,8 +642,8 @@ function stmtNode(it, revealed) {
   const box = el("div", { class: "stmt" });
   if (!revealed) { box.textContent = it.t; return box; }
   if (it.parts) { box.append(...it.parts.map(([txt, k]) => el("mark", { class: k }, txt))); return box; }
-  let segs = [it.t];
-  for (const w of it.clue || []) {
+  let segs = [gameT(it.t)];
+  for (const w of (it.clue || []).map(gameT)) {
     segs = segs.flatMap((seg) => {
       if (typeof seg !== "string") return [seg];
       const out = []; let rest = seg, j;
@@ -377,7 +731,7 @@ function stepResult() {
 /* ===================================================================== 导出 */
 function download(blob, name) {
   const url = URL.createObjectURL(blob);
-  const a = el("a", { href: url, download: name });
+  const a = el("a", { href: url, download: gameT(name) });
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
@@ -405,7 +759,7 @@ $("#btn-ex-png").onclick = () => {
     ctx.fillStyle = r.ok ? "#2f9e44" : "#d64545"; ctx.font = `700 28px ${font}`; ctx.fillText(r.ok ? "✓" : "✗", 70, y);
     ctx.fillStyle = "#5f6b7a"; ctx.font = `400 24px ${font}`; ctx.fillText(L.name, 110, y);
     ctx.fillStyle = "#1f2937"; ctx.font = `400 28px ${font}`;
-    let t = it.t; while (ctx.measureText(t).width > 1000 && t.length > 4) t = t.slice(0, -2); if (t !== it.t) t += "…";
+    const full = gameT(it.t); let t = full; while (ctx.measureText(t).width > 1000 && t.length > 4) t = t.slice(0, -2); if (t !== full) t += "…";
     ctx.fillText(t, 190, y);
     ctx.fillStyle = "#5f6b7a"; ctx.font = `400 24px ${font}`; ctx.fillText(`答案：${LABEL[it.k].name}　全班选：${LABEL[r.pick].name}`, 1220, y);
     y += 64;
@@ -417,7 +771,7 @@ $("#btn-ex-csv").onclick = () => {
   const m = meta();
   const rows = [["日期", "班级", "参与人数", "关卡", "句子", "正确答案", "全班选择", "是否答对"],
     ...rowsDone().map(({ L, it, r }) => [m.date, m.cls, m.count, L.name, it.t, LABEL[it.k].name, LABEL[r.pick].name, r.ok ? "是" : "否"])];
-  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const csv = "﻿" + rows.map((r) => r.map((v) => `"${String(gameT(String(v))).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   download(new Blob([csv], { type: "text/csv;charset=utf-8" }), fileBase(m) + ".csv");
 };
 
