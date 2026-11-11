@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>班级 AI 规则投票墙 · 泉心光语 Spring Foundation</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* 顶栏：返回游戏大厅 + 游戏名 + 老师说明 */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 按钮：主按钮（实色）、次按钮（描边） */
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+
+/* 步骤条 */
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; }    /* 关键内容 ≥ 32px */
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 示例：举手计票器 */
+.counter { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; max-width: 320px; }
+.counter button { height: 56px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 1.6rem; font-weight: 700; }
+.counter output { text-align: center; font-size: 2.4rem; font-weight: 800; }
+
+/* 讨论问题条（深色，放在每个环节的结尾） */
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+
+/* 弹窗（老师说明、导出） */
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+
+/* 手机：375px 宽时不能出现横向滚动 */
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+}
+
+html{font-size:20px}.btn.small,.back{font-size:20px;min-height:44px;display:inline-flex;align-items:center}.title p,.hint{font-size:20px}
+.rule-card{margin:20px 0}.rule-text{font-size:32px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.vote-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:20px}.vote-label{display:block;font-size:32px;text-align:center}.counter{max-width:none}.counter input{font-size:32px;text-align:center;padding:6px;min-width:0}.participant-label{display:block;max-width:320px;margin-bottom:20px}.tally,.result-line,.decision-text{font-size:32px}.result-line{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.track{height:16px;background:var(--line);border-radius:8px;overflow:hidden}.fill{height:100%;background:var(--primary)}.result-panel{margin-top:20px}.confirm-box{background:var(--accent-soft);border:1px solid var(--line);padding:20px;border-radius:var(--radius);margin:20px 0}.confirm-box .btn{margin:4px}.controls{margin-top:24px}textarea{display:block;width:100%;max-width:100%;min-height:150px;padding:12px;border:1px solid var(--line);border-radius:10px;resize:vertical;background:var(--card);margin-top:8px}select{display:block;max-width:100%;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);min-height:48px}.rule-card .btn{margin:4px 0}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}#main:focus{outline:none}footer{margin:32px auto;color:var(--muted)}
+@media(max-width:640px){.vote-grid{grid-template-columns:1fr}.wrap{padding:0 16px}.card{padding:16px}.step{white-space:normal;word-break:normal}.steps{flex-wrap:wrap}.step{flex:1 1 90px;min-height:48px;padding:8px}.step .n{flex-shrink:0}.title h1{overflow-wrap:anywhere}.modal{padding:16px}.modal .row label{min-width:0!important;flex-basis:100%!important}.modal .btn{max-width:100%;white-space:normal}.back{width:100%}.result-line strong{overflow-wrap:anywhere}}
+</style>
+<script id="game-en">
+window.GAME_RAW_FILL = CanvasRenderingContext2D.prototype.fillText;
+window.GAME_RAW_MEASURE = CanvasRenderingContext2D.prototype.measureText;
+window.GAME_EN = {
+  "text": {
+    "班级 AI 规则投票墙": "Class AI Rules Wall",
+    "泉心光语 Spring Foundation": "Spring Foundation",
+    "聊天机器人背后的大脑 · 第 4 节": "The Brain Behind the Bot · Lesson 4",
+    "提出规则": "Propose rules",
+    "全班投票": "Class vote",
+    "班级规范": "Class guidelines",
+    "每个人先想一条 AI 使用规则": "Everyone proposes a rule for using AI",
+    "先独立写在纸上，再轮流分享。老师将相近建议合并，建议选 3–6 条共同投票。": "Write independently on paper, then take turns sharing. The teacher combines similar ideas; choose 3–6 rules to vote on.",
+    "老师录入一条规则": "Teacher: enter a rule",
+    "修改规则": "Edit rule",
+    "保存修改": "Save changes",
+    "取消修改": "Cancel edit",
+    "提交规则": "Submit rule",
+    "例如：用 AI 帮助学习时，我会自己检查答案是否正确。": "For example: When using AI to learn, I will check whether its answers are correct.",
+    "只写 AI 使用规则，不填写姓名或个人经历。修改规则内容会清除该条原有票数。": "Enter only AI use rules, without names or personal stories. Editing a rule clears its existing votes.",
+    "最多保留 40 条规则，请合并相近建议或删除后再添加。": "Up to 40 rules. Combine similar ideas or remove a rule before adding more.",
+    "修改": "Edit",
+    "删除": "Delete",
+    "删除规则确认": "Confirm rule deletion",
+    "删除这条规则及其票数？": "Delete this rule and its votes?",
+    "确定删除": "Delete rule",
+    "保留规则": "Keep rule",
+    "开始全班投票 →": "Start class vote →",
+    "一条好规则需要说清楚：什么时候、可以做什么、需要注意什么？": "A clear rule explains when it applies, what we can do, and what we should consider.",
+    "老师依次询问同意、不同意和弃票的人数。每人每条规则只投一次，三项合计应等于参与人数。": "The teacher counts agree, disagree and abstain votes. Each person votes once per rule; totals must equal the participant count.",
+    "同意": "Agree",
+    "不同意": "Disagree",
+    "弃票": "Abstain",
+    "减少同意票数": "Reduce agree votes",
+    "减少不同意票数": "Reduce disagree votes",
+    "减少弃票票数": "Reduce abstain votes",
+    "增加同意票数": "Increase agree votes",
+    "增加不同意票数": "Increase disagree votes",
+    "增加弃票票数": "Increase abstain votes",
+    "票数超过参与人数，请核对后再展示结果。": "Votes exceed the participant count. Check the numbers before showing results.",
+    "展示投票结果": "Show vote results",
+    "重新计票": "Recount votes",
+    "本班实际举手投票结果": "Actual class hand-vote results",
+    "讨论后的共同决定": "Shared decision after discussion",
+    "待讨论": "To discuss",
+    "纳入班级规范": "Include in class guidelines",
+    "修改后再讨论": "Revise and discuss again",
+    "暂不纳入": "Do not include yet",
+    "票数用于了解观点，不自动决定规则是否合理。听取不同意见后，再共同决定是否纳入。": "Votes show viewpoints, not whether a rule is reasonable. Hear different opinions before deciding together whether to include it.",
+    "上一条": "Previous rule",
+    "下一条 →": "Next rule →",
+    "查看班级规范 →": "View class guidelines →",
+    "多数同意就一定是好规则吗？不同意的同学担心什么，可以怎样修改？": "Does majority support always make a good rule? What concerns do others have, and how could the rule change?",
+    "我们共同讨论的 AI 使用规范": "Our shared discussion of AI use guidelines",
+    "这份记录保留每条规则的投票和共同决定。尚待讨论或需要修改的规则，不能当成已通过。": "This record keeps the votes and shared decision for every rule. Rules awaiting discussion or revision are not approved guidelines.",
+    "返回讨论和修改": "Return to discussion and editing",
+    "开始新活动": "Start a new activity",
+    "开始新活动会清空本页所有规则和票数，请先导出结果。": "A new activity clears all rules and votes on this page. Export the results first.",
+    "确定开始新活动": "Confirm new activity",
+    "保留本节课": "Keep this activity",
+    "这些规则怎样帮助我们学习？遇到新的 AI 工具或新情况时，应该怎样更新它们？": "How do these rules help us learn? How should we update them for new AI tools or situations?",
+    "规则编号": "Rule number",
+    "规则内容": "Rule text",
+    "总票数": "Total votes",
+    "核对状态": "Verification status",
+    "共同决定": "Shared decision",
+    "已核对": "Verified",
+    "待核对": "Not verified",
+    "所有规则已完成计票": "All rules have verified vote counts",
+    "部分规则尚未完成计票": "Some rules still need verified vote counts",
+    "本记录是老师录入的课堂举手票数，不是线上多人实时投票。": "These are teacher-entered classroom hand votes, not live online multiplayer votes.",
+    "由泉心光语 Spring Foundation 开发。课程主题参考 Day of AI《The Brain Behind the Bot》第 4 节；非 Day of AI 官方产品。": "Developed by Spring Foundation. Curriculum reference: Day of AI, The Brain Behind the Bot, Lesson 4. Not an official Day of AI product.",
+    "本活动配套第 4 节《共同制定班级 AI 使用规范》，帮助学生提出可执行的规则，倾听不同意见并共同协商。建议 18–22 分钟。": "Supports Lesson 4, Creating class AI norms together. Students propose practical rules, hear different views and make shared decisions. Allow 18–22 minutes.",
+    "独立思考（3 分钟）：每位同学在纸上写一条 AI 使用规则，不写姓名和个人经历。": "Independent thinking (3 min): Everyone writes one rule for using AI on paper, without names or personal stories.",
+    "汇总建议（4 分钟）：全班轮流分享，老师录入规则。合并相近建议，优先选择 3–6 条讨论；最多可录入 40 条。": "Collect ideas (4 min): Take turns sharing while the teacher records rules. Combine similar ideas and choose 3–6 to discuss. Up to 40 can be recorded.",
+    "全班投票（8–10 分钟）：设置本次实际参与人数，逐条举手表态。老师录入同意、不同意、弃票人数，总票数核对一致后展示结果。": "Class votes (8–10 min): Set the actual participant count. Vote by hand on each rule. Enter agree, disagree and abstain counts, then verify the total before revealing results.",
+    "共同决定（3–5 分钟）：听取不同理由，记录是否纳入规范或需要修改。修改规则后需重新投票，最后导出 PNG 和 CSV。": "Decide together (3–5 min): Hear different reasons and record whether to include or revise each rule. Edited rules need a new vote. Export PNG and CSV at the end.",
+    "本页不收集学生身份，不跨设备同步。规则和票数仅在本次页面中保留；刷新或关闭前请先导出。": "No student identities are collected and devices are not synchronized. Rules and votes stay only in this page session; export before refreshing or closing.",
+    "规则只录入一次，同学们先在纸上独立思考；不是让每个学生在同一个浏览器里轮流点击。": "Record each rule once after students think independently on paper. Students do not take turns clicking votes in a shared browser.",
+    "导出中的参与人数与投票环节一致；如需调整，请返回全班投票。": "The export uses the participant count from the voting stage. Return to class voting to change it.",
+    "参与人数（点击更新后生效）": "Participants (apply to update)",
+    "更新参与人数": "Update participants"
+  },
+  "patterns": [
+    [
+      "^规则 (\\d+)$",
+      "Rule $1"
+    ],
+    [
+      "^已收集 (\\d+) / 40 条规则$",
+      "Collected $1 / 40 rules"
+    ],
+    [
+      "^第 (\\d+) / (\\d+) 条规则$",
+      "Rule $1 / $2"
+    ],
+    [
+      "^已记录 (\\d+) / (\\d+) 票$",
+      "Recorded $1 / $2 votes"
+    ],
+    [
+      "^(.+) · 泉心光语 Spring Foundation$",
+      "$1 · Spring Foundation"
+    ]
+  ]
+};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title">
+        
+        <h1>班级 AI 规则投票墙</h1>
+        <p>聊天机器人背后的大脑 · 第 4 节</p>
+      </div>
+      <div class="actions">
+        <button class="btn outline small" id="btn-export">导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">老师说明</button>
+      </div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main" tabindex="-1"></main><footer class="wrap"><p>泉心光语 Spring Foundation</p><p>本记录是老师录入的课堂举手票数，不是线上多人实时投票。</p><p>由泉心光语 Spring Foundation 开发。课程主题参考 Day of AI《The Brain Behind the Bot》第 4 节；非 Day of AI 官方产品。</p></footer>
+
+<!-- 老师说明：课堂流程 + 每个环节的建议时长 -->
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    
+    <p>本活动配套第 4 节《共同制定班级 AI 使用规范》，帮助学生提出可执行的规则，倾听不同意见并共同协商。建议 18–22 分钟。</p><ol><li>独立思考（3 分钟）：每位同学在纸上写一条 AI 使用规则，不写姓名和个人经历。</li><li>汇总建议（4 分钟）：全班轮流分享，老师录入规则。合并相近建议，优先选择 3–6 条讨论；最多可录入 40 条。</li><li>全班投票（8–10 分钟）：设置本次实际参与人数，逐条举手表态。老师录入同意、不同意、弃票人数，总票数核对一致后展示结果。</li><li>共同决定（3–5 分钟）：听取不同理由，记录是否纳入规范或需要修改。修改规则后需重新投票，最后导出 PNG 和 CSV。</li></ol><p>本页不收集学生身份，不跨设备同步。规则和票数仅在本次页面中保留；刷新或关闭前请先导出。</p><p>规则只录入一次，同学们先在纸上独立思考；不是让每个学生在同一个浏览器里轮流点击。</p>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。</p>
+  </div>
+</div>
+
+<!-- 导出：PNG 图片（成果展示）+ CSV（原始数据），用于给资助方的成效报告 -->
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="1" max="1000" step="1" placeholder="例如：42"></label>
+    </div>
+    <p>导出中的参与人数与投票环节一致；如需调整，请返回全班投票。</p><div class="row" style="margin-top:16px">
+      <button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button>
+      <button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v === true ? '' : v);
+  }
+  e.append(...kids.flat());
+  return e;
+};
+const STEPS = ['提出规则', '全班投票', '班级规范'];
+const LABELS = ['同意', '不同意', '弃票'];
+const DECISIONS = ['待讨论', '纳入班级规范', '修改后再讨论', '暂不纳入'];
+const S = { step: 0, rules: [], pos: 0, nextId: 1, count: 40, editing: null, deleting: null, resetting: false };
+const total = (r) => r.votes.reduce((a, b) => a + b, 0);
+const complete = (r) => r.submitted && total(r) === S.count;
+const allComplete = () => S.rules.length > 0 && S.rules.every(complete);
+const raw = (text, attrs = {}) => el('span', { ...attrs, 'data-no-tr': '' }, text);
+const discuss = (text) => el('div', { class: 'discuss' }, text);
+const btn = (text, fn, disabled = false, outline = false) => el('button', { type: 'button', class: 'btn' + (outline ? ' outline' : ''), disabled, onclick: fn }, text);
+function focusMain() { $('#main').focus(); window.scrollTo(0, 0); }
+function go(step) { S.step = step; S.resetting = false; render(); focusMain(); }
+function render() {
+  $('#steps').replaceChildren(...STEPS.map((name, i) => el('button', {
+    type: 'button', class: 'step' + (i === S.step ? ' active' : ''),
+    'aria-current': i === S.step ? 'step' : null,
+    disabled: i === 1 && !S.rules.length || i === 2 && !allComplete(), onclick: () => go(i)
+  }, el('span', { class: 'n' }, i + 1), name)));
+  $('#main').replaceChildren(...[collectStage, voteStage, summaryStage][S.step]());
+  $('#btn-export').disabled = S.rules.length === 0;
+}
+function collectStage() {
+  const area = el('textarea', { id: 'proposal', maxlength: 300, rows: 3,
+    placeholder: '例如：用 AI 帮助学习时，我会自己检查答案是否正确。', 'aria-describedby': 'proposal-note',
+    oninput: () => {
+      $('#char-count').textContent = `${area.value.length} / 300`;
+      $('#save-rule').disabled = !area.value.trim();
+    }
+  });
+  if (S.editing !== null) area.value = S.rules.find(r => r.id === S.editing)?.text || '';
+  const form = el('form', { class: 'card', onsubmit: (e) => {
+    e.preventDefault(); const text = area.value.trim();
+    if (!text || text.length > 300) return;
+    if (S.editing !== null) {
+      const r = S.rules.find(r => r.id === S.editing);
+      if (r && r.text !== text) { r.text = text; r.votes = [0, 0, 0]; r.submitted = false; r.decision = 0; }
+      S.editing = null;
+    } else {
+      if (S.rules.length >= 40) return;
+      S.rules.push({ id: S.nextId++, text, votes: [0, 0, 0], submitted: false, decision: 0 });
+    }
+    render(); $('#proposal').focus();
+  } }, el('label', { for: 'proposal' }, S.editing !== null ? '修改规则' : '老师录入一条规则'), area,
+    el('p', { id: 'proposal-note' }, '只写 AI 使用规则，不填写姓名或个人经历。修改规则内容会清除该条原有票数。'),
+    el('div', { class: 'row' }, el('output', { id: 'char-count', for: 'proposal' }, `${area.value.length} / 300`),
+      el('button', { class: 'btn', type: 'submit', id: 'save-rule', disabled: !area.value.trim() }, S.editing !== null ? '保存修改' : '提交规则'),
+      ...(S.editing !== null ? [btn('取消修改', () => { S.editing = null; render(); }, false, true)] : [])));
+  const cards = S.rules.map((r, i) => {
+    const c = el('article', { class: 'card rule-card' }, el('h3', {}, gameT(`规则 ${i + 1}`)), el('p', { class: 'rule-text', 'data-no-tr': '' }, r.text),
+      el('div', { class: 'row' }, btn('修改', () => { S.editing = r.id; render(); $('#proposal').focus(); }, false, true),
+        btn('删除', () => { S.deleting = r.id; render(); }, false, true)));
+    if (S.deleting === r.id) c.append(el('div', { class: 'confirm-box', role: 'group', 'aria-label': '删除规则确认' },
+      el('p', {}, '删除这条规则及其票数？'), btn('确定删除', () => {
+        S.rules = S.rules.filter(x => x.id !== r.id); S.deleting = null;
+        if (S.editing === r.id) S.editing = null;
+        S.pos = Math.min(S.pos, Math.max(0, S.rules.length - 1)); render();
+      }), btn('保留规则', () => { S.deleting = null; render(); }, false, true)));
+    return c;
+  });
+  return [el('h2', {}, '每个人先想一条 AI 使用规则'),
+    el('p', { class: 'lead' }, '先独立写在纸上，再轮流分享。老师将相近建议合并，建议选 3–6 条共同投票。'),
+    form, el('p', { role: 'status' }, gameT(`已收集 ${S.rules.length} / 40 条规则`)),
+    ...(S.rules.length >= 40 && S.editing === null ? [el('p', {}, '最多保留 40 条规则，请合并相近建议或删除后再添加。')] : []),
+    ...cards,
+    btn('开始全班投票 →', () => { S.editing = null; S.deleting = null; S.pos = 0; go(1); }, !S.rules.length || S.editing !== null),
+    discuss('一条好规则需要说清楚：什么时候、可以做什么、需要注意什么？')];
+}
+function syncVoteInputs(r) {
+  const n = total(r);
+  $('#vote-tally').textContent = gameT(`已记录 ${n} / ${S.count} 票`);
+  $('#vote-overflow').hidden = n <= S.count;
+  const valid = [...document.querySelectorAll('.counter input')].every(x => x.value !== '' && x.checkValidity());
+  $('#show-results').disabled = !valid || n !== S.count;
+  for (let j = 0; j < 3; j++) {
+    $(`#vote-minus-${j}`).disabled = r.votes[j] === 0;
+    $(`#vote-plus-${j}`).disabled = n >= S.count;
+  }
+}
+function voteStage() {
+  const r = S.rules[S.pos];
+  if (!r) return collectStage();
+  const n = total(r), shown = complete(r);
+  const countInput = el('input', { type: 'number', id: 'class-count', min: 1, max: 1000, step: 1, value: S.count });
+  const participantForm = el('form', { class: 'participant-form row', onsubmit: (e) => {
+    e.preventDefault();
+    if (!countInput.reportValidity() || !countInput.value) return;
+    S.count = Number(countInput.value); $('#ex-count').value = String(S.count);
+    S.rules.forEach(x => { if (total(x) !== S.count) { x.submitted = false; x.decision = 0; } }); render();
+  } }, el('label', { class: 'participant-label', for: 'class-count' }, '参与人数（点击更新后生效）', countInput),
+    el('button', { class: 'btn outline', type: 'submit' }, '更新参与人数'));
+  const counters = r.votes.map((v, j) => el('div', { class: 'card vote-card' },
+    el('label', { for: `votes-${j}`, class: 'vote-label' }, LABELS[j]),
+    el('div', { class: 'counter' },
+      el('button', { type: 'button', id: `vote-minus-${j}`, disabled: shown || v === 0, 'aria-label': `减少${LABELS[j]}票数`, onclick: () => { r.votes[j]--; render(); } }, '−'),
+      el('input', { type: 'number', id: `votes-${j}`, min: 0, max: S.count, step: 1, value: v, disabled: shown,
+        oninput: (e) => {
+          if (e.target.value !== '' && e.target.checkValidity()) r.votes[j] = Number(e.target.value);
+          syncVoteInputs(r);
+        },
+
+      }),
+      el('button', { type: 'button', id: `vote-plus-${j}`, disabled: shown || n >= S.count, 'aria-label': `增加${LABELS[j]}票数`, onclick: () => { r.votes[j]++; render(); } }, '＋'))));
+  const content = [el('h2', {}, gameT(`第 ${S.pos + 1} / ${S.rules.length} 条规则`)),
+    el('p', { class: 'lead' }, '老师依次询问同意、不同意和弃票的人数。每人每条规则只投一次，三项合计应等于参与人数。'),
+    participantForm,
+    el('section', { class: 'card' }, el('h3', { class: 'rule-text', 'data-no-tr': '' }, r.text)),
+    el('div', { class: 'vote-grid' }, ...counters),
+    el('p', { id: 'vote-tally', class: 'tally', role: 'status' }, gameT(`已记录 ${n} / ${S.count} 票`)),
+    el('p', { id: 'vote-overflow', role: 'status', hidden: n <= S.count }, '票数超过参与人数，请核对后再展示结果。'),
+    Object.assign(btn(shown ? '重新计票' : '展示投票结果', () => {
+      if (shown) { r.submitted = false; r.decision = 0; } else if (total(r) === S.count) r.submitted = true;
+      render();
+    }, !shown && n !== S.count), { id: 'show-results' })];
+  if (shown) {
+    const result = el('section', { class: 'card result-panel' }, el('h3', {}, '本班实际举手投票结果'));
+    r.votes.forEach((v, j) => result.append(el('div', {},
+      el('p', { class: 'result-line' }, el('span', {}, LABELS[j]), el('strong', {}, `${v} / ${S.count} · ${(v / S.count * 100).toFixed(1)}%`)),
+      el('div', { class: 'track', 'aria-hidden': true }, el('div', { class: 'fill', style: `width:${v / S.count * 100}%` })))));
+    const select = el('select', { id: 'decision', onchange: (e) => { r.decision = Number(e.target.value); } },
+      ...DECISIONS.map((d, i) => el('option', { value: i, selected: r.decision === i }, d)));
+    result.append(el('label', { for: 'decision' }, '讨论后的共同决定', select), el('p', {}, '票数用于了解观点，不自动决定规则是否合理。听取不同意见后，再共同决定是否纳入。'));
+    content.push(result);
+  }
+  content.push(el('div', { class: 'row controls' }, btn('上一条', () => { S.pos--; render(); focusMain(); }, S.pos === 0, true),
+    btn(S.pos === S.rules.length - 1 ? '查看班级规范 →' : '下一条 →', () => {
+      if (S.pos < S.rules.length - 1) { S.pos++; render(); focusMain(); }
+      else if (allComplete()) go(2);
+    }, !shown || S.pos === S.rules.length - 1 && !allComplete())),
+    discuss('多数同意就一定是好规则吗？不同意的同学担心什么，可以怎样修改？'));
+  return content;
+}
+function resetArea() {
+  return S.resetting ? el('div', { class: 'confirm-box' }, el('p', {}, '开始新活动会清空本页所有规则和票数，请先导出结果。'),
+    btn('确定开始新活动', () => { Object.assign(S, { step: 0, rules: [], pos: 0, nextId: 1, editing: null, deleting: null, resetting: false }); render(); focusMain(); }),
+    btn('保留本节课', () => { S.resetting = false; render(); }, false, true)) : btn('开始新活动', () => { S.resetting = true; render(); }, false, true);
+}
+function summaryStage() {
+  return [el('h2', {}, '我们共同讨论的 AI 使用规范'), el('p', { class: 'lead' }, '这份记录保留每条规则的投票和共同决定。尚待讨论或需要修改的规则，不能当成已通过。'),
+    ...S.rules.map((r, i) => el('article', { class: 'card rule-card' }, el('h3', {}, gameT(`规则 ${i + 1}`)),
+      el('p', { class: 'rule-text', 'data-no-tr': '' }, r.text), el('p', { class: 'decision-text' }, DECISIONS[r.decision]),
+      ...r.votes.map((v, j) => el('p', { class: 'result-line' }, el('span', {}, LABELS[j]), el('strong', {}, `${v} / ${S.count}`))))),
+    btn('返回讨论和修改', () => go(0), false, true), resetArea(),
+    discuss('这些规则怎样帮助我们学习？遇到新的 AI 工具或新情况时，应该怎样更新它们？')];
+}
+function download(blob, name) {
+  const url = URL.createObjectURL(blob), a = el('a', { href: url, download: name });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+function meta() {
+  return { date: new Date().toLocaleDateString('sv-SE'), cls: $('#ex-class').value.trim() || gameT('未填写班级') };
+}
+const exportStatus = (r) => complete(r) ? '已核对' : '待核对';
+const csvCell = (s) => { s = String(s); if (/^[=+\-@\t\r\n]/.test(s)) s = "'" + s; return '"' + s.replaceAll('"', '""') + '"'; };
+$('#btn-ex-csv').onclick = () => {
+  const m = meta();
+  const rows = [['日期', '班级', '参与人数', '规则编号', '规则内容', ...LABELS, '总票数', '核对状态', '共同决定'].map(gameT),
+    ...S.rules.map((r, i) => [m.date, m.cls, S.count, i + 1, r.text, ...r.votes, total(r), gameT(exportStatus(r)), gameT(complete(r) ? DECISIONS[r.decision] : '待讨论')])];
+  download(new Blob(['\ufeff' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }), `ai-rules-wall_${m.date}.csv`);
+};
+$('#btn-ex-png').onclick = () => {
+  const m = meta(), c = document.createElement('canvas'), ctx = c.getContext('2d'), lines = [];
+  const font = '30px "PingFang SC","Microsoft YaHei",sans-serif';
+  c.width = 1600; ctx.font = font;
+  function wrap(text) {
+    let line = '';
+    const tokens = gameLang() === 'en' ? String(text).match(/\S+\s*|\s+/g) || [''] : [...String(text)];
+    for (const token of tokens) {
+      if (window.GAME_RAW_MEASURE.call(ctx, line + token).width <= 1440) { line += token; continue; }
+      if (line) { lines.push(line); line = ''; }
+      for (const ch of token) { if (window.GAME_RAW_MEASURE.call(ctx, line + ch).width > 1440) { lines.push(line); line = ''; } line += ch; }
+    }
+    lines.push(line);
+  }
+  wrap(gameT('班级 AI 规则投票墙')); wrap(gameT('泉心光语 Spring Foundation'));
+  wrap(`${m.date} | ${m.cls} | ${gameT('参与人数')}: ${S.count}`);
+  wrap(gameT(allComplete() ? '所有规则已完成计票' : '部分规则尚未完成计票'));
+  S.rules.forEach((r, i) => {
+    wrap(`${i + 1}. ${r.text}`);
+    wrap(LABELS.map((l, j) => `${gameT(l)}: ${r.votes[j]}`).join(' | '));
+    wrap(gameT(exportStatus(r)) + ' | ' + gameT(complete(r) ? DECISIONS[r.decision] : '待讨论')); lines.push('');
+  });
+  wrap(gameT('本记录是老师录入的课堂举手票数，不是线上多人实时投票。'));
+  c.height = 100 + lines.length * 46;
+  ctx.fillStyle = '#faf8f3'; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#1f7a68'; ctx.fillRect(0, 0, c.width, 14);
+  ctx.fillStyle = '#1f2937'; ctx.font = font;
+  lines.forEach((line, i) => window.GAME_RAW_FILL.call(ctx, line, 70, 70 + i * 46));
+  c.toBlob(b => b && download(b, `ai-rules-wall_${m.date}.png`), 'image/png');
+};
+$('#ex-count').value = String(S.count); $('#ex-count').readOnly = true;
+let returnFocus;
+function closeModal(bg) { bg.hidden = true; returnFocus?.focus(); }
+function openModal(id) { returnFocus = document.activeElement; const bg = $(id); bg.hidden = false; bg.querySelector('button').focus(); }
+for (const bg of document.querySelectorAll('.modal-bg')) {
+  const dialog = bg.querySelector('.modal'); dialog.setAttribute('role', 'dialog'); dialog.setAttribute('aria-modal', 'true'); dialog.setAttribute('aria-label', dialog.querySelector('h2').textContent);
+  bg.addEventListener('click', e => { if (e.target === bg || e.target.hasAttribute('data-close')) closeModal(bg); });
+  bg.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal(bg);
+    if (e.key !== 'Tab') return;
+    const items = [...bg.querySelectorAll('button,input')], first = items[0], last = items.at(-1);
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+}
+$('#btn-guide').onclick = () => openModal('#guide-modal');
+$('#btn-export').onclick = () => openModal('#export-modal');
+render();
+
+</script>
+</body>
+</html>
