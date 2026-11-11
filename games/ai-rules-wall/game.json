@@ -1,0 +1,27 @@
+{
+  "title": "班级 AI 规则投票墙",
+  "course": "brain-behind-the-bot",
+  "session": 4,
+  "summary": "每人提出 AI 使用规则，全班举手投票、讨论不同意见，共同形成班级规范并导出记录。",
+  "minutes": "18–22 分钟",
+  "format": "老师投屏，学生提议并举手投票",
+  "concepts": [
+    "AI 使用规范",
+    "共同决策",
+    "倾听与协商"
+  ],
+  "authors": [
+    "泉心光语 Spring Foundation"
+  ],
+  "en": {
+    "title": "Class AI Rules Wall",
+    "summary": "Propose AI use rules, vote by hand, discuss different views, and record shared classroom guidelines.",
+    "minutes": "18–22 min",
+    "format": "Teacher projects; students propose and vote by hand",
+    "concepts": [
+      "AI use guidelines",
+      "Shared decisions",
+      "Listening and discussion"
+    ]
+  }
+}
