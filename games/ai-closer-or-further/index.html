@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>AI 亲近还是疏远 · 泉心光语 Spring Foundation</title>
+<style>
+/* =====================================================================
+   光语课堂游戏 · 共享样式（复制模板后不要改这一段的变量值）
+   和游戏大厅保持一致：暖白底色 + 深青绿主色 + 琥珀色强调
+   ===================================================================== */
+:root {
+  --bg: #faf8f3;          /* 页面底色（暖白） */
+  --card: #ffffff;        /* 卡片 */
+  --ink: #1f2937;         /* 正文 */
+  --muted: #5f6b7a;       /* 次要文字 */
+  --line: #e6e1d6;        /* 边框 */
+  --primary: #1f7a68;     /* 主色：深青绿（按钮、选中、进度） */
+  --primary-ink: #165a4d; /* 主色悬停 */
+  --primary-soft: #e3f1ec;/* 主色浅底 */
+  --accent: #e8a33a;      /* 强调：琥珀色（揭晓、高亮，少量使用） */
+  --accent-soft: #fdf1dc;
+  --good: #2f9e44;
+  --bad: #d64545;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+/* 投屏友好：正文至少 20px；关键内容（答案、票数）至少 32px */
+html { font-size: 20px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.6;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* 顶栏：返回游戏大厅 + 游戏名 + 老师说明 */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 12px 16px; padding: 12px 0; flex-wrap: wrap; }
+.back { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.back:hover { color: var(--primary); }
+.title { flex: 1 1 260px; min-width: 0; }
+.title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: .01em; }
+.title p { margin: 0; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 按钮：主按钮（实色）、次按钮（描边） */
+.btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 600; background: var(--primary); color: #fff; min-height: 48px; transition: background .15s, transform .08s; }
+.btn:hover { background: var(--primary-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.outline { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.outline:hover { background: var(--bg); }
+.btn.accent { background: var(--accent); color: #2b1d05; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: .85rem; }
+.btn.big { min-height: 60px; padding: 12px 26px; font-size: 1.15rem; }
+
+/* 步骤条 */
+.steps { display: flex; gap: 8px; padding: 0 0 12px; }
+.step { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); white-space: nowrap; font-size: .9rem; }
+.step .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); font-size: .85rem; }
+.step.active { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+.step.active .n { background: var(--primary); color: #fff; }
+
+main { padding: 24px 0 80px; }
+h2 { font-size: 1.5rem; margin: 0 0 4px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.big-answer { font-size: 2.2rem; font-weight: 800; }    /* 关键内容 ≥ 32px */
+.hint { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* 示例：举手计票器 */
+.counter { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; max-width: 320px; }
+.counter button { height: 56px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font-size: 1.6rem; font-weight: 700; }
+.counter output { text-align: center; font-size: 2.4rem; font-weight: 800; }
+
+/* 讨论问题条（深色，放在每个环节的结尾） */
+.discuss { margin-top: 24px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 16px 22px; font-size: 1.15rem; font-weight: 600; }
+.discuss span { color: #f6d08f; }
+
+/* 弹窗（老师说明、导出） */
+.modal-bg { position: fixed; inset: 0; background: rgba(17, 24, 39, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--card); border-radius: 16px; max-width: 720px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; padding: 24px; }
+.modal h2 { margin-top: 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+input[type=text], input[type=number] { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; min-height: 48px; width: 100%; }
+
+/* 手机：375px 宽时不能出现横向滚动 */
+@media (max-width: 640px) {
+  html { font-size: 17px; }
+  header.top { position: static; }
+  .title p { display: none; }
+  .step { font-size: .8rem; padding: 4px 8px; }
+}
+
+html {font-size:20px} .btn.small,.back {min-height:44px;font-size:20px;display:inline-flex;align-items:center} .title p,.hint {font-size:20px}
+.title h1 {overflow-wrap:anywhere} #steps {font-size:24px;padding-bottom:12px} .scene {font-size:32px;line-height:1.5;margin-bottom:24px}
+.options {display:grid;gap:12px} .option {text-align:left;padding:18px;background:var(--card);border:2px solid var(--line);border-radius:var(--radius);font-size:32px;line-height:1.4;min-height:64px;display:flex;gap:12px}
+.option.selected {border-color:var(--primary);background:var(--primary-soft)} .option:disabled {cursor:default;color:var(--ink);opacity:1} .controls {margin-top:24px} .recap {margin:20px 0} h3 {margin:0} .result-score,.vote-label {font-size:32px} .vote-label {display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap} .track {height:16px;background:var(--line);border-radius:8px;overflow:hidden;margin-bottom:18px} .fill {height:100%;background:var(--primary)}
+footer {margin-top:30px;color:var(--muted)} button:focus-visible,a:focus-visible,input:focus-visible {outline:3px solid var(--accent);outline-offset:3px} #main:focus {outline:none}
+@media(max-width:640px){.wrap{padding:0 16px}.card{padding:16px}.scene,.option,.vote-label,.result-score{font-size:32px}.modal{padding:16px}.modal .row label{min-width:0!important;flex-basis:100%!important}.modal .btn{max-width:100%;white-space:normal}.steps{display:block}.back{width:100%}}
+@media print{header,.controls,.modal-bg,.actions,button{display:none!important}body{background:white}.card{break-inside:avoid}}
+</style>
+<script id="game-en">
+window.GAME_EN = {"text": {"泉心光语 Spring Foundation": "Spring Foundation", "聊天机器人背后的大脑 · 第 3 节": "The Brain Behind the Bot · Lesson 3", "人际连接值挑战": "Connection Challenge", "AI 亲近还是疏远": "AI: Closer or Further?", "全班举手表达观点，老师点击课堂选择，再查看模拟结果。": "Vote by raising hands. The teacher records a class choice, then reveals simulated results.", "全班讨论并举手选择，老师记录本班的一种选择；积分在最后揭晓。": "Discuss and vote by hand. The teacher records one class choice; points are revealed at the end.", "你认为 AI 在这个情景下对人与人之间的联系有什么影响？": "How does AI affect human connection in this situation?", "更加亲近": "Closer", "更加疏远": "Further apart", "视情况而定": "It depends", "模拟全班投票结果": "Simulated class vote results", "预设示例，并非真实投票；百分比不代表正确答案。": "Preset examples, not real votes. Percentages do not indicate correct answers.", "连接值是课堂讨论的示意性分数，不是科学测量，也不评价学生的社交能力。": "Connection points are illustrative discussion scores, not scientific measurements or ratings of students' social skills.", "其他选择在什么条件下也可能成立？": "Under what conditions might the other choices also make sense?", "不同人的偏好和现实情况会不会改变你的选择？": "Could different preferences and circumstances change your choice?", "AI 让我们更加亲近还是更加疏远？为什么同样的技术在不同情境下可能产生不同影响？": "Does AI bring us closer or further apart? Why can the same technology have different effects in different situations?", "游戏分数最高，就一定代表拥有更好的人际关系吗？如果对方不方便见面、偏好文字交流，得分规则应该怎样变化？": "Does the highest score always mean better relationships? How should scores change if someone cannot meet or prefers text?", "课堂观点回顾": "Class reflection", "课堂选择：": "Class choice: ", "当前累计得分：": "Points so far: ", "得分：": "Points: ", "得分": "Points", "未作答": "Not answered", "已提交": "Submitted", "待提交": "Not submitted", "活动尚未完成": "Activity in progress", "挑战完成": "Activity complete", "上一题": "Previous", "提交课堂判断": "Submit class choice", "查看课堂总结": "View class summary", "下一题 →": "Next →", "打印/保存结果": "Print / save results", "再玩一次": "Play again", "不设唯一正确答案。示例人物与情景均为虚构。": "There is no single correct answer. Characters and situations are fictional.", "每题最高 5 分 · 得分暂时保密。示例人物与情景均为虚构。": "Up to 5 points per question. Scores stay hidden until the end. Characters and situations are fictional.", "你倾向于主动维系人际联系，并能灵活利用沟通工具。": "Your choices suggest active efforts to stay connected and flexible use of communication tools.", "你使用了多种社交方式。想一想：不同人的偏好和现实情况会不会改变你的选择？": "You used several ways to connect. Could different preferences and circumstances change your choices?", "你的选择体现了一些特定沟通习惯。可以探索哪些方式能增加双向交流与理解。": "Your choices reflect certain communication habits. Explore ways to increase two-way communication and understanding.", "题目": "Question", "情景": "Scenario", "课堂选择": "Class choice", "参与人数": "Participants", "预设百分比或解读": "Preset percentages or explanation", "提交状态": "Submission status", "课程主题参考：Day of AI《The Brain Behind the Bot》第三课（非官方合作或出品）。": "Curriculum reference: Day of AI, The Brain Behind the Bot, Lesson 3. This is not an official Day of AI product or partnership.", "由泉心光语 Spring Foundation 开发，用于中文 AI 素养课堂。": "Developed by Spring Foundation for Chinese AI literacy classrooms.", "本活动只记录老师代选的课堂观点，不代表每位学生的答案；不收集学生个人信息。": "This activity records only teacher-entered class choices, not every student's answers. No student personal information is collected.", "投票百分比是预设示例。真实课堂可举手投票，本游戏不记录真实票数，也不提供多人实时投票。": "Percentages are preset examples. Use raised hands for real classroom votes; this game does not record vote counts or provide live multiplayer voting.", "配套第 3 节《AI 对人际连接的影响》，教材第 62–64 页。理解交流方式的作用取决于情景、双方需要和偏好。": "Supports Lesson 3, AI's impact on human connection, pages 62–64. Explore how communication depends on context, needs and preferences.", "配套第 3 节《AI 对人际连接的影响》，教材第 65–67 页。理解 AI 既可能促进联系，也可能减少真实交流。": "Supports Lesson 3, AI's impact on human connection, pages 65–67. Explore how AI can support connection or reduce real interaction.", "导入（2 分钟）：说明规则，请学生尊重不同交流偏好。": "Introduction (2 min): Explain the rules and respect different communication preferences.", "情景选择（8 分钟）：逐题朗读，全班举手表达意见，邀请不同观点说明理由，老师代选一种课堂意见；平票时先讨论再决定。": "Scenarios (8 min): Read each situation, vote by hand, hear different reasons, then record one class choice. Discuss ties before deciding.", "总结（3–5 分钟）：逐题回顾解释，讨论最高分是否一定意味着更好的人际关系。可再次体验比较情景差异，不做学生排名。": "Reflection (3–5 min): Review explanations and discuss whether more points always mean better relationships. Replay to compare situations without ranking students.", "情景投票（8 分钟）：朗读情景，全班举手三选一；听取不同理由后由老师代选，再展示预设模拟结果，不把模拟百分比当作本班统计。": "Scenario votes (8 min): Read, vote among three choices, hear different reasons, then record a class choice. Reveal preset simulated results; do not present them as class statistics.", "总结（3–5 分钟）：回顾五个情景，讨论哪些条件会改变 AI 对人际联系的影响。": "Reflection (3–5 min): Review the five situations and discuss what could change AI's effect on connection.", "导出（1 分钟）：填写班级与参与人数，下载 PNG 或 CSV。未完成时导出会标注进度。": "Export (1 min): Enter the class and participant count, then download PNG or CSV. Incomplete activities are labeled.", "课堂选择是全班讨论后的代表观点，积分不对应任何学生。": "Class choices represent group discussion. Scores do not belong to individual students.", "小明刚转学到一所新学校。AI 根据他的兴趣推荐了一个篮球社团，他加入后认识了几个新朋友。": "Xiaoming has just moved to a new school. AI recommends a basketball club based on his interests. He joins and makes new friends.", "AI 让小明发现了社交机会，但真正建立友谊仍需要参与活动和真实互动。": "AI helps Xiaoming discover a social opportunity, but friendship still requires participation and real interaction.", "一家人吃晚饭时，每个人都在刷算法推荐的短视频，整顿饭几乎没有交流。": "At a family dinner, everyone watches algorithm-recommended short videos. They barely talk during the meal.", "个性化推荐可以带来娱乐，也可能分散注意力、占用面对面交流的时间。": "Personalized recommendations can entertain, but can also distract people and take time away from face-to-face conversation.", "两位语言不同的学生借助 AI 实时翻译，一起完成课堂任务，后来成为朋友。": "Two students who speak different languages use real-time AI translation to complete a class task together. They later become friends.", "AI 翻译降低了语言障碍，有助于促成真正的人际合作。": "AI translation lowers language barriers and can help people cooperate.", "小红遇到烦恼时经常只和 AI 聊天，渐渐地很少主动联系身边的朋友。": "When upset, Xiaohong often talks only to AI. Gradually, she stops reaching out to friends around her.", "AI 可能提供即时回应，但如果持续取代现实中的交流，可能减少朋友间的互动。": "AI may respond immediately, but repeatedly replacing real conversations can reduce interaction with friends.", "远方的家人不熟悉智能手机。AI 帮他们把视频通话软件操作步骤翻译成了简单的中文。": "Distant family members find smartphones difficult. AI turns the video-call app instructions into simple Chinese.", "AI 可以辅助解决技术障碍，使真实的人际沟通更容易发生。": "AI can help remove technical barriers and make real human communication easier."}, "patterns": [["^第 (\\d+) / (\\d+) 题$", "Question $1 / $2"], ["^情景 (\\d+)$", "Scenario $1"], ["^得分：(\\d+)$", "Points: $1"], ["^(.+) · 泉心光语 Spring Foundation$", "$1 · Spring Foundation"]]};
+</script>
+<script id="game-i18n">
+/* =====================================================================
+   语言切换（复制模板后不要改这一段）：把界面上的中文按 GAME_EN 词典换成英文。
+   和游戏大厅共用同一个语言设置；游戏逻辑仍然用中文数据运行。
+   需要在 JS 里拿到译文时用 gameT("中文")；当前语言用 gameLang()。
+   ===================================================================== */
+(function () {
+  const KEY = "guangyu-hub:lang", CJK = /[一-鿿]/;
+  const COMMON = {
+    text: {
+      "← 游戏大厅": "← Game hub", "导出本节课结果": "Export class results", "老师说明": "Teacher guide", "关闭": "Close",
+      "班级名称": "Class name", "参与人数": "Participants", "例如：五年级二班": "e.g. Grade 5 Class 2", "例如：42": "e.g. 42",
+      "下载结果图片 (PNG)": "Download results image (PNG)", "下载原始数据 (CSV)": "Download raw data (CSV)",
+      "光语课堂游戏": "Guangyu Classroom Games", "课堂结果": "Class results",
+      "讨论：": "Discuss: ", "未填写班级": "Class not entered", "日期": "Date", "班级": "Class",
+      "光语 × 铺路石 · AI 素养课堂": "Guangyu × Pulushi · AI literacy classroom",
+      "本游戏完全离线可用，不收集任何学生信息。": "This game works fully offline and collects no student data.",
+    },
+    patterns: [
+      ["^(.+?)　\\|　(.+)$", "$1 | $2"],
+      ["^参与人数：(\\d+) 人$", "Participants: $1"],
+      ["^光语(?: AI )?课堂游戏 · 聊天机器人背后的大脑 · 第 (\\d+) [节课]$", "Guangyu Classroom Games · The Brain Behind the Bot · Lesson $1"],
+      ["^(.+) · 光语(?: AI )?课堂游戏$", "$1 · Guangyu Classroom Games"],
+      ["^(.+) · 课堂结果$", "$1 · Class results"],
+      ["^未填写班级_(.+)$", "Class-not-entered_$1"],
+    ],
+  };
+  const EN = window.GAME_EN || {};
+  const TEXT = { ...COMMON.text, ...EN.text };
+  const PATTERNS = [...COMMON.patterns, ...(EN.patterns || [])].map(([re, to]) => [new RegExp(re), to]);
+  let lang = "zh";
+  try { if (localStorage.getItem(KEY) === "en") lang = "en"; } catch { /* 没有存储时默认中文 */ }
+
+  // 英文界面里没有译文的中文（检查翻译是否完整时看这里）
+  const missing = (window.__i18nMissing = new Set());
+  function tr(s) {
+    if (lang !== "en" || typeof s !== "string") return s;
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), key = m[2];
+    if (Object.hasOwn(TEXT, key)) return m[1] + TEXT[key] + m[3];
+    if (!CJK.test(s)) return s;
+    for (const [re, to] of PATTERNS) {
+      const g = key.match(re);
+      if (g) return m[1] + to.replace(/\$(\d)/g, (_, i) => tr(g[i] ?? "")) + m[3];
+    }
+    missing.add(key);
+    return s;
+  }
+  window.gameT = tr;
+  window.gameLang = () => lang;
+
+  // 页面文字和属性：记住中文原文，切换语言时可以换回来
+  const ORIG = new WeakMap(), ATTRS = ["placeholder", "title", "aria-label", "alt"];
+  const skip = (e) => !e || e.closest("script,style,[data-no-tr]");
+  function swap(rec, cur, write) {
+    if (!rec.has || (cur !== rec.zh && cur !== rec.out)) { rec.has = true; rec.zh = cur; }
+    rec.out = tr(rec.zh);
+    if (cur !== rec.out) write(rec.out);
+  }
+  function doText(n) {
+    if (skip(n.parentElement)) return;
+    if (!ORIG.has(n)) ORIG.set(n, {});
+    swap(ORIG.get(n), n.nodeValue, (v) => { n.nodeValue = v; });
+  }
+  function doAttr(e, a) {
+    if (skip(e) || !e.hasAttribute(a)) return;
+    if (!ORIG.has(e)) ORIG.set(e, {});
+    const recs = ORIG.get(e);
+    recs[a] ||= {};
+    swap(recs[a], e.getAttribute(a), (v) => e.setAttribute(a, v));
+  }
+  function walk(root) {
+    if (root.nodeType === 3) return doText(root);
+    if (root.nodeType !== 1) return;
+    ATTRS.forEach((a) => doAttr(root, a));
+    root.querySelectorAll("*").forEach((e) => ATTRS.forEach((a) => doAttr(e, a)));
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) doText(w.currentNode);
+  }
+  new MutationObserver((list) => {
+    for (const r of list) {
+      if (r.type === "childList") r.addedNodes.forEach(walk);
+      else if (r.type === "characterData") doText(r.target);
+      else doAttr(r.target, r.attributeName);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  // 导出图片（canvas）里的文字
+  const P = CanvasRenderingContext2D.prototype, fill = P.fillText, measure = P.measureText;
+  P.fillText = function (t, ...rest) { return fill.call(this, tr(String(t)), ...rest); };
+  P.measureText = function (t) { return measure.call(this, tr(String(t))); };
+
+  // 语言按钮（放在顶栏），切换后重新绘制当前画面，游戏进度不变
+  const style = document.createElement("style");
+  style.textContent = "html[lang=en] .step{white-space:normal;line-height:1.2;text-align:left}";
+  document.head.append(style);
+  let btn;
+  function apply() {
+    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+    if (btn) { btn.textContent = lang === "en" ? "中文" : "English"; btn.setAttribute("aria-label", lang === "en" ? "切换到中文" : "Switch to English"); }
+    walk(document.documentElement);
+  }
+  apply();
+  document.addEventListener("DOMContentLoaded", () => {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn outline ghost small"; btn.setAttribute("data-no-tr", "");
+    btn.onclick = () => {
+      lang = lang === "en" ? "zh" : "en";
+      try { localStorage.setItem(KEY, lang); } catch { /* 这次打开有效，刷新后恢复默认 */ }
+      window.dispatchEvent(new Event("game-langchange"));
+      if (typeof window.render === "function") window.render();
+      apply();
+    };
+    const bar = document.querySelector(".actions,.top-actions");
+    if (bar) bar.prepend(btn);
+    apply();
+  });
+})();
+</script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      
+      <a class="back" href="/classes/brain-behind-the-bot">← 游戏大厅</a>
+      <div class="title">
+        
+        <h1>AI 亲近还是疏远</h1>
+        <p>聊天机器人背后的大脑 · 第 3 节</p>
+      </div>
+      <div class="actions">
+        <button class="btn outline small" id="btn-export">导出本节课结果</button>
+        <button class="btn accent small" id="btn-guide">老师说明</button>
+      </div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main" tabindex="-1"></main><footer class="wrap"><p>泉心光语 Spring Foundation</p><p>由泉心光语 Spring Foundation 开发，用于中文 AI 素养课堂。</p><p>课程主题参考：Day of AI《The Brain Behind the Bot》第三课（非官方合作或出品）。</p></footer>
+
+<!-- 老师说明：课堂流程 + 每个环节的建议时长 -->
+<div class="modal-bg" id="guide-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>老师说明</h2><button class="btn outline small" data-close>关闭</button></div>
+    
+    <p>配套第 3 节《AI 对人际连接的影响》，教材第 65–67 页。理解 AI 既可能促进联系，也可能减少真实交流。</p><ol><li>导入（2 分钟）：说明规则，请学生尊重不同交流偏好。</li><li>情景投票（8 分钟）：朗读情景，全班举手三选一；听取不同理由后由老师代选，再展示预设模拟结果，不把模拟百分比当作本班统计。</li><li>总结（3–5 分钟）：回顾五个情景，讨论哪些条件会改变 AI 对人际联系的影响。</li><li>导出（1 分钟）：填写班级与参与人数，下载 PNG 或 CSV。未完成时导出会标注进度。</li></ol><p>本活动只记录老师代选的课堂观点，不代表每位学生的答案；不收集学生个人信息。</p><p>投票百分比是预设示例。真实课堂可举手投票，本游戏不记录真实票数，也不提供多人实时投票。</p>
+    <p class="hint">本游戏完全离线可用，不收集任何学生信息。</p>
+  </div>
+</div>
+
+<!-- 导出：PNG 图片（成果展示）+ CSV（原始数据），用于给资助方的成效报告 -->
+<div class="modal-bg" id="export-modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h2>导出本节课结果</h2><button class="btn outline small" data-close>关闭</button></div>
+    <div class="row">
+      <label style="flex:1;min-width:200px">班级名称<input type="text" id="ex-class" placeholder="例如：五年级二班"></label>
+      <label style="flex:1;min-width:200px">参与人数<input type="number" id="ex-count" min="0" max="1000" step="1" placeholder="例如：42"></label>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="btn-ex-png">下载结果图片 (PNG)</button>
+      <button class="btn outline" id="btn-ex-csv">下载原始数据 (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const VOTE=true;
+const SLUG="ai-closer-or-further";
+const TITLE="AI 亲近还是疏远";
+const DATA=[{"q": "小明刚转学到一所新学校。AI 根据他的兴趣推荐了一个篮球社团，他加入后认识了几个新朋友。", "v": [68, 7, 25], "r": "AI 让小明发现了社交机会，但真正建立友谊仍需要参与活动和真实互动。"}, {"q": "一家人吃晚饭时，每个人都在刷算法推荐的短视频，整顿饭几乎没有交流。", "v": [5, 82, 13], "r": "个性化推荐可以带来娱乐，也可能分散注意力、占用面对面交流的时间。"}, {"q": "两位语言不同的学生借助 AI 实时翻译，一起完成课堂任务，后来成为朋友。", "v": [76, 4, 20], "r": "AI 翻译降低了语言障碍，有助于促成真正的人际合作。"}, {"q": "小红遇到烦恼时经常只和 AI 聊天，渐渐地很少主动联系身边的朋友。", "v": [9, 67, 24], "r": "AI 可能提供即时回应，但如果持续取代现实中的交流，可能减少朋友间的互动。"}, {"q": "远方的家人不熟悉智能手机。AI 帮他们把视频通话软件操作步骤翻译成了简单的中文。", "v": [71, 5, 24], "r": "AI 可以辅助解决技术障碍，使真实的人际沟通更容易发生。"}];
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, ...children) => {
+ const e=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)) {
+  if(k.startsWith('on')) e.addEventListener(k.slice(2),v);
+  else if(v!==false && v!=null) e.setAttribute(k,v===true?'':v);
+ }
+ e.append(...children.flat()); return e;
+};
+let pos=0, picks=DATA.map(()=>-1), revealed=DATA.map(()=>false), ended=false;
+const labels=['更加亲近','更加疏远','视情况而定'];
+const disclaimer=VOTE?'预设示例，并非真实投票；百分比不代表正确答案。':'连接值是课堂讨论的示意性分数，不是科学测量，也不评价学生的社交能力。';
+const discussion=VOTE?'其他选择在什么条件下也可能成立？':'不同人的偏好和现实情况会不会改变你的选择？';
+const finalQuestion=VOTE?'AI 让我们更加亲近还是更加疏远？为什么同样的技术在不同情境下可能产生不同影响？':'游戏分数最高，就一定代表拥有更好的人际关系吗？如果对方不方便见面、偏好文字交流，得分规则应该怎样变化？';
+const score=()=>DATA.reduce((n,d,i)=>n+(picks[i]<0?0:d.a[picks[i]][1]),0);
+function reportRows(){return DATA.map((d,i)=>[String(i+1),d.q,picks[i]<0?'未作答':VOTE?labels[picks[i]]:d.a[picks[i]][0],VOTE?'':picks[i]<0||!ended?'':String(d.a[picks[i]][1]),VOTE?d.v.join(' / ')+' %':picks[i]<0||!ended?'':d.a[picks[i]][2],picks[i]<0?'未作答':revealed[i]||!VOTE?'已提交':'待提交']);}
+function move(n){pos=n;render();$('#main').focus();window.scrollTo(0,0);}
+function render(){
+ $('#steps').textContent=ended?gameT('挑战完成'):gameT(`第 ${pos+1} / ${DATA.length} 题`);
+ const main=$('#main'); main.replaceChildren();
+ if(ended){
+  main.append(el('h2',{},'课堂观点回顾'));
+  if(!VOTE){
+   main.append(el('p',{class:'big-answer'},`${score()} / 30`));
+   main.append(el('p',{},score()>=25?'你倾向于主动维系人际联系，并能灵活利用沟通工具。':score()>=18?'你使用了多种社交方式。想一想：不同人的偏好和现实情况会不会改变你的选择？':'你的选择体现了一些特定沟通习惯。可以探索哪些方式能增加双向交流与理解。'));
+  }
+  reportRows().forEach((r,i)=>{
+   const c=el('section',{class:'card recap'},el('h3',{},gameT(`情景 ${i+1}`)),el('p',{},r[1]),el('p',{},gameT('课堂选择：'),el('strong',{},r[2])));
+   if(!VOTE)c.append(el('p',{class:'result-score'},gameT(`得分：${r[3]}`)),el('p',{},r[4]));
+   else c.append(el('p',{},DATA[i].r));
+   main.append(c);
+  });
+  main.append(el('div',{class:'discuss'},finalQuestion),el('p',{},disclaimer));
+  main.append(el('div',{class:'row'},el('button',{class:'btn outline',onclick:()=>window.print()},'打印/保存结果'),el('button',{class:'btn',onclick:()=>{ended=false;pos=0;picks=DATA.map(()=>-1);revealed=DATA.map(()=>false);render();}},'再玩一次')));
+  return;
+ }
+ const d=DATA[pos];
+ main.append(el('p',{class:'lead'},VOTE?'全班举手表达观点，老师点击课堂选择，再查看模拟结果。':'全班讨论并举手选择，老师记录本班的一种选择；积分在最后揭晓。'));
+ main.append(el('h2',{class:'scene'},d.q));
+ if(VOTE)main.append(el('p',{},'你认为 AI 在这个情景下对人与人之间的联系有什么影响？'));
+ const options=el('div',{class:'options'});
+ (VOTE?labels:d.a.map(a=>a[0])).forEach((text,i)=>options.append(el('button',{class:'option'+(picks[pos]===i?' selected':''),'aria-pressed':picks[pos]===i,disabled:VOTE&&revealed[pos],onclick:()=>{picks[pos]=i;render();}},el('span',{},String.fromCharCode(65+i)+'. '),el('span',{},text))));
+ main.append(options);
+ if(VOTE&&revealed[pos]){
+  const panel=el('section',{class:'card recap'},el('h3',{},'模拟全班投票结果'),el('p',{},disclaimer));
+  d.v.forEach((v,i)=>panel.append(el('div',{},el('div',{class:'vote-label'},el('span',{},labels[i]),el('strong',{},`${v}%`)),el('div',{class:'track','aria-hidden':true},el('div',{class:'fill',style:`width:${v}%`})))));
+  panel.append(el('p',{},d.r));main.append(panel);
+ }
+ main.append(el('div',{class:'row controls'},el('button',{class:'btn outline',disabled:pos===0,onclick:()=>move(pos-1)},'上一题'),el('button',{class:'btn',disabled:picks[pos]<0,onclick:()=>{
+  if(VOTE&&!revealed[pos]){revealed[pos]=true;render();return;}
+  if(pos===DATA.length-1){ended=true;render();$('#main').focus();window.scrollTo(0,0);}else move(pos+1);
+ }},VOTE&&!revealed[pos]?'提交课堂判断':pos===DATA.length-1?'查看课堂总结':'下一题 →')));
+ main.append(el('div',{class:'discuss'},discussion),el('p',{},VOTE?'不设唯一正确答案。示例人物与情景均为虚构。':'每题最高 5 分 · 得分暂时保密。示例人物与情景均为虚构。'));
+}
+function download(blob,name){const url=URL.createObjectURL(blob),a=el('a',{href:url,download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+function meta(){return {date:new Date().toLocaleDateString('sv-SE'),cls:$('#ex-class').value.trim()||'未填写班级',count:$('#ex-count').value};}
+function filename(m,ext){return `${SLUG}_${m.date}.${ext}`;}
+$('#btn-ex-csv').onclick=()=>{
+ const m=meta(); if(!$('#ex-count').reportValidity())return;
+ const rows=[['日期','班级','参与人数','情景','题目','课堂选择','得分','预设百分比或解读','提交状态'],...reportRows().map(r=>[m.date,m.cls,m.count,...r])];
+ const csv='\ufeff'+rows.map(r=>r.map(v=>{let s=String(gameT(v));if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}).join(',')).join('\r\n');
+ download(new Blob([csv],{type:'text/csv;charset=utf-8'}),filename(m,'csv'));
+};
+$('#btn-ex-png').onclick=()=>{
+ if(!$('#ex-count').reportValidity())return;
+ const m=meta(), c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=1600;
+ const lines=[];ctx.font='30px "PingFang SC","Microsoft YaHei",sans-serif';
+ function wrap(s){let line='';for(const ch of gameT(String(s))){if(ctx.measureText(line+ch).width>1420){lines.push(line);line='';}line+=ch;}lines.push(line);}
+ wrap(TITLE);wrap('泉心光语 Spring Foundation');wrap(m.date+' | '+gameT(m.cls)+' | '+gameT('参与人数')+': '+m.count);wrap(ended?'挑战完成':'活动尚未完成');wrap(disclaimer);
+ if(!VOTE&&ended)wrap(gameT('当前累计得分：')+score()+' / 30');
+ reportRows().forEach((r,i)=>{wrap(`${i+1}. ${gameT(r[1])}`);wrap(gameT('课堂选择：')+gameT(r[2])+' | '+gameT(r[5]));if(VOTE){wrap(labels.map((l,j)=>gameT(l)+': '+DATA[i].v[j]+'%').join(' / '));wrap(DATA[i].r);}else if(picks[i]>=0&&ended){wrap(gameT('得分：')+r[3]);wrap(r[4]);}lines.push('');});wrap(finalQuestion);
+ c.height=100+lines.length*46;ctx.fillStyle='#faf8f3';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#1f7a68';ctx.fillRect(0,0,c.width,14);ctx.fillStyle='#1f2937';ctx.font='30px "PingFang SC","Microsoft YaHei",sans-serif';lines.forEach((l,i)=>ctx.fillText(l,70,70+i*46));c.toBlob(b=>b&&download(b,filename(m,'png')),'image/png');
+};
+let returnFocus;
+function closeModal(bg){bg.hidden=true;returnFocus?.focus();}
+function openModal(id){returnFocus=document.activeElement;const bg=$(id);bg.hidden=false;bg.querySelector('button').focus();}
+for(const bg of document.querySelectorAll('.modal-bg')){
+ bg.querySelector('.modal').setAttribute('role','dialog');bg.querySelector('.modal').setAttribute('aria-modal','true');bg.querySelector('.modal').setAttribute('aria-label',bg.querySelector('h2').textContent);
+ bg.addEventListener('click',e=>{if(e.target===bg||e.target.hasAttribute('data-close'))closeModal(bg);});
+ bg.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal(bg);return;}if(e.key==='Tab'){const f=[...bg.querySelectorAll('button,input')],a=f[0],b=f.at(-1);if(e.shiftKey&&document.activeElement===a){e.preventDefault();b.focus();}else if(!e.shiftKey&&document.activeElement===b){e.preventDefault();a.focus();}}});
+}
+$('#btn-guide').onclick=()=>openModal('#guide-modal');$('#btn-export').onclick=()=>openModal('#export-modal');
+render();
+
+</script>
+</body>
+</html>

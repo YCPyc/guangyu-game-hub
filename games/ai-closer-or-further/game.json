@@ -1,0 +1,27 @@
+{
+  "title": "AI 亲近还是疏远",
+  "course": "brain-behind-the-bot",
+  "session": 3,
+  "summary": "全班判断五种 AI 情景，比较预设模拟投票，讨论技术如何影响人际联系。",
+  "minutes": "14–16 分钟",
+  "format": "老师投屏，全班举手选择和讨论",
+  "concepts": [
+    "人际联系",
+    "AI 辅助",
+    "注意力"
+  ],
+  "authors": [
+    "泉心光语 Spring Foundation"
+  ],
+  "en": {
+    "title": "AI: Closer or Further?",
+    "summary": "Discuss five AI situations and preset simulated votes to explore how technology affects human connection.",
+    "minutes": "14–16 min",
+    "format": "Teacher projects; class votes by hand and discusses",
+    "concepts": [
+      "Human connection",
+      "AI support",
+      "Attention"
+    ]
+  }
+}
