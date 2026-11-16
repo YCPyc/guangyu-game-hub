@@ -96,6 +96,91 @@ input[type=text], input[type=number] { border: 1px solid var(--line); border-rad
   .title p { display: none; }
   .step { font-size: .8rem; padding: 4px 8px; }
 }
+
+/* 光语课堂：轻快、有一点纸艺感的课堂舞台 */
+body { background-image: none; }
+header.top { border-bottom: 2px solid var(--ink); overflow: hidden; }
+header.top .wrap { position: relative; }
+header.top .wrap::after { content: ""; position: absolute; z-index: -1; right: 3%; top: -34px; width: 120px; height: 120px; border: 2px dashed var(--primary); border-radius: 50%; opacity: .24; animation: game-orbit 24s linear infinite; }
+.top-row { padding-top: 16px; padding-bottom: 14px; }
+.back { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-ink); font-weight: 700; transition: transform .18s, background .18s; }
+.back:hover { background: var(--accent-soft); transform: translateX(-3px); }
+.title h1 { letter-spacing: -.02em; }
+.actions { position: relative; z-index: 1; }
+.btn { border: 2px solid var(--primary); border-radius: 14px; box-shadow: 0 3px 0 var(--primary-ink); transition: transform .16s, box-shadow .16s, background .16s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--primary-ink); }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--primary-ink); }
+.btn.outline { border-color: var(--line); box-shadow: 0 3px 0 var(--line); }
+.btn.outline:hover { border-color: var(--primary); box-shadow: 0 4px 0 var(--primary-soft); }
+.btn.accent { border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
+.steps { padding-top: 4px; }
+.step { transition: transform .2s, border-color .2s, background .2s; }
+.step.active { box-shadow: 0 3px 0 var(--primary); transform: translateY(-2px); }
+main { animation: stage-pop .45s ease-out both; }
+.card { box-shadow: 0 4px 0 var(--line); transition: transform .2s, box-shadow .2s; }
+.card:hover { box-shadow: 0 7px 0 var(--line); }
+.big-answer { color: var(--primary-ink); }
+.discuss { position: relative; overflow: hidden; border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.discuss::after { content: ""; position: absolute; width: 52px; height: 52px; right: 15px; top: -22px; border: 2px solid var(--accent); border-radius: 50%; opacity: .65; }
+.modal { border: 2px solid var(--ink); box-shadow: 8px 8px 0 rgb(31 41 55 / 16%); animation: modal-pop .22s ease-out both; }
+input[type=text], input[type=number] { border-width: 2px; }
+input:focus { outline: 3px solid var(--primary-soft); border-color: var(--primary); }
+@keyframes game-orbit { to { rotate: 360deg; } }
+@keyframes stage-pop { from { opacity: .5; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modal-pop { from { opacity: .6; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 640px) {
+  .top-row { gap: 8px; }
+  .title { flex-basis: 190px; }
+  .title h1 { font-size: 1.35rem; }
+  .actions { width: 100%; }
+  .actions .btn { flex: 1; }
+  .discuss { padding-right: 52px; }
+  header.top .wrap::after { right: 8%; top: 10px; width: 64px; height: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+
+/* Shared playful presentation: carry the hub's illustrated look into every activity */
+header.top { background: var(--primary); color: #fff; border-bottom: 0; box-shadow: 0 5px 0 var(--primary-soft); }
+.title h1 { color: #fff; }
+.title p { color: var(--primary-soft); opacity: .92; }
+.back { background: var(--primary-soft); color: var(--primary-ink); }
+.back:hover { background: var(--accent-soft); color: var(--ink); }
+header.top .wrap::after { border-color: #fff; opacity: .3; }
+.steps { border-top: 1px solid rgb(255 255 255 / 24%); padding-top: 11px; }
+.step { background: rgb(255 255 255 / 94%); border-color: rgb(255 255 255 / 70%); }
+.step.active { background: var(--accent-soft); border-color: var(--accent); color: var(--primary-ink); box-shadow: 0 3px 0 var(--accent); }
+.step.active .n { background: var(--primary); color: #fff; }
+.actions .btn.outline { background: #fff; color: var(--ink); border-color: #fff; box-shadow: 0 3px 0 var(--primary-ink); }
+.actions .btn.outline:hover { background: var(--primary-soft); border-color: var(--primary-soft); }
+.actions .btn.accent { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+.game-skyline { width: min(calc(100% - 40px), 1160px); height: 136px; margin: 20px auto 0; overflow: hidden; border-radius: 24px; background: var(--primary-soft); }
+.game-skyline svg { display: block; width: 100%; height: 100%; }
+.skyline-wave { transform-box: fill-box; transform-origin: 100% 0%; animation: skyline-wave 2.8s ease-in-out infinite; }
+main { padding-top: 18px; }
+main h2 { color: var(--primary-ink); }
+.card { border: 2px solid var(--line); border-radius: 20px; box-shadow: 0 5px 0 var(--line); }
+.card:hover { transform: translateY(-2px); }
+main button:not(.btn):not(:disabled) { border-radius: 14px; transition: transform .16s, border-color .16s, background .16s, box-shadow .16s; }
+main button:not(.btn):not(:disabled):hover { border-color: var(--primary); background-color: var(--primary-soft); transform: translateY(-2px); }
+main button:not(.btn):not(:disabled):active { transform: translateY(1px); }
+main button:focus-visible, .btn:focus-visible, .step:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.discuss { border-radius: 18px; background: var(--ink); }
+@keyframes skyline-wave { 0%,100% { transform: rotate(0); } 18%,48% { transform: rotate(-12deg); } 32%,62% { transform: rotate(9deg); } }
+@media (max-width: 640px) {
+  .game-skyline { height: 94px; margin-top: 14px; border-radius: 18px; }
+  .game-skyline svg { width: 145%; max-width: none; margin-left: -12%; }
+  main { padding-top: 14px; }
+  .steps { border-top: 0; padding-top: 0; }
+  .step { background: rgb(255 255 255 / 94%); }
+  .step.active { background: var(--accent-soft); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skyline-wave { animation: none !important; }
+}
+
 </style>
 <script id="game-en">
 /* 这个游戏的英文词典（见 AGENTS.md）。text：完整句子；patterns：带变量的句子 */
@@ -270,6 +355,22 @@ window.GAME_EN = {
   </div>
 </header>
 
+<div class="game-skyline" aria-hidden="true">
+  <svg viewBox="0 0 720 150" role="presentation">
+    <circle cx="586" cy="76" r="72" fill="#f2b84b" />
+    <path d="M72 38h210a16 16 0 0 1 16 16v50a16 16 0 0 1-16 16h-96l-31 24v-24H72a16 16 0 0 1-16-16V54a16 16 0 0 1 16-16Z" fill="#fff" />
+    <circle cx="111" cy="79" r="9" fill="#1f7a68" /><circle cx="147" cy="79" r="9" fill="#f2b84b" /><circle cx="183" cy="79" r="9" fill="#1f7a68" />
+    <path d="M406 27V14" stroke="#1f2937" stroke-width="8" stroke-linecap="round" /><circle cx="406" cy="11" r="10" fill="#f2b84b" />
+    <rect x="354" y="26" width="134" height="112" rx="38" fill="#1f7a68" />
+    <rect x="370" y="42" width="102" height="67" rx="27" fill="#fff" />
+    <ellipse cx="398" cy="70" rx="7" ry="10" fill="#1f2937" /><ellipse cx="444" cy="70" rx="7" ry="10" fill="#1f2937" />
+    <path d="M405 91q16 13 32 0" fill="none" stroke="#1f2937" stroke-width="5" stroke-linecap="round" />
+    <path class="skyline-wave" d="M359 70q-29 4-34 29" fill="none" stroke="#1f7a68" stroke-width="12" stroke-linecap="round" />
+    <path d="M528 24 535 39 552 41 539 53 543 70 528 62 513 70 517 53 504 41 521 39Z" fill="#fff" />
+    <circle cx="628" cy="35" r="8" fill="#1f7a68" /><circle cx="641" cy="112" r="6" fill="#fff" />
+    <path d="m291 24 5 10 11 1-8 7 2 11-10-5-10 5 2-11-8-7 11-1Z" fill="#e8a33a" />
+  </svg>
+</div>
 <main class="wrap" id="main"></main>
 
 <!-- 老师说明：课堂流程 + 每个环节的建议时长 -->

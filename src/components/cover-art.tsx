@@ -8,6 +8,30 @@ const TONES: Record<Course["tone"], { bg: string; a: string; b: string; c: strin
   coral: { bg: "#f8e1da", a: "#c8553d", b: "#2f5fa7", c: "#ffffff" },
 }
 
+/** A small classroom mascot, drawn in the hub palette (no remote art or fonts). */
+export function HeroIllustration({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 560 360" className={className} role="img" aria-hidden="true">
+      <ellipse cx="282" cy="315" rx="160" ry="18" fill="#1f2937" opacity=".12" />
+      <path d="M94 104h122a18 18 0 0 1 18 18v48a18 18 0 0 1-18 18h-54l-26 22v-22H94a18 18 0 0 1-18-18v-48a18 18 0 0 1 18-18Z" fill="#fff" />
+      <circle cx="113" cy="145" r="8" fill="#1f7a68" /><circle cx="143" cy="145" r="8" fill="#f2b84b" /><circle cx="173" cy="145" r="8" fill="#1f7a68" />
+      <path d="M366 76h100a16 16 0 0 1 16 16v42a16 16 0 0 1-16 16h-30l-20 18v-18h-50a16 16 0 0 1-16-16V92a16 16 0 0 1 16-16Z" fill="#fff" />
+      <path d="M388 112h56" stroke="#1f7a68" strokeWidth="8" strokeLinecap="round" /><path d="M388 129h35" stroke="#1f7a68" strokeWidth="6" strokeLinecap="round" opacity=".35" />
+      <path d="M249 112V85" stroke="#1f2937" strokeWidth="10" strokeLinecap="round" /><circle cx="249" cy="75" r="15" fill="#f2b84b" />
+      <rect x="173" y="112" width="176" height="164" rx="52" fill="#1f7a68" />
+      <rect x="194" y="136" width="134" height="92" rx="34" fill="#fff" />
+      <ellipse cx="234" cy="175" rx="11" ry="15" fill="#1f2937" /><ellipse cx="289" cy="175" rx="11" ry="15" fill="#1f2937" />
+      <path d="M242 202q20 18 40 0" fill="none" stroke="#1f2937" strokeWidth="6" strokeLinecap="round" />
+      <path className="hero-bot-arm" d="M176 177q-38 5-40 39" fill="none" stroke="#1f7a68" strokeWidth="17" strokeLinecap="round" />
+      <path d="M348 177q38 5 40 39" fill="none" stroke="#1f7a68" strokeWidth="17" strokeLinecap="round" />
+      <path d="M220 276v26m82-26v26" stroke="#1f2937" strokeWidth="16" strokeLinecap="round" />
+      <path d="M206 303h30m50 0h30" stroke="#f2b84b" strokeWidth="13" strokeLinecap="round" />
+      <path d="m416 216 8 17 19 2-14 12 4 19-17-9-17 9 4-19-14-12 19-2Z" fill="#f2b84b" />
+      <circle cx="111" cy="252" r="12" fill="#f2b84b" /><path d="m452 240 5 10 11 1-8 7 2 11-10-5-10 5 2-11-8-7 11-1Z" fill="#1f7a68" />
+    </svg>
+  )
+}
+
 /** 课程封面：对话气泡 + 一个由节点连成的“大脑” */
 export function CourseCover({ tone, className }: { tone: Course["tone"]; className?: string }) {
   const t = TONES[tone]

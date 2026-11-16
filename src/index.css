@@ -132,3 +132,84 @@
     @apply font-sans;
     }
 }
+
+/* A brighter, illustrated playground for young learners. */
+html { scroll-behavior: smooth; }
+body { background-color: var(--background); }
+.hero-scene, .class-hero { background: #f3f6e8; }
+.hero-scene::before, .hero-scene::after, .class-hero::before {
+  content: ""; position: absolute; border-radius: 9999px; pointer-events: none;
+}
+.hero-scene::before { width: 22rem; height: 22rem; left: -10rem; top: 10%; background: #e3f1ec; }
+.hero-scene::after { width: 13rem; height: 13rem; right: -5rem; bottom: 2rem; background: #fdf1dc; }
+.class-hero::before { width: 17rem; height: 17rem; left: -8rem; top: -5rem; background: #fdf1dc; }
+.hero-inner { position: relative; z-index: 1; }
+.hero-kicker { box-shadow: 0 3px 0 rgb(31 122 104 / 8%); }
+.hero-copy h1 { white-space: pre-line; }
+.hero-art-wrap { min-height: 300px; display: grid; place-items: center; isolation: isolate; }
+.hero-art { transform: rotate(2deg); animation: art-float 5s ease-in-out infinite; }
+.hero-bot-arm { transform-box: fill-box; transform-origin: 100% 0%; animation: bot-wave 2.8s ease-in-out infinite; }
+.hero-sun { position: absolute; width: 72%; aspect-ratio: 1; border-radius: 50%; background: #f2b84b; opacity: .9; }
+.hero-orbit { position: absolute; border: 2px dashed rgb(31 122 104 / 35%); border-radius: 50%; }
+.hero-orbit-one { width: 94%; aspect-ratio: 1; animation: orbit-spin 32s linear infinite; }
+.hero-orbit-two { width: 112%; aspect-ratio: 1; border-color: rgb(200 132 31 / 25%); animation: orbit-spin 48s linear infinite reverse; }
+.hero-note { position: absolute; z-index: 11; padding: .65rem 1rem; border: 2px solid #1f2937; border-radius: 9999px; background: white; font-weight: 800; box-shadow: 3px 4px 0 #1f2937; animation: note-bob 3.2s ease-in-out infinite; }
+.hero-note-top { top: 10%; right: 0; transform: rotate(7deg); }
+.hero-note-bottom { bottom: 8%; left: 0; transform: rotate(-6deg); animation-delay: -1.2s; }
+.hero-star { position: absolute; z-index: 12; color: #c8841f; font-size: 2rem; animation: twinkle 2.4s ease-in-out infinite; }
+.hero-star-one { top: 13%; left: 8%; }
+.hero-star-two { right: 8%; bottom: 12%; animation-delay: -1.2s; }
+.hero-cta { box-shadow: 0 5px 0 #165a4d; }
+.hero-cta:active { box-shadow: 0 1px 0 #165a4d; }
+.hero-wave { position: absolute; z-index: 0; bottom: -1px; left: 0; width: 100%; height: 48px; }
+.hero-wave svg { width: 100%; height: 100%; display: block; }
+.hero-wave path { fill: var(--background); }
+.course-section { position: relative; }
+.section-heading { animation: rise-in .6s both; }
+.course-item { animation: rise-in .65s both; }
+.course-item:nth-child(2) { animation-delay: .12s; }
+.course-tile { box-shadow: 0 5px 0 rgb(31 41 55 / 8%); transition: transform .25s ease, box-shadow .25s ease; }
+.single-course-list { max-width: 940px; }
+.course-tile:hover { transform: translateY(-7px) rotate(-.35deg); box-shadow: 0 12px 0 rgb(31 41 55 / 9%); }
+.course-art { overflow: hidden; }
+.course-art svg, .game-cover-wrap img, .game-cover-wrap svg { transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.course-tile:hover .course-art svg, .game-card:hover .game-cover-wrap img, .game-card:hover .game-cover-wrap svg { transform: scale(1.04); }
+.course-number { font-size: 3rem; line-height: 1; font-weight: 900; color: white; -webkit-text-stroke: 1px rgb(31 41 55 / 60%); text-shadow: 2px 3px 0 rgb(31 41 55 / 35%); }
+.course-arrow { transition: transform .25s, background .25s; }
+.course-tile:hover .course-arrow { transform: rotate(-35deg); background: var(--primary); }
+.site-logo { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.site-header > div > a:hover .site-logo { transform: rotate(-7deg) scale(1.05); }
+.class-hero > div { position: relative; z-index: 1; }
+.class-art { animation: art-float 5.5s ease-in-out infinite; }
+.class-art-spark { position: absolute; right: -1rem; top: -1.25rem; color: #c8841f; font-size: 3rem; animation: twinkle 2.2s ease-in-out infinite; }
+.lesson-rail { align-self: start; }
+.lesson-choice { transition: transform .18s ease, border-color .18s, background .18s; }
+.lesson-choice:hover { transform: translateX(4px); }
+.game-card { box-shadow: 0 4px 0 rgb(31 41 55 / 7%); transition: transform .22s ease, box-shadow .22s ease; }
+.game-card:hover { transform: translateY(-5px); box-shadow: 0 10px 0 rgb(31 41 55 / 9%); }
+.game-sticker { position: absolute; top: .65rem; right: .8rem; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border: 2px solid #1f2937; border-radius: 50%; background: #f2b84b; font-size: 1.3rem; box-shadow: 2px 3px 0 #1f2937; transition: transform .25s; }
+.game-card:hover .game-sticker { transform: rotate(25deg) scale(1.1); }
+header > div > a svg { transition: transform .35s; }
+header > div > a:hover svg { transform: rotate(-8deg) scale(1.08); }
+
+@keyframes art-float { 0%,100% { transform: translateY(0) rotate(2deg); } 50% { transform: translateY(-10px) rotate(-1deg); } }
+@keyframes bot-wave { 0%,100% { transform: rotate(0); } 18%,48% { transform: rotate(-12deg); } 32%,62% { transform: rotate(9deg); } }
+@keyframes note-bob { 0%,100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes orbit-spin { to { rotate: 360deg; } }
+@keyframes twinkle { 0%,100% { transform: scale(.85) rotate(-8deg); opacity: .72; } 50% { transform: scale(1.15) rotate(10deg); opacity: 1; } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) {
+  .hero-art-wrap { min-height: 245px; width: 88%; }
+  .hero-note { font-size: .85rem; padding: .45rem .75rem; }
+  .hero-wave { height: 28px; }
+  .course-tile:hover { transform: translateY(-3px); }
+}
+@media (min-width: 768px) {
+  .course-tile-wide { flex-direction: row; }
+  .course-tile-wide .course-art { width: 43%; flex: none; }
+  .course-tile-wide .course-art svg { height: 100%; min-height: 300px; }
+  .course-tile-wide > div:last-child { padding: 2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
