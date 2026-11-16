@@ -21,7 +21,12 @@ const EXTERNAL = [
   [/\bimport\s*(?:\(|[^;]*?\bfrom)\s*["'](?:https?:)?\/\//i, "imports a JS module from another site"],
   [/\bfetch\s*\(\s*["'`](?:https?:)?\/\//i, "calls a web API (fetch)"],
   [/\bnew\s+(?:XMLHttpRequest|WebSocket|EventSource)\b/, "makes network requests (XMLHttpRequest/WebSocket)"],
+  [/\bsendBeacon\b|\bfetch\s*\(/, "makes network requests (fetch/sendBeacon)"],
 ]
+
+// The one allowed network use: the shared anonymous-analytics block, copied unchanged from the template.
+const ANALYTICS_RE = /<script id="game-analytics">[\s\S]*?<\/script>/
+const ANALYTICS_BLOCK = fs.readFileSync(path.join(GAMES, "_template/index.html"), "utf8").match(ANALYTICS_RE)?.[0]
 
 const errors = []
 const fail = (slug, msg) => errors.push(`games/${slug}: ${msg}`)
@@ -85,7 +90,11 @@ for (const slug of slugs) {
   if (!html.includes("老师说明")) fail(slug, "index.html: needs a 「老师说明」 (teacher guide) button")
   if (meta.course && !html.includes(`href="/classes/${meta.course}"`))
     fail(slug, `index.html: needs a back link to the hub: <a class="back" href="/classes/${meta.course}">← 游戏大厅</a>`)
-  for (const [re, why] of EXTERNAL) if (re.test(html)) fail(slug, `index.html ${why} — games must work fully offline`)
+  const analytics = html.match(ANALYTICS_RE)?.[0]
+  if (!analytics) fail(slug, 'index.html: needs the anonymous-analytics block from games/_template (<script id="game-analytics">)')
+  else if (analytics !== ANALYTICS_BLOCK) fail(slug, 'index.html: the <script id="game-analytics"> block must be copied unchanged from games/_template')
+  const ownCode = html.replace(ANALYTICS_RE, "")
+  for (const [re, why] of EXTERNAL) if (re.test(ownCode)) fail(slug, `index.html ${why} — games must work fully offline`)
 
   // Only the game's own files belong in the folder.
   for (const f of fs.readdirSync(dir)) {

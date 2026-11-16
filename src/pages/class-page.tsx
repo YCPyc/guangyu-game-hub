@@ -5,7 +5,6 @@ import { Pin, Robot, Squiggle, Wave } from "@/components/art"
 import { GameCover, lessonColor } from "@/components/cover-art"
 import { gamesFor, getCourse } from "@/data/catalog"
 import { localizeCourse, localizeGame, useI18n } from "@/lib/i18n"
-import { posthogLogger } from "@/lib/posthog-logger"
 import { NotFoundPage } from "@/pages/not-found"
 
 export function ClassPage() {
@@ -37,19 +36,12 @@ export function ClassPage() {
   }
 
   const handleGameStart = (gameSlug: string, launchSurface: "cover" | "button") => {
-    posthog.capture("game_started", {
-      course_id: course.id,
-      lesson_number: lesson,
-      game_slug: gameSlug,
-      launch_surface: launchSurface,
-    })
-    posthogLogger.info("game launch started", {
-      event: "game_launch_started",
-      course_id: course.id,
-      lesson_number: lesson,
-      game_slug: gameSlug,
-      launch_surface: launchSurface,
-    })
+    // The browser leaves for the game page right away, so send this one immediately.
+    posthog.capture(
+      "game_started",
+      { course_id: course.id, lesson_number: lesson, game_slug: gameSlug, launch_surface: launchSurface },
+      { transport: "sendBeacon", send_instantly: true },
+    )
   }
 
   return (

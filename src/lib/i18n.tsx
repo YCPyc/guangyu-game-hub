@@ -1,3 +1,4 @@
+import posthog from "posthog-js"
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import type { Course, Game } from "@/data/catalog"
 
@@ -12,7 +13,7 @@ const STRINGS = {
     switchTo: "English",
     switchLabel: "切换到英文",
     footerOrg: "光语 · 泉心 UC Berkeley 公益项目组 × 铺路石",
-    footerPrivacy: "不需要登录，不收集任何学生信息",
+    footerPrivacy: "不需要登录，不收集学生信息，只匿名统计游戏的使用情况",
     kicker: "光语 × 铺路石 · AI 素养课堂",
     heroLines: ["一起玩游戏，", "一起弄懂 AI"],
     heroLead: "投屏到大屏幕，全班一起看、一起举手、一起讨论。",
@@ -47,7 +48,7 @@ const STRINGS = {
     switchTo: "中文",
     switchLabel: "Switch to Chinese",
     footerOrg: "Guangyu · a Quanxin (UC Berkeley) nonprofit project × Pulushi",
-    footerPrivacy: "No login needed. No student data collected.",
+    footerPrivacy: "No login needed. No student data, only anonymous usage stats.",
     kicker: "Guangyu × Pulushi · AI literacy classroom",
     heroLines: ["Play games,", "understand AI!"],
     heroLead: "Put a game on the big screen. The whole class watches, votes and talks it over.",
@@ -96,6 +97,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = lang === "en" ? "en" : "zh-CN"
     document.title = STRINGS[lang].siteName
+    // Every analytics event carries the current language.
+    if (posthog.__loaded) posthog.register({ language: lang })
     try {
       localStorage.setItem(STORAGE_KEY, lang)
     } catch {

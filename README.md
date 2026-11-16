@@ -21,6 +21,8 @@ scripts/validate-games.mjs   game rules, run in CI and before every build
     npm run dev        # http://localhost:5173
     npm run build      # validate games, type-check, build to dist/
 
+Analytics (PostHog) is off unless `.env` sets the two variables in `.env.example`; see AGENTS.md → Analytics.
+
 ## Deploy
 
 Merging to `main` deploys automatically (`.github/workflows/deploy.yml`). Manual deploy:
@@ -35,3 +37,7 @@ Merging to `main` deploys automatically (`.github/workflows/deploy.yml`). Manual
    the real site is the one in China.)
 3. **Protect `main`** — Settings → Branches → add a rule for `main`: require a pull request and the
    `CI / build` check to pass before merging.
+4. **Analytics** — in GitHub: Settings → Secrets and variables → Actions → **Variables**, add
+   `POSTHOG_PROJECT_TOKEN` (the PostHog project token, `phc_…`) and `POSTHOG_HOST`
+   (`https://us.i.posthog.com`). Add the same two as `VITE_PUBLIC_POSTHOG_PROJECT_TOKEN` and
+   `VITE_PUBLIC_POSTHOG_HOST` in Vercel if previews should send events too.

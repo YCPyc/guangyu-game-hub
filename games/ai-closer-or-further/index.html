@@ -306,6 +306,157 @@ input[type=text], input[type=number], textarea { border: 2px solid var(--ink); b
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
+<script id="game-analytics">
+/* =====================================================================
+   匿名使用统计（复制模板后不要改这一段）：记录游戏打开、进行到第几步、打开老师说明、导出、
+   停留时间和老师的 👍/👎 评分，发到 PostHog，帮助我们改进游戏。
+   不记录学生信息、班级名称、人数或任何输入的文字。
+   配置由网站构建时填入；直接双击打开的文件或断网时什么都不发送，游戏照常运行。
+   有步骤条（.steps .step / .stepper .step-btn）的游戏会自动记录步骤；
+   没有步骤条的游戏自己调用 gameTrack.step(第几步, 总步数)，最后一步算“完成”。
+   ===================================================================== */
+(function () {
+  const CFG = /*GAME_ANALYTICS_CONFIG*/null;
+  const on = !!(CFG && CFG.token && CFG.host && /^https?:$/.test(location.protocol));
+  const lang = () => (typeof window.gameLang === "function" ? window.gameLang() : "zh");
+
+  // 和游戏大厅共用同一个匿名 ID（大厅的 PostHog 存在 localStorage 里）
+  let id = null, session = null;
+  try {
+    const ph = on && JSON.parse(localStorage.getItem("ph_" + CFG.token + "_posthog") || "null");
+    if (ph && ph.distinct_id) {
+      id = ph.distinct_id;
+      const s = ph.$sesid;
+      if (Array.isArray(s) && Date.now() - s[0] < 30 * 60 * 1000) session = s[1];
+    }
+    if (!id) {
+      id = localStorage.getItem("guangyu-hub:anon-id");
+      if (!id) localStorage.setItem("guangyu-hub:anon-id", (id = "game-" + Math.random().toString(36).slice(2) + Date.now().toString(36)));
+    }
+  } catch { /* 没有存储：每次打开算一个新访客 */ }
+  if (!id) id = "game-" + Math.random().toString(36).slice(2);
+
+  function send(event, props) {
+    if (!on) return;
+    const properties = {
+      app: "game", game_slug: CFG.slug, course_id: CFG.course, lesson_number: CFG.lesson, language: lang(),
+      $current_url: location.href, $host: location.host, $pathname: location.pathname,
+      $screen_width: screen.width, $screen_height: screen.height, $viewport_width: innerWidth, $lib: "guangyu-game",
+      ...props,
+    };
+    if (session) properties.$session_id = session;
+    const body = JSON.stringify({ api_key: CFG.token, event, distinct_id: id, timestamp: new Date().toISOString(), properties });
+    const url = CFG.host.replace(/\/+$/, "") + "/i/v0/e/";
+    try { if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([body], { type: "text/plain" }))) return; } catch { /* 改用 fetch */ }
+    try { fetch(url, { method: "POST", body, keepalive: true }).catch(() => {}); } catch { /* 发送失败不影响游戏 */ }
+  }
+
+  // 页面在屏幕上的时间（切到别的标签页不算），最多记 60 分钟
+  let visibleMs = 0, since = document.visibilityState === "visible" ? Date.now() : null;
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") since = Date.now();
+    else if (since) { visibleMs += Date.now() - since; since = null; }
+  });
+  const seconds = () => Math.min(3600, Math.round((visibleMs + (since ? Date.now() - since : 0)) / 1000));
+
+  // 步骤和完成
+  let step = 0, total = 0, furthest = 0, completed = false;
+  const reached = new Set();
+  function setStep(n, t) {
+    n = Number(n); t = Number(t);
+    if (!(n >= 1 && t >= 1 && n <= t)) return;
+    step = n; total = t; furthest = Math.max(furthest, n);
+    if (!reached.has(n)) {
+      reached.add(n);
+      send("game_step_reached", { step: n, total_steps: t, is_last_step: n === t, seconds_visible: seconds() });
+    }
+    if (n === t && !completed) {
+      completed = true;
+      send("game_completed", { total_steps: t, seconds_visible: seconds() });
+      setTimeout(showRating, 45000); // 给全班时间玩完最后一步，再请老师评分
+    }
+  }
+  window.gameTrack = { step: setStep };
+
+  let queued = false;
+  function readStepBar() {
+    queued = false;
+    const items = [...document.querySelectorAll(".steps .step, .steps .step-btn, .stepper .step-btn")];
+    const i = items.findIndex((e) => e.classList.contains("active"));
+    if (i >= 0) setStep(i + 1, items.length);
+  }
+  new MutationObserver(() => { if (!queued) { queued = true; setTimeout(readStepBar, 30); } })
+    .observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+  document.addEventListener("DOMContentLoaded", readStepBar);
+
+  // 老师说明、导出（PNG / CSV）
+  const exported = (a) => {
+    send("results_exported", { format: (a.download.split(".").pop() || "").toLowerCase(), step, total_steps: total });
+    if (completed) setTimeout(showRating, 800); // 导出说明这节课结束了，正好请老师评分
+  };
+  document.addEventListener("click", (e) => {
+    const t = e.target instanceof Element ? e.target : null;
+    if (!t) return;
+    if (t.closest("#btn-guide")) send("teacher_guide_opened", { step, total_steps: total, seconds_visible: seconds() });
+    const a = t.closest("a[download]");
+    if (a && e.isTrusted) exported(a);
+  }, true);
+  const nativeClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () { if (this.download) exported(this); return nativeClick.call(this); };
+
+  // 打开和离开
+  send("game_opened", { from_hub: document.referrer.includes("/classes/") });
+  let closed = false;
+  addEventListener("pagehide", () => {
+    if (closed) return;
+    closed = true;
+    send("game_closed", { seconds_visible: seconds(), last_step: step, furthest_step: furthest, total_steps: total, completed });
+  });
+
+  // 游戏完成后（到最后一步 45 秒，或者导出结果后），请老师点一下 👍 / 👎
+  const RATE = {
+    zh: { q: "这个游戏好用吗？", up: "好用", down: "不好用", thanks: "谢谢！", close: "关闭" },
+    en: { q: "Was this game easy to use?", up: "Yes", down: "No", thanks: "Thanks!", close: "Close" },
+  };
+  let rateBox = null;
+  function showRating() {
+    if (!on || rateBox || !document.body) return;
+    const style = document.createElement("style");
+    style.textContent = `
+      .gy-rate { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 10px;
+        max-width: calc(100vw - 24px); background: #fff; color: var(--ink, #24342e); border: 2.5px solid var(--ink, #24342e); border-radius: 999px;
+        box-shadow: 0 5px 0 var(--ink, #24342e); padding: 8px 10px 8px 20px; font-weight: 700; font-size: .9rem; animation: gy-rate-in .4s cubic-bezier(.34, 1.4, .64, 1) both; }
+      @keyframes gy-rate-in { from { transform: translate(-50%, 24px); } to { transform: translate(-50%, 0); } }
+      .gy-rate button { min-width: 48px; min-height: 44px; border-radius: 999px; border: 2px solid var(--ink, #24342e); background: var(--sun-soft, #fbe6b4);
+        font: inherit; cursor: pointer; padding: 0 12px; }
+      .gy-rate button.x { background: transparent; border: 0; min-width: 40px; color: var(--muted, #5d6b65); }
+      @media (max-width: 640px) { .gy-rate { font-size: .8rem; padding-left: 14px; gap: 6px; } }`;
+    document.head.append(style);
+    rateBox = document.createElement("div");
+    rateBox.className = "gy-rate";
+    rateBox.setAttribute("data-no-tr", "");
+    rateBox.setAttribute("role", "group");
+    const draw = () => {
+      const T = RATE[lang()] || RATE.zh;
+      rateBox.setAttribute("aria-label", T.q);
+      rateBox.innerHTML = `<span>${T.q}</span><button type="button" data-r="up" aria-label="${T.up}">👍</button>` +
+        `<button type="button" data-r="down" aria-label="${T.down}">👎</button><button type="button" class="x" aria-label="${T.close}">✕</button>`;
+    };
+    draw();
+    addEventListener("game-langchange", () => { if (rateBox && rateBox.isConnected && rateBox.querySelector("[data-r]")) draw(); });
+    rateBox.addEventListener("click", (e) => {
+      const b = e.target instanceof Element && e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.r) {
+        send("game_rated", { rating: b.dataset.r, seconds_visible: seconds() });
+        rateBox.textContent = (RATE[lang()] || RATE.zh).thanks;
+        setTimeout(() => rateBox.remove(), 1800);
+      } else rateBox.remove();
+    });
+    document.body.append(rateBox);
+  }
+})();
+</script>
 </head>
 <body>
 <header class="top">
@@ -379,6 +530,7 @@ function reportRows(){return DATA.map((d,i)=>[String(i+1),d.q,picks[i]<0?'未作
 function move(n){pos=n;render();$('#main').focus();window.scrollTo(0,0);}
 function render(){
  $('#steps').textContent=ended?gameT('挑战完成'):gameT(`第 ${pos+1} / ${DATA.length} 题`);
+ window.gameTrack&&gameTrack.step(ended?DATA.length+1:pos+1,DATA.length+1);
  const main=$('#main'); main.replaceChildren();
  if(ended){
   main.append(el('h2',{},'课堂观点回顾'));

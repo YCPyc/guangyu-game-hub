@@ -6,7 +6,6 @@ import { Bubble, HeroScene, Squiggle, Wave } from "@/components/art"
 import { CourseCover } from "@/components/cover-art"
 import { COURSES, gamesFor } from "@/data/catalog"
 import { localizeCourse, useI18n } from "@/lib/i18n"
-import { posthogLogger } from "@/lib/posthog-logger"
 
 const STEP_ICONS = [
   { Icon: MousePointerClick, fill: "var(--sun-soft)" },
@@ -75,12 +74,6 @@ export function HomePage() {
                       to={`/classes/${c.id}`}
                       onClick={() => {
                         posthog.capture("course_selected", {
-                          course_id: c.id,
-                          course_session_count: c.sessions.length,
-                          course_game_count: games,
-                        })
-                        posthogLogger.info("course navigation started", {
-                          event: "course_navigation_started",
                           course_id: c.id,
                           course_session_count: c.sessions.length,
                           course_game_count: games,
