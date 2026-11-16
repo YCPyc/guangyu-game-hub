@@ -249,6 +249,86 @@ window.GAME_EN = {
   });
 })();
 </script>
+<style id="game-theme">
+/* =====================================================================
+   光语课堂游戏 · 共享外观（复制模板后不要改这一段）：和游戏大厅一样的
+   奶油底色、墨线描边、圆胖按钮、飘动的云。放在游戏自己的样式后面，覆盖默认外观。
+   ===================================================================== */
+:root {
+  --bg: #fbf5e6; --card: #ffffff; --ink: #24342e; --muted: #5d6b65; --line: #e6dcc4;
+  --mint: #d3eedd; --mint-deep: #a9d9bd; --sun: #f4b63f; --sun-soft: #fbe6b4;
+  --coral: #ec6a46; --coral-soft: #f9d3c3; --sky: #d7ecf6; --sky-deep: #8cc3dd;
+  --accent: var(--sun); --accent-soft: var(--sun-soft); --primary-soft: var(--mint); --brand-soft: var(--mint);
+  --radius: 20px;
+  --round: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+body { background: var(--bg); color: var(--ink); }
+/* 背景：慢慢飘过的云和小星星（不挡点击） */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'%3E%3Cg transform='translate(60 90) scale(1)'%3E%3Cpath d='M20 52 h120 a22 22 0 0 0 0 -44 a30 30 0 0 0 -54 -6 a24 24 0 0 0 -44 12 a19 19 0 0 0 -22 38z' fill='%23fff' stroke='%2324342e' stroke-width='2.5' stroke-linejoin='round' opacity='.75'/%3E%3C/g%3E%3Cg transform='translate(620 380) scale(0.8)'%3E%3Cpath d='M20 52 h120 a22 22 0 0 0 0 -44 a30 30 0 0 0 -54 -6 a24 24 0 0 0 -44 12 a19 19 0 0 0 -22 38z' fill='%23fff' stroke='%2324342e' stroke-width='2.5' stroke-linejoin='round' opacity='.75'/%3E%3C/g%3E%3Cg transform='translate(1180 140) scale(1.15)'%3E%3Cpath d='M20 52 h120 a22 22 0 0 0 0 -44 a30 30 0 0 0 -54 -6 a24 24 0 0 0 -44 12 a19 19 0 0 0 -22 38z' fill='%23fff' stroke='%2324342e' stroke-width='2.5' stroke-linejoin='round' opacity='.75'/%3E%3C/g%3E%3Cg transform='translate(300 700) scale(0.9)'%3E%3Cpath d='M20 52 h120 a22 22 0 0 0 0 -44 a30 30 0 0 0 -54 -6 a24 24 0 0 0 -44 12 a19 19 0 0 0 -22 38z' fill='%23fff' stroke='%2324342e' stroke-width='2.5' stroke-linejoin='round' opacity='.75'/%3E%3C/g%3E%3Cg transform='translate(1000 640) scale(0.7)'%3E%3Cpath d='M20 52 h120 a22 22 0 0 0 0 -44 a30 30 0 0 0 -54 -6 a24 24 0 0 0 -44 12 a19 19 0 0 0 -22 38z' fill='%23fff' stroke='%2324342e' stroke-width='2.5' stroke-linejoin='round' opacity='.75'/%3E%3C/g%3E%3Cpath transform='translate(480 120)' d='M0 -11 q2 9 11 11 q-9 2 -11 11 q-2 -9 -11 -11 q9 -2 11 -11z' fill='%23f4b63f' stroke='%2324342e' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath transform='translate(1450 420)' d='M0 -11 q2 9 11 11 q-9 2 -11 11 q-2 -9 -11 -11 q9 -2 11 -11z' fill='%23a9d9bd' stroke='%2324342e' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath transform='translate(160 470)' d='M0 -11 q2 9 11 11 q-9 2 -11 11 q-2 -9 -11 -11 q9 -2 11 -11z' fill='%23a9d9bd' stroke='%2324342e' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath transform='translate(860 820)' d='M0 -11 q2 9 11 11 q-9 2 -11 11 q-2 -9 -11 -11 q9 -2 11 -11z' fill='%23f4b63f' stroke='%2324342e' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath transform='translate(1300 780)' d='M0 -11 q2 9 11 11 q-9 2 -11 11 q-2 -9 -11 -11 q9 -2 11 -11z' fill='%23f4b63f' stroke='%2324342e' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0 / 1600px 900px repeat; opacity: .55;
+  animation: gy-drift 160s linear infinite;
+}
+/* 宽屏右下角的小机器人 */
+body::after {
+  content: ""; position: fixed; right: 24px; bottom: 16px; width: 96px; height: 120px; z-index: 1; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-80 -190 160 200'%3E%3Cg stroke='%2324342e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E %3Cline x1='0' y1='-150' x2='0' y2='-168'/%3E%3Ccircle cx='0' cy='-174' r='8' fill='%23f4b63f'/%3E %3Crect x='-62' y='-128' width='14' height='26' rx='6' fill='%23f9d3c3'/%3E%3Crect x='48' y='-128' width='14' height='26' rx='6' fill='%23f9d3c3'/%3E %3Crect x='-50' y='-152' width='100' height='78' rx='24' fill='%23fff'/%3E%3Crect x='-38' y='-140' width='76' height='52' rx='15' fill='%231f7a68'/%3E %3Cellipse cx='-14' cy='-118' rx='5' ry='7' fill='%23fff' stroke='none'/%3E%3Cellipse cx='14' cy='-118' rx='5' ry='7' fill='%23fff' stroke='none'/%3E %3Cpath d='M-10 -103 q10 8 20 0' fill='none' stroke='%23fff'/%3E %3Cpath d='M-40 -60 q-22 14 -18 40' fill='none' stroke-width='9'/%3E%3Cpath d='M-40 -60 q-22 14 -18 40' fill='none' stroke='%23fff' stroke-width='4'/%3E %3Cpath d='M40 -60 q24 -10 30 -42' fill='none' stroke-width='9'/%3E%3Cpath d='M40 -60 q24 -10 30 -42' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Ccircle cx='71' cy='-106' r='8' fill='%23fff'/%3E %3Crect x='-42' y='-68' width='84' height='58' rx='20' fill='%23a9d9bd'/%3E%3Ccircle cx='0' cy='-40' r='11' fill='%23f4b63f'/%3E %3Crect x='-28' y='-12' width='20' height='12' rx='5' fill='%23fff'/%3E%3Crect x='8' y='-12' width='20' height='12' rx='5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  animation: gy-bob 3.2s ease-in-out infinite; display: none;
+}
+@media (min-width: 1560px) { body::after { display: block; } }
+h1, h2, h3, .big-answer, .counter output { font-family: var(--round); }
+main { animation: gy-pop .5s cubic-bezier(.34, 1.4, .64, 1) both; }
+
+/* 顶栏：奶油色 + 波浪下边 */
+header.top { background: rgba(251, 245, 230, .92); border-bottom: 0; }
+header.top::after { content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='14'%3E%3Cpath d='M0 7 q30 -7 60 0 t60 0 t60 0 t60 0 V0 H0z' fill='%23fbf5e6'/%3E%3Cpath d='M0 7 q30 -7 60 0 t60 0 t60 0 t60 0' fill='none' stroke='%2324342e' stroke-width='2.5'/%3E%3C/svg%3E") 0 0 / 240px 14px repeat-x; pointer-events: none; }
+.back { font-weight: 700; }
+
+/* 按钮：圆胖、粗墨线、下面一条实色“影子”，按下去会陷下去 */
+.btn { border: 2.5px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-weight: 700; transition: transform .15s cubic-bezier(.34, 1.56, .64, 1), box-shadow .15s, background .15s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn:disabled, .btn:disabled:hover { opacity: 1; transform: none; background: #ece5d3; color: #8f968f; border-color: #b8b19f; box-shadow: 0 4px 0 #b8b19f; }
+.btn.outline, .btn.ghost { background: #fff; color: var(--ink); border-color: var(--ink); }
+.btn.outline:hover, .btn.ghost:hover { background: var(--mint); }
+.btn.accent { background: var(--sun); color: var(--ink); }
+.btn.accent:hover { background: #f7c562; }
+.btn.small { box-shadow: 0 3px 0 var(--ink); }
+
+/* 步骤条 */
+.step, .step-btn { border: 2.5px solid var(--ink); background: #fff; color: var(--ink); }
+.step .n, .step-btn .n { border: 2px solid var(--ink); background: var(--sun-soft); }
+.step.active, .step-btn.active { background: var(--mint); color: var(--ink); border-color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+
+/* 卡片：粗墨线 + 薄荷色“影子” */
+.card { border: 2.5px solid var(--ink); border-radius: var(--radius); box-shadow: 0 6px 0 var(--mint-deep); }
+.card .card { box-shadow: none; border-width: 2px; }
+
+/* 计票器 */
+.counter button { border: 2.5px solid var(--ink); border-radius: 16px; background: #fff; box-shadow: 0 3px 0 var(--ink); }
+.counter button:active { transform: translateY(2px); box-shadow: none; }
+
+/* 讨论条：深色 + 对话气泡图标 */
+.discuss { border-radius: var(--radius); background: var(--ink); color: #fff; box-shadow: 0 6px 0 var(--sun); padding-left: 68px; position: relative; }
+.discuss::before { content: ""; position: absolute; left: 18px; top: 50%; width: 36px; height: 32px; margin-top: -16px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M6 2 h28 a5 5 0 0 1 5 5 v14 a5 5 0 0 1 -5 5 h-16 l-8 7 v-7 h-4 a5 5 0 0 1 -5 -5 v-14 a5 5 0 0 1 5 -5z' fill='%23f4b63f' stroke='%23fff' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='13' cy='14' r='2.2' fill='%2324342e'/%3E%3Ccircle cx='20' cy='14' r='2.2' fill='%2324342e'/%3E%3Ccircle cx='27' cy='14' r='2.2' fill='%2324342e'/%3E%3C/svg%3E") center / contain no-repeat; }
+.discuss span { color: var(--sun); }
+
+/* 弹窗 */
+.modal-bg { background: rgba(36, 52, 46, .45); }
+.modal { border: 2.5px solid var(--ink); border-radius: 24px; box-shadow: 0 8px 0 var(--ink); animation: gy-pop .35s cubic-bezier(.34, 1.4, .64, 1) both; }
+input[type=text], input[type=number], textarea { border: 2px solid var(--ink); border-radius: 14px; }
+
+@keyframes gy-drift { to { background-position: 1600px 0; } }
+@keyframes gy-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes gy-pop { from { transform: translateY(14px); } to { transform: none; } }
+@media (max-width: 640px) {
+  header.top { position: relative; }
+  .discuss { padding-left: 56px; } .discuss::before { left: 12px; width: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
 </head>
 <body>
 <header class="top">

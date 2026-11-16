@@ -1,14 +1,14 @@
 import { Languages } from "lucide-react"
 import { Link, Outlet } from "react-router"
-import { Button } from "@/components/ui/button"
+import { Robot, SkyLayer, Wave } from "@/components/art"
 import { useI18n } from "@/lib/i18n"
 
 function Logo() {
   return (
-    <svg viewBox="0 0 32 32" className="size-8 shrink-0" aria-hidden="true">
-      <rect width="32" height="32" rx="9" className="fill-primary" />
-      <path d="M9 21.5c2.5-6 11.5-6 14 0" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="16" cy="11.5" r="3" fill="#f2b84b" />
+    <svg viewBox="0 0 40 40" className="size-10 shrink-0 transition-transform group-hover:-rotate-6" aria-hidden="true">
+      <rect x="2" y="2" width="36" height="36" rx="12" fill="#1f7a68" stroke="var(--ink)" strokeWidth="2.5" />
+      <path d="M11 26c3-7 15-7 18 0" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="20" cy="14" r="4" fill="var(--sun)" stroke="var(--ink)" strokeWidth="2" />
     </svg>
   )
 }
@@ -16,20 +16,26 @@ function Logo() {
 export function SiteLayout() {
   const { t, toggle } = useI18n()
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/75">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5">
-          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+    <div className="relative isolate flex min-h-dvh flex-col">
+      <SkyLayer />
+      <header className="sticky top-0 z-20 bg-cream/85 backdrop-blur-sm">
+        <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-3 px-4 sm:px-5">
+          <Link to="/" className="group flex min-w-0 items-center gap-2.5">
             <Logo />
-            <span className="truncate text-base font-semibold tracking-tight sm:text-lg">{t.siteName}</span>
+            <span className="display truncate text-lg sm:text-xl">{t.siteName}</span>
           </Link>
-          <nav className="flex shrink-0 items-center gap-1 text-sm text-muted-foreground">
-            <Link to="/" className="hidden rounded-md px-3 py-2 hover:bg-muted hover:text-foreground sm:block">
+          <nav className="flex shrink-0 items-center gap-2">
+            <Link to="/" className="hidden rounded-full px-4 py-2 font-medium hover:bg-mint sm:block">
               {t.allCourses}
             </Link>
-            <Button variant="outline" size="lg" onClick={toggle} aria-label={t.switchLabel}>
-              <Languages /> {t.switchTo}
-            </Button>
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={t.switchLabel}
+              className="flex h-11 items-center gap-2 rounded-full border-[2.5px] border-ink bg-white px-4 font-semibold shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
+            >
+              <Languages className="size-5" /> {t.switchTo}
+            </button>
           </nav>
         </div>
       </header>
@@ -38,10 +44,20 @@ export function SiteLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:justify-between">
-          <p>{t.footerOrg}</p>
-          <p>{t.footerPrivacy}</p>
+      <footer className="relative -mt-8 sm:-mt-12">
+        <Wave fill="var(--mint)" />
+        <div className="bg-mint">
+          <div className="mx-auto flex max-w-6xl items-end justify-between gap-6 px-5 pt-6 pb-8">
+            <div className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+              <p>{t.footerOrg}</p>
+              <p>{t.footerPrivacy}</p>
+            </div>
+            <svg viewBox="-80 -190 160 200" className="hidden h-24 shrink-0 sm:block" aria-hidden="true">
+              <g className="anim-bob">
+                <Robot />
+              </g>
+            </svg>
+          </div>
         </div>
       </footer>
     </div>

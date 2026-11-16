@@ -69,6 +69,9 @@ Checked automatically by `npm run validate` (`scripts/validate-games.mjs`):
 - `<html lang="zh-CN">`.
 - A back link to the hub: `<a class="back" href="/classes/<course id>">← 游戏大厅</a>`.
 - A 「老师说明」 button that opens a short teacher guide.
+- The shared look from the template: `<style id="game-theme">`, copied unchanged and placed after the game's
+  own `<style>` so it wins. It gives every game the hub's cream background, ink outlines, chunky buttons and
+  drifting clouds.
 - The language blocks from the template: `<script id="game-en">` (this game's English dictionary) and
   `<script id="game-i18n">` (the translator; copy it unchanged). See "Translating a game" below.
 - `game.json` fields valid; `course` exists; `session` is in range; summaries within the length limits.
@@ -122,20 +125,25 @@ To check for gaps: switch to English, play every stage, open the 老师说明, a
 
 ## Style guide (match the hub)
 
-The hub is clean and calm, like Khan Academy or Code.org — not flashy. Games should feel like part of it.
+The hub is playful and friendly for elementary students: a hand-drawn storybook look with thin dark "ink"
+outlines, soft flat pastel colors, chunky rounded buttons, a little robot mascot and gently drifting clouds.
+Games should feel like part of it; the template's `game-theme` block does most of the work.
 
-- **Copy the template's `:root` variables unchanged** and use them; don't invent new colors.
-  - Background `--bg` #faf8f3 (warm white), cards `--card` #fff with a 1px `--line` border.
+- **Use the template's colors** (`:root` in `game-theme`); don't invent new ones.
+  - Background `--bg` #fbf5e6 (cream), cards `--card` #fff with a 2.5px `--ink` outline.
   - Primary `--primary` #1f7a68 (deep teal): main buttons, selected states, progress.
-  - Accent `--accent` #e8a33a (amber): reveals and highlights only — use sparingly.
-  - `--good` / `--bad` only for right/wrong feedback.
-- **Typography**: the template's system font stack (PingFang SC / Microsoft YaHei / Noto Sans CJK SC).
-  No web fonts. Bold for headings, regular for body.
+  - Soft fills for groups or options: `--mint`, `--sun-soft`, `--coral-soft`, `--sky` (and their stronger
+    `--mint-deep`, `--sun`, `--coral`, `--sky-deep`). `--good` / `--bad` only for right/wrong feedback.
+- **Shapes**: ink outlines, big corner radius (`--radius` 20px), pill buttons, and solid offset "shadows"
+  (`box-shadow: 0 4px 0 var(--ink)`) instead of blurry ones. Use `.btn`, `.card` and `.step` so the theme
+  styles them; style your own elements the same way.
+- **Motion**: small and purposeful (a bounce when something is revealed, a gentle bob). Never hide content
+  until an animation runs, and keep `prefers-reduced-motion` working (the theme already does).
+- **Typography**: the template's system font stack; headings use `var(--round)`. No web fonts.
 - **Layout**: header (back link, title, 老师说明), a step bar if there are multiple stages, then one stage
-  at a time. White cards on the warm background, 14px corner radius, generous spacing, left-aligned text.
-- **Avoid the "AI-generated" look**: no gradients, glows, glassmorphism, neon colors, rainbow palettes,
-  heavy drop shadows, or emoji used as icons everywhere (one or two meaningful emoji in content is fine).
-  No decorative filler text.
+  at a time. Generous spacing, left-aligned text, as little text as possible on screen.
+- **Avoid**: gradients, glows, glassmorphism, neon colors, heavy blurry shadows, and emoji used as icons
+  everywhere (one or two meaningful emoji in content is fine). No decorative filler text.
 - End each stage with a dark discussion bar (`.discuss`) holding one question that connects the game to
   the lesson's concept.
 
