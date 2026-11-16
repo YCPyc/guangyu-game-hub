@@ -1,13 +1,16 @@
 import { ArrowLeft, Clock, Play, Presentation } from "lucide-react"
+import { usePostHog } from "@posthog/react"
 import { Link, useParams, useSearchParams } from "react-router"
 import { Pin, Robot, Squiggle, Wave } from "@/components/art"
 import { GameCover, lessonColor } from "@/components/cover-art"
 import { gamesFor, getCourse } from "@/data/catalog"
 import { localizeCourse, localizeGame, useI18n } from "@/lib/i18n"
+import { posthogLogger } from "@/lib/posthog-logger"
 import { NotFoundPage } from "@/pages/not-found"
 
 export function ClassPage() {
   const { lang, t } = useI18n()
+  const posthog = usePostHog()
   const found = getCourse(useParams().id)
   const [params, setParams] = useSearchParams()
   if (!found) return <NotFoundPage />
@@ -23,6 +26,31 @@ export function ClassPage() {
       : (games[0]?.session ?? 1)
   const lessonGames = games.filter((g) => g.session === lesson)
   const color = lessonColor(lesson)
+
+  const handleLessonSelection = (selectedLesson: number) => {
+    posthog.capture("lesson_selected", {
+      course_id: course.id,
+      lesson_number: selectedLesson,
+      game_count: games.filter((game) => game.session === selectedLesson).length,
+    })
+    setParams({ lesson: String(selectedLesson) }, { replace: true })
+  }
+
+  const handleGameStart = (gameSlug: string, launchSurface: "cover" | "button") => {
+    posthog.capture("game_started", {
+      course_id: course.id,
+      lesson_number: lesson,
+      game_slug: gameSlug,
+      launch_surface: launchSurface,
+    })
+    posthogLogger.info("game launch started", {
+      event: "game_launch_started",
+      course_id: course.id,
+      lesson_number: lesson,
+      game_slug: gameSlug,
+      launch_surface: launchSurface,
+    })
+  }
 
   return (
     <>
@@ -67,7 +95,7 @@ export function ClassPage() {
                   <button
                     type="button"
                     aria-current={active ? "true" : undefined}
-                    onClick={() => setParams({ lesson: String(n) }, { replace: true })}
+                    onClick={() => handleLessonSelection(n)}
                     className="group flex w-full flex-col items-center rounded-2xl px-1 pt-16 pb-2 text-center focus-visible:ring-4 focus-visible:ring-ring/40 focus-visible:outline-none"
                   >
                     {active ? (
@@ -126,7 +154,7 @@ export function ClassPage() {
                 return (
                   // Every row below has a fixed height, so the same content lines up across all cards.
                   <article key={g.slug} className="chunky lift anim-pop flex flex-col overflow-hidden" style={{ animationDelay: `${i * 0.08}s` }}>
-                    <a href={g.href} tabIndex={-1} aria-hidden="true">
+                    <a href={g.href} onClick={() => handleGameStart(g.slug, "cover")} tabIndex={-1} aria-hidden="true">
                       <GameCover game={game} className="aspect-video w-full border-b-[2.5px] border-ink" />
                     </a>
                     <div className="flex flex-1 flex-col px-5 pt-5">
@@ -155,6 +183,7 @@ export function ClassPage() {
                     <div className="mt-5 px-5 pb-5">
                       <a
                         href={g.href}
+                        onClick={() => handleGameStart(g.slug, "button")}
                         className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-coral px-5 text-lg font-bold whitespace-nowrap text-white shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
                       >
                         <Play className="size-5 fill-current" /> {t.startGame}
