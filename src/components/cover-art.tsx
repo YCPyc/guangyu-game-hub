@@ -1,56 +1,57 @@
 import type { Course, Game } from "@/data/catalog"
+import { Pin, Robot, Sparkle, Tile } from "@/components/art"
 
-// 简单的扁平插画，作为课程和游戏的封面。纯 SVG，不依赖外部图片。
-const TONES: Record<Course["tone"], { bg: string; a: string; b: string; c: string }> = {
-  teal: { bg: "#dcefe9", a: "#1f7a68", b: "#f2b84b", c: "#ffffff" },
-  amber: { bg: "#f8ecd4", a: "#c8841f", b: "#1f7a68", c: "#ffffff" },
-  blue: { bg: "#dfe8f6", a: "#2f5fa7", b: "#f2b84b", c: "#ffffff" },
-  coral: { bg: "#f8e1da", a: "#c8553d", b: "#2f5fa7", c: "#ffffff" },
-}
+// 每节课一个颜色，课程地图、游戏封面和标签都用它（第 5 节以后循环使用）
+export const LESSON_COLORS = [
+  { soft: "var(--mint)", strong: "var(--mint-deep)", screen: "#1f7a68" },
+  { soft: "var(--sun-soft)", strong: "var(--sun)", screen: "#c27a12" },
+  { soft: "var(--coral-soft)", strong: "var(--coral)", screen: "#c2492a" },
+  { soft: "var(--sky)", strong: "var(--sky-deep)", screen: "#2f6f95" },
+]
+export const lessonColor = (session: number) => LESSON_COLORS[(session - 1) % LESSON_COLORS.length]
 
-/** 课程封面：对话气泡 + 一个由节点连成的“大脑” */
-export function CourseCover({ tone, className }: { tone: Course["tone"]; className?: string }) {
-  const t = TONES[tone]
+/** 课程封面：机器人和几块漂浮的字块 */
+export function CourseCover({ className }: { tone?: Course["tone"]; className?: string }) {
   return (
-    <svg viewBox="0 0 320 200" className={className} preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">
-      <rect width="320" height="200" fill={t.bg} />
-      <circle cx="262" cy="42" r="70" fill={t.c} opacity="0.45" />
-      <rect x="34" y="52" width="132" height="54" rx="16" fill={t.c} />
-      <path d="M58 106 l0 18 l18 -18 z" fill={t.c} />
-      <rect x="52" y="70" width="70" height="7" rx="3.5" fill={t.a} opacity="0.85" />
-      <rect x="52" y="84" width="96" height="7" rx="3.5" fill={t.a} opacity="0.35" />
-      <rect x="120" y="120" width="104" height="44" rx="14" fill={t.a} />
-      <path d="M204 164 l0 16 l-16 -16 z" fill={t.a} />
-      <rect x="136" y="136" width="56" height="6" rx="3" fill={t.c} opacity="0.9" />
-      <rect x="136" y="148" width="36" height="6" rx="3" fill={t.c} opacity="0.55" />
-      <g stroke={t.a} strokeWidth="3" opacity="0.7">
-        <line x1="236" y1="70" x2="276" y2="96" />
-        <line x1="276" y1="96" x2="252" y2="132" />
-        <line x1="236" y1="70" x2="252" y2="132" />
-        <line x1="276" y1="96" x2="296" y2="62" />
+    <svg viewBox="0 0 320 220" className={className} preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">
+      <rect width="320" height="220" fill="var(--mint)" />
+      <circle cx="250" cy="50" r="70" fill="#fff" opacity="0.5" />
+      <path d="M0 190 q80 -30 160 -10 t160 -8 v48 h-320z" fill="var(--mint-deep)" className="ink-art" />
+      <g transform="translate(160 196) scale(0.82)">
+        <g className="anim-bob">
+          <Robot />
+        </g>
       </g>
-      <circle cx="236" cy="70" r="9" fill={t.a} />
-      <circle cx="276" cy="96" r="11" fill={t.b} />
-      <circle cx="252" cy="132" r="8" fill={t.a} />
-      <circle cx="296" cy="62" r="6" fill={t.a} />
+      <Tile x={58} y={70} ch="A" fill="var(--sun-soft)" r={-8} />
+      <Tile x={262} y={96} ch="词" fill="#fff" r={6} delay={0.9} />
+      <Sparkle x={86} y={140} delay={0.4} />
+      <Pin x={258} y={176} delay={0.3} />
     </svg>
   )
 }
 
-/** 游戏封面：游戏文件夹里有封面图（game.json 的 cover）就用它，否则用课程配色的通用图案 */
-export function GameCover({ game, tone, className }: { game: Game; tone: Course["tone"]; className?: string }) {
+const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+
+/** 游戏封面：游戏文件夹里有封面图（game.json 的 cover）就用它，否则画一张这节课颜色的机器人小图 */
+export function GameCover({ game, className }: { game: Game; tone?: Course["tone"]; className?: string }) {
   if (game.coverUrl) return <img src={game.coverUrl} alt="" className={className} style={{ objectFit: "cover" }} />
-  const t = TONES[tone]
+  const c = lessonColor(game.session)
+  const h = hash(game.slug)
+  const chars = ["A", "?", "!", "词", "AI", "你", "好", "★"]
+  const a = chars[h % chars.length]
+  const b = chars[(h >> 3) % chars.length]
+  const flip = h % 2 === 0
   return (
     <svg viewBox="0 0 320 180" className={className} preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">
-      <rect width="320" height="180" fill={t.bg} />
-      <rect x="60" y="48" width="120" height="84" rx="14" fill={t.c} />
-      <rect x="76" y="66" width="70" height="8" rx="4" fill={t.a} opacity="0.8" />
-      <rect x="76" y="82" width="88" height="8" rx="4" fill={t.a} opacity="0.35" />
-      <rect x="76" y="98" width="52" height="8" rx="4" fill={t.a} opacity="0.35" />
-      <circle cx="226" cy="90" r="34" fill={t.a} />
-      <path d="M216 76 l26 14 l-26 14 z" fill={t.c} />
-      <circle cx="262" cy="52" r="10" fill={t.b} />
+      <rect width="320" height="180" fill={c.soft} />
+      <circle cx={flip ? 70 : 250} cy="40" r="56" fill="#fff" opacity="0.5" />
+      <path d="M0 158 q80 -22 160 -6 t160 -6 v40 h-320z" fill={c.strong} className="ink-art" />
+      <g transform={`translate(${flip ? 196 : 124} 160) scale(0.66)`}>
+        <Robot screen={c.screen} wave={h % 3 !== 0} />
+      </g>
+      <Tile x={flip ? 70 : 250} y={70} ch={a} fill="#fff" r={-6} delay={(h % 5) * 0.3} />
+      <Tile x={flip ? 112 : 208} y={124} ch={b} fill="var(--cream)" r={8} delay={1 + (h % 3) * 0.4} />
+      <Sparkle x={flip ? 280 : 40} y={36} delay={h % 2} />
     </svg>
   )
 }

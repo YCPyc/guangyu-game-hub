@@ -75,6 +75,7 @@ for (const slug of slugs) {
   if (!/<html[^>]*\slang=["']zh-CN["']/i.test(html)) fail(slug, 'index.html: <html> must have lang="zh-CN"')
   if (!html.includes('id="game-i18n"')) fail(slug, 'index.html: needs the language block from games/_template (<script id="game-i18n">)')
   if (!html.includes('id="game-en"') || !/window\.GAME_EN\s*=\s*\{/.test(html)) fail(slug, 'index.html: needs an English dictionary (<script id="game-en">window.GAME_EN = {...})')
+  if (!html.includes('<style id="game-theme">')) fail(slug, 'index.html: needs the shared look from games/_template (<style id="game-theme">), placed after the game\'s own styles')
   // Text in CSS (content: "…") isn't on the page, so the translator can't reach it.
   const css = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join("").replace(/\/\*[\s\S]*?\*\//g, "")
   for (const [, selector] of css.matchAll(/([^{}]+)\{[^{}]*content:\s*"[^"]*[\u4e00-\u9fff][^"]*"[^{}]*\}/g)) {

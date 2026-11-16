@@ -1,17 +1,7 @@
-import { Clock, Download, Play, Presentation } from "lucide-react"
+import { ArrowLeft, Clock, Play, Presentation } from "lucide-react"
 import { Link, useParams, useSearchParams } from "react-router"
-import { CourseCover, GameCover } from "@/components/cover-art"
-import { Badge } from "@/components/ui/badge"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Pin, Robot, Squiggle, Wave } from "@/components/art"
+import { GameCover, lessonColor } from "@/components/cover-art"
 import { gamesFor, getCourse } from "@/data/catalog"
 import { localizeCourse, localizeGame, useI18n } from "@/lib/i18n"
 import { NotFoundPage } from "@/pages/not-found"
@@ -32,139 +22,151 @@ export function ClassPage() {
       ? requested
       : (games[0]?.session ?? 1)
   const lessonGames = games.filter((g) => g.session === lesson)
+  const color = lessonColor(lesson)
 
   return (
     <>
-      <section className="border-b bg-card">
-        <div className="mx-auto max-w-6xl px-5 py-8 sm:py-12">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/">{t.allCourses}</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{course.title}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="mt-8 grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">{course.source}</Badge>
-                <span className="text-sm text-muted-foreground">{course.altTitle}</span>
-              </div>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{course.title}</h1>
-              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{course.summary}</p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {t.courseMeta(course.grades, course.sessions.length, games.length)}
-              </p>
-            </div>
-            <CourseCover tone={course.tone} className="hidden w-full rounded-2xl border md:block" />
-          </div>
+      <section className="mx-auto flex max-w-6xl items-center gap-6 px-4 pt-6 sm:px-5 sm:pt-10">
+        <div className="anim-pop min-w-0 flex-1">
+          <Link to="/" className="inline-flex items-center gap-1.5 rounded-full px-1 py-1 font-semibold text-ink/70 hover:text-primary">
+            <ArrowLeft className="size-5" /> {t.allCourses}
+          </Link>
+          <p className="mt-4 text-sm font-semibold text-ink/60">
+            {course.altTitle} · {course.source} · {course.grades}
+          </p>
+          <h1 className="display mt-2 text-4xl leading-tight sm:text-6xl">{course.title}</h1>
         </div>
+        <svg viewBox="-90 -195 180 200" className="hidden h-44 shrink-0 md:block" aria-hidden="true">
+          <g className="anim-bob">
+            <Robot />
+          </g>
+        </svg>
       </section>
 
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-5 py-12 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside>
-          <h2 className="text-sm font-semibold text-muted-foreground">{t.courseOutline}</h2>
-          <ol className="mt-4 flex flex-col">
+      {/* 课程地图：每节课一个站点，点一下只看这节课的游戏 */}
+      <section className="mx-auto mt-8 max-w-6xl px-4 sm:px-5">
+        <div className="chunky px-4 pt-6 pb-6 sm:px-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 className="display text-2xl sm:text-3xl">
+              {t.courseMapTitle} <span className="ml-1 text-sm font-bold tracking-[0.2em] text-ink/50 uppercase">{t.courseMapLabel}</span>
+            </h2>
+            <p className="font-medium text-ink/60">👆 {t.courseMapHint}</p>
+          </div>
+          <ol className="relative mt-4 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-4">
+            <span
+              aria-hidden="true"
+              className="absolute top-[98px] right-[12%] left-[12%] hidden border-t-[3px] border-dashed border-ink/30 sm:block"
+            />
             {course.sessions.map((s, i) => {
               const n = i + 1
               const count = games.filter((g) => g.session === n).length
               const active = n === lesson
+              const c = lessonColor(n)
               return (
-                <li key={s}>
+                <li key={s} className="relative">
                   <button
                     type="button"
                     aria-current={active ? "true" : undefined}
                     onClick={() => setParams({ lesson: String(n) }, { replace: true })}
-                    className={`flex w-full gap-3 border-l-2 py-2.5 pr-2 pl-4 text-left focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${
-                      active ? "border-primary bg-accent" : "hover:bg-muted"
-                    }`}
+                    className="group flex w-full flex-col items-center rounded-2xl px-1 pt-16 pb-2 text-center focus-visible:ring-4 focus-visible:ring-ring/40 focus-visible:outline-none"
                   >
+                    {active ? (
+                      <svg key={lesson} viewBox="-20 -52 40 56" className="absolute top-1 left-1/2 h-11 -translate-x-1/2" aria-hidden="true">
+                        <Pin x={0} y={0} fill="var(--coral)" />
+                      </svg>
+                    ) : null}
                     <span
-                      className={`text-sm font-semibold whitespace-nowrap tabular-nums ${
-                        active ? "text-accent-foreground" : "text-muted-foreground"
+                      className={`display relative flex size-16 items-center justify-center rounded-full border-[2.5px] border-ink text-3xl transition-transform sm:size-[4.5rem] ${
+                        active ? "shadow-[0_3px_0_0_var(--ink)]" : "group-hover:-translate-y-1"
                       }`}
+                      style={{ background: active ? c.strong : c.soft }}
                     >
-                      {t.sessionNumber(n)}
+                      {active ? (
+                        <span aria-hidden="true" className="anim-spin-slow absolute -inset-2 rounded-full border-[2.5px] border-dashed border-coral" />
+                      ) : null}
+                      {n}
                     </span>
-                    <span className={`flex-1 text-sm ${active ? "font-medium text-accent-foreground" : ""}`}>
-                      {s}
-                      <span
-                        className={`mt-0.5 block text-xs font-normal ${count > 0 ? "text-primary" : "text-muted-foreground"}`}
-                      >
-                        {count > 0 ? t.sessionGames(count) : t.gamesInProgress}
-                      </span>
+                    <span className={`mt-3 text-base leading-snug sm:text-lg ${active ? "font-bold" : "font-medium text-ink/80"}`}>{s}</span>
+                    <span
+                      className={`mt-1.5 rounded-full px-2.5 py-0.5 text-sm font-semibold ${count > 0 ? "border-2 border-ink" : "text-ink/50"}`}
+                      style={count > 0 ? { background: c.soft } : undefined}
+                    >
+                      {count > 0 ? t.sessionGames(count) : t.gamesInProgress}
                     </span>
                   </button>
                 </li>
               )
             })}
           </ol>
-        </aside>
+        </div>
+      </section>
 
-        <section>
-          <p className="text-sm font-medium text-primary">{t.sessionNumber(lesson)}</p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight">{course.sessions[lesson - 1]}</h2>
-          {lessonGames.length === 0 ? (
-            <p className="mt-6 rounded-xl border border-dashed px-5 py-10 text-center text-muted-foreground">{t.noGamesYet}</p>
-          ) : null}
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {lessonGames.map((game) => {
-              const g = localizeGame(game, lang)
-              return (
-                // Every row below has a fixed height, so the same content lines up across all cards.
-                <Card key={g.slug} className="gap-0 py-0">
-                  <GameCover game={g} tone={course.tone} className="aspect-video w-full border-b" />
-                  <CardHeader className="pt-5">
-                    <CardTitle className="truncate text-xl" title={g.title}>
-                      {g.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-3 min-h-[4.875em] text-sm leading-relaxed" title={g.summary}>
-                      {g.summary}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 pt-4 pb-5">
-                    <div className="flex h-[3.25rem] flex-wrap content-start gap-1.5 overflow-hidden">
-                      {g.concepts.map((k) => (
-                        <Badge key={k} variant="outline">
-                          {k}
-                        </Badge>
-                      ))}
+      <section className="mt-12">
+        <Wave fill={color.soft} />
+        <div className="pb-14" style={{ background: color.soft }}>
+          <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-5">
+            <p className="display text-xl text-ink/70">{t.sessionNumber(lesson)}</p>
+            <h2 className="display mt-1 text-3xl sm:text-4xl">{course.sessions[lesson - 1]}</h2>
+            <Squiggle className="mt-2 text-ink/40" />
+
+            {lessonGames.length === 0 ? (
+              <div className="chunky mt-8 flex flex-col items-center px-6 py-10 text-center">
+                <svg viewBox="-90 -195 180 200" className="h-32" aria-hidden="true">
+                  <g className="anim-bob">
+                    <Robot wave={false} />
+                  </g>
+                </svg>
+                <p className="display mt-4 text-2xl">{t.noGamesYet}</p>
+              </div>
+            ) : null}
+
+            <div key={lesson} className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {lessonGames.map((game, i) => {
+                const g = localizeGame(game, lang)
+                return (
+                  // Every row below has a fixed height, so the same content lines up across all cards.
+                  <article key={g.slug} className="chunky lift anim-pop flex flex-col overflow-hidden" style={{ animationDelay: `${i * 0.08}s` }}>
+                    <a href={g.href} tabIndex={-1} aria-hidden="true">
+                      <GameCover game={game} className="aspect-video w-full border-b-[2.5px] border-ink" />
+                    </a>
+                    <div className="flex flex-1 flex-col px-5 pt-5">
+                      <h3 className="display truncate text-2xl" title={g.title}>
+                        {g.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-3 min-h-[4.875em] leading-relaxed text-ink/75" title={g.summary}>
+                        {g.summary}
+                      </p>
+                      <div className="mt-4 flex h-[4.25rem] flex-wrap content-start gap-1.5 overflow-hidden">
+                        {g.concepts.map((k) => (
+                          <span key={k} className="rounded-full border-2 border-ink px-2.5 py-0.5 text-sm font-semibold" style={{ background: color.soft }}>
+                            {k}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-3 flex flex-col gap-1.5 text-sm font-medium text-ink/65">
+                        <span className="flex items-center gap-2">
+                          <Clock className="size-4 shrink-0" /> {g.minutes}
+                        </span>
+                        <span className="flex items-center gap-2" title={g.format}>
+                          <Presentation className="size-4 shrink-0" /> <span className="truncate">{g.format}</span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="mt-3 flex flex-col gap-1.5 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-2">
-                        <Clock className="size-4 shrink-0" /> {g.minutes}
-                      </span>
-                      <span className="flex items-center gap-2" title={g.format}>
-                        <Presentation className="size-4 shrink-0" /> <span className="truncate">{g.format}</span>
-                      </span>
+                    <div className="mt-5 px-5 pb-5">
+                      <a
+                        href={g.href}
+                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-coral px-5 text-lg font-bold whitespace-nowrap text-white shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
+                      >
+                        <Play className="size-5 fill-current" /> {t.startGame}
+                      </a>
                     </div>
-                  </CardContent>
-                  <CardFooter className="flex flex-wrap gap-2 border-t bg-muted/40 py-4">
-                    <Button asChild size="lg">
-                      <a href={g.href}>
-                        <Play /> {t.startGame}
-                      </a>
-                    </Button>
-                    <Button asChild size="lg" variant="outline">
-                      <a href={g.href} download={`光语-${game.title}.html`}>
-                        <Download /> {t.downloadOffline}
-                      </a>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              )
-            })}
+                  </article>
+                )
+              })}
+            </div>
           </div>
-          <p className="mt-6 text-sm text-muted-foreground">{t.offlineNote}</p>
-        </section>
-      </div>
+        </div>
+      </section>
     </>
   )
 }
