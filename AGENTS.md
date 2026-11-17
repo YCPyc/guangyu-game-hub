@@ -64,8 +64,9 @@ Checked automatically by `npm run validate` (`scripts/validate-games.mjs`):
 - One self-contained `index.html`: all HTML, CSS, JS and data inline. Only `index.html`, `game.json`
   and an optional cover image in the folder.
 - **No external resources and no network calls.** No CDNs, no Google Fonts, no external images,
-  no `fetch`/XHR/WebSocket, no AI APIs. Foreign CDNs are blocked or slow in China, and classrooms are
-  often offline. Teachers also download the file and send it over WeChat — it must work by double-click.
+  no `fetch`/`sendBeacon`/XHR/WebSocket, no AI APIs. Foreign CDNs are blocked or slow in China, and
+  classrooms are often offline. A copy saved to disk must still work by double-click. The only exception
+  is the shared analytics block below, which sends nothing when offline or opened from disk.
 - `<html lang="zh-CN">`.
 - A back link to the hub: `<a class="back" href="/classes/<course id>">← 游戏大厅</a>`.
 - A 「老师说明」 button that opens a short teacher guide.
@@ -74,6 +75,8 @@ Checked automatically by `npm run validate` (`scripts/validate-games.mjs`):
   drifting clouds.
 - The language blocks from the template: `<script id="game-en">` (this game's English dictionary) and
   `<script id="game-i18n">` (the translator; copy it unchanged). See "Translating a game" below.
+- The anonymous-analytics block from the template: `<script id="game-analytics">`, copied **unchanged**
+  (the validator compares it with the template). See "Analytics" below.
 - `game.json` fields valid; `course` exists; `session` is in range; summaries within the length limits.
   Under 3 MB.
 
@@ -100,6 +103,27 @@ Not machine-checked, but required:
 - Content must be original and age-appropriate. Any example phone numbers, addresses, URLs or "AI outputs"
   are clearly fictional. When simplifying how AI works, say so honestly in the UI
   (e.g. "这是一个简化版……真正的 AI……").
+
+## Analytics
+
+The hub and the games send anonymous usage events to PostHog so the team can see which games get used,
+how far classes get, and whether teachers find them easy. Nothing identifies a student, a teacher or a
+class: never add names, class names, head counts or typed text to an event.
+
+- **Hub** (`posthog-js`, set up in `src/main.tsx`): `course_selected`, `lesson_selected`, `game_started`,
+  `language_changed`, plus page views. Every event carries `app: "hub"` and `language`.
+- **Games** (the `game-analytics` block): `game_opened`, `game_step_reached`, `game_completed`,
+  `teacher_guide_opened`, `results_exported`, `game_closed` (seconds on screen, furthest step, completed)
+  and `game_rated` (the teacher's 👍/👎, offered after the last step). Every event carries `app: "game"`,
+  `game_slug`, `course_id`, `lesson_number` and `language`, and the same anonymous ID as the hub.
+- **Steps**: a game with a step bar (`.steps .step` / `.stepper .step-btn` with `.active` on the current
+  one) is tracked automatically. A game without one calls `window.gameTrack?.step(current, total)`
+  whenever the stage changes; reaching `total` counts as completing the game. Make the results screen
+  the last step.
+- **Configuration**: the build fills in the PostHog token, host, slug, course and lesson where the block
+  says `/*GAME_ANALYTICS_CONFIG*/null` (`vite.config.ts`). The token and host come from
+  `VITE_PUBLIC_POSTHOG_PROJECT_TOKEN` and `VITE_PUBLIC_POSTHOG_HOST` (see `.env.example`; in CI, the
+  `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST` repository variables). Without them nothing is sent.
 
 ## Translating a game
 

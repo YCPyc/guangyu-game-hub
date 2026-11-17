@@ -1,4 +1,5 @@
 import { Languages } from "lucide-react"
+import { usePostHog } from "@posthog/react"
 import { Link, Outlet } from "react-router"
 import { Robot, SkyLayer, Wave } from "@/components/art"
 import { useI18n } from "@/lib/i18n"
@@ -14,7 +15,15 @@ function Logo() {
 }
 
 export function SiteLayout() {
-  const { t, toggle } = useI18n()
+  const { lang, t, toggle } = useI18n()
+  const posthog = usePostHog()
+
+  const handleLanguageChange = () => {
+    const nextLanguage = lang === "zh" ? "en" : "zh"
+    posthog.capture("language_changed", { language: nextLanguage })
+    toggle()
+  }
+
   return (
     <div className="relative isolate flex min-h-dvh flex-col">
       <SkyLayer />
@@ -30,7 +39,7 @@ export function SiteLayout() {
             </Link>
             <button
               type="button"
-              onClick={toggle}
+              onClick={handleLanguageChange}
               aria-label={t.switchLabel}
               className="flex h-11 items-center gap-2 rounded-full border-[2.5px] border-ink bg-white px-4 font-semibold shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
             >

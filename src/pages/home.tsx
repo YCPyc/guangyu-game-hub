@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { ArrowDown, ArrowRight, Download, MonitorPlay, MousePointerClick } from "lucide-react"
+import { usePostHog } from "@posthog/react"
 import { Link } from "react-router"
 import { Bubble, HeroScene, Squiggle, Wave } from "@/components/art"
 import { CourseCover } from "@/components/cover-art"
@@ -14,6 +15,7 @@ const STEP_ICONS = [
 
 export function HomePage() {
   const { lang, t } = useI18n()
+  const posthog = usePostHog()
   return (
     <>
       <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-4 px-4 pt-8 sm:px-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:pt-12">
@@ -70,6 +72,13 @@ export function HomePage() {
                   <li key={c.id}>
                     <Link
                       to={`/classes/${c.id}`}
+                      onClick={() => {
+                        posthog.capture("course_selected", {
+                          course_id: c.id,
+                          course_session_count: c.sessions.length,
+                          course_game_count: games,
+                        })
+                      }}
                       className="chunky group grid grid-cols-1 overflow-hidden focus-visible:ring-4 focus-visible:ring-ring/40 focus-visible:outline-none md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
                     >
                       <CourseCover className="aspect-[16/10] h-full w-full border-b-[2.5px] border-ink md:aspect-auto md:border-r-[2.5px] md:border-b-0" />
