@@ -3,15 +3,11 @@ import { usePostHog } from "@posthog/react"
 import { Link, Outlet } from "react-router"
 import { Robot, SkyLayer, Wave } from "@/components/art"
 import { useI18n } from "@/lib/i18n"
+import springLogo from "@/assets/spring-foundation-logo.png"
 
 function Logo() {
-  return (
-    <svg viewBox="0 0 40 40" className="size-10 shrink-0 transition-transform group-hover:-rotate-6" aria-hidden="true">
-      <rect x="2" y="2" width="36" height="36" rx="12" fill="#1769b5" stroke="var(--ink)" strokeWidth="2.5" />
-      <path d="M11 26c3-7 15-7 18 0" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="20" cy="14" r="4" fill="var(--sun)" stroke="var(--ink)" strokeWidth="2" />
-    </svg>
-  )
+  // Spring Foundation 的标志（光语所属的机构）
+  return <img src={springLogo} alt="Spring Foundation" className="size-16 shrink-0 object-contain transition-transform group-hover:-rotate-6" />
 }
 
 export function SiteLayout() {
