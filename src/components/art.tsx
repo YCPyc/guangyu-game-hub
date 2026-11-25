@@ -6,7 +6,7 @@ import { cn } from "cn"
 const INK = "var(--ink)"
 
 /** 小机器人吉祥物。原点在两脚中间，高约 180。 */
-export function Robot({ wave = true, screen = "#1f7a68" }: { wave?: boolean; screen?: string }) {
+export function Robot({ wave = true, screen = "#1769b5" }: { wave?: boolean; screen?: string }) {
   return (
     <g className="ink-art">
       <line x1="0" y1="-150" x2="0" y2="-168" />
@@ -190,7 +190,7 @@ export function HeroScene({ hello, className }: { hello: string; className?: str
         {[420, 528].map((x) => (
           <rect key={x} x={x} y="298" width="38" height="34" rx="6" fill="var(--sky)" />
         ))}
-        <path d="M474 372 v-56 a21 21 0 0 1 42 0 v56z" fill="#1f7a68" />
+        <path d="M474 372 v-56 a21 21 0 0 1 42 0 v56z" fill="#1769b5" />
       </g>
 
       {/* 左边的小房子 */}
@@ -209,7 +209,7 @@ export function HeroScene({ hello, className }: { hello: string; className?: str
       <Tree x={612} y={452} s={0.8} delay={2} />
 
       <Pin x={134} y={228} delay={0.2} />
-      <Pin x={600} y={214} fill="#1f7a68" delay={0.5} />
+      <Pin x={600} y={214} fill="#1769b5" delay={0.5} />
 
       {/* 机器人和举手的同学 */}
       <g transform="translate(300 470)">

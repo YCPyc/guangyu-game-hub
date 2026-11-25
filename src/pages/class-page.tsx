@@ -92,7 +92,7 @@ export function ClassPage() {
                   >
                     {active ? (
                       <svg key={lesson} viewBox="-20 -52 40 56" className="absolute top-1 left-1/2 h-11 -translate-x-1/2" aria-hidden="true">
-                        <Pin x={0} y={0} fill="var(--coral)" />
+                        <Pin x={0} y={0} fill="var(--primary)" />
                       </svg>
                     ) : null}
                     <span
@@ -102,7 +102,7 @@ export function ClassPage() {
                       style={{ background: active ? c.strong : c.soft }}
                     >
                       {active ? (
-                        <span aria-hidden="true" className="anim-spin-slow absolute -inset-2 rounded-full border-[2.5px] border-dashed border-coral" />
+                        <span aria-hidden="true" className="anim-spin-slow absolute -inset-2 rounded-full border-[2.5px] border-dashed border-primary" />
                       ) : null}
                       {n}
                     </span>
@@ -176,7 +176,7 @@ export function ClassPage() {
                       <a
                         href={g.href}
                         onClick={() => handleGameStart(g.slug, "button")}
-                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-coral px-5 text-lg font-bold whitespace-nowrap text-white shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
+                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-primary px-5 text-lg font-bold whitespace-nowrap text-white shadow-[0_4px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
                       >
                         <Play className="size-5 fill-current" /> {t.startGame}
                       </a>

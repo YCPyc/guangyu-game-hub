@@ -8,9 +8,9 @@ import { COURSES, gamesFor } from "@/data/catalog"
 import { localizeCourse, useI18n } from "@/lib/i18n"
 
 const STEP_ICONS = [
-  { Icon: MousePointerClick, fill: "var(--sun-soft)" },
-  { Icon: MonitorPlay, fill: "var(--sky)" },
-  { Icon: Download, fill: "var(--coral-soft)" },
+  { Icon: MousePointerClick, fill: "var(--mint)" },
+  { Icon: MonitorPlay, fill: "var(--aqua)" },
+  { Icon: Download, fill: "var(--sky)" },
 ]
 
 export function HomePage() {
@@ -32,7 +32,7 @@ export function HomePage() {
           <p className="mt-8 max-w-lg text-xl leading-relaxed text-ink/80">{t.heroLead}</p>
           <a
             href="#courses"
-            className="mt-8 inline-flex h-14 items-center gap-2 rounded-full border-[2.5px] border-ink bg-coral px-7 text-lg font-bold text-white shadow-[0_5px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
+            className="mt-8 inline-flex h-14 items-center gap-2 rounded-full border-[2.5px] border-ink bg-primary px-7 text-lg font-bold text-white shadow-[0_5px_0_0_var(--ink)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
           >
             {t.heroCta} <ArrowDown className="size-5" />
           </a>
@@ -58,8 +58,8 @@ export function HomePage() {
       </ol>
 
       <section id="courses" className="mt-16 scroll-mt-20">
-        <Wave fill="var(--sun-soft)" />
-        <div className="bg-sun-soft pb-16">
+        <Wave fill="var(--mint)" />
+        <div className="bg-mint pb-16">
           <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-5">
             <h2 className="display text-4xl sm:text-5xl">{t.coursesHeading}</h2>
             <p className="mt-1 text-sm font-bold tracking-[0.2em] text-ink/60 uppercase">{t.coursesLabel}</p>
@@ -90,10 +90,10 @@ export function HomePage() {
                         <p className="mt-3 line-clamp-2 text-lg text-ink/75">{c.summary}</p>
                         <div className="mt-5 mb-auto flex flex-wrap gap-2">
                           <Chip fill="var(--mint)">{c.grades}</Chip>
-                          <Chip fill="var(--sky)">
+                          <Chip fill="var(--aqua)">
                             <b className="text-lg">{c.sessions.length}</b> {t.lessonsLabel}
                           </Chip>
-                          <Chip fill="var(--coral-soft)">
+                          <Chip fill="var(--sky)">
                             <b className="text-lg">{games}</b> {t.gamesLabel}
                           </Chip>
                         </div>

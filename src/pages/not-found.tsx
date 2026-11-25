@@ -8,10 +8,10 @@ export function NotFoundPage() {
     <div className="mx-auto flex max-w-6xl flex-col items-center px-5 py-20 text-center">
       <svg viewBox="-90 -195 180 200" className="h-40" aria-hidden="true">
         <g className="anim-bob">
-          <Robot screen="#c2492a" wave={false} />
+          <Robot screen="#1769b5" wave={false} />
         </g>
       </svg>
-      <p className="display mt-6 text-6xl text-coral">404</p>
+      <p className="display mt-6 text-6xl text-primary">404</p>
       <h1 className="display mt-2 text-3xl">{t.notFoundTitle}</h1>
       <p className="mt-2 text-lg text-ink/70">{t.notFoundText}</p>
       <Link

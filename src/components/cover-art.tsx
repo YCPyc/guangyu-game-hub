@@ -1,12 +1,12 @@
 import type { Course, Game } from "@/data/catalog"
 import { Pin, Robot, Sparkle, Tile } from "@/components/art"
 
-// 每节课一个颜色，课程地图、游戏封面和标签都用它（第 5 节以后循环使用）
+// 每节课一个颜色（都在蓝色系里），课程地图、游戏封面和标签都用它（第 5 节以后循环使用）
 export const LESSON_COLORS = [
-  { soft: "var(--mint)", strong: "var(--mint-deep)", screen: "#1f7a68" },
-  { soft: "var(--sun-soft)", strong: "var(--sun)", screen: "#c27a12" },
-  { soft: "var(--coral-soft)", strong: "var(--coral)", screen: "#c2492a" },
-  { soft: "var(--sky)", strong: "var(--sky-deep)", screen: "#2f6f95" },
+  { soft: "var(--mint)", strong: "var(--mint-deep)", screen: "#1769b5" },
+  { soft: "var(--aqua)", strong: "var(--aqua-deep)", screen: "#13808c" },
+  { soft: "var(--sky)", strong: "var(--sky-deep)", screen: "#3b5bb5" },
+  { soft: "var(--lilac)", strong: "var(--lilac-deep)", screen: "#5b45a8" },
 ]
 export const lessonColor = (session: number) => LESSON_COLORS[(session - 1) % LESSON_COLORS.length]
 
